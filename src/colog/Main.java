@@ -5,6 +5,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.*;
 import java.io.*;
+import java.util.List;
 
 public class Main {
     private static File lastDir;
@@ -31,6 +32,27 @@ public class Main {
 
         menuBar.add(fileMenu);
         frame.setJMenuBar(menuBar);
+
+        JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+
+        ConversationPanel c1 = new ConversationPanel("Conversation A", List.of(
+                new ExchangePanel("10:00", "Prompt about feature A", "tag1, tag2"),
+                new ExchangePanel("10:05", "Response summary A", "tag2")
+        ));
+
+        ConversationPanel c2 = new ConversationPanel("Conversation B", List.of(
+                new ExchangePanel("11:00", "Another prompt", "tagX"),
+                new ExchangePanel("11:05", "Another response", "tagY"),
+                new ExchangePanel("11:10", "Follow up question", "tagZ")
+        ));
+
+        container.add(c1);
+        container.add(Box.createRigidArea(new Dimension(0, 10)));
+        container.add(c2);
+
+        JScrollPane scrollPane = new JScrollPane(container);
+        frame.setContentPane(scrollPane);
 
         frame.setVisible(true);
     }
