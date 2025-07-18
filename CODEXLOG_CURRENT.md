@@ -18,3 +18,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507182050][b15314][FTR][REF] Added toggleable expand/collapse behavior in ExchangePanel
 [2507182159][c08061][FTR][REF] Refined ExchangePanel expand/collapse handling
 [2507182311][8dff0d][FTR][REF] Grouped exchanges under conversation panels
+[2507182317][924969e][FTR][REF] Preserved expand state and scroll position

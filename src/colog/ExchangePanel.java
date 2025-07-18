@@ -21,14 +21,19 @@ public class ExchangePanel extends JPanel {
     private final JTextArea responseArea;
     private final JLabel expandLabel;
     private boolean isExpanded = false;
+    private Exchange exchange;
 
     public ExchangePanel(Exchange ex) {
         this(ex.timestamp, ex.prompt, ex.response, String.join(", ", ex.tags));
+        this.exchange = ex;
+        this.isExpanded = ex.isExpanded;
+        updateLayout();
     }
 
-    public ExchangePanel(String timestamp, String prompt, String response, String tags) {
+    private ExchangePanel(String timestamp, String prompt, String response, String tags) {
         this.promptText = prompt == null ? "" : prompt;
         this.responseText = response == null ? "" : response;
+        this.exchange = null;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(new LineBorder(Color.LIGHT_GRAY));
@@ -124,8 +129,19 @@ public class ExchangePanel extends JPanel {
     }
 
     private void toggleExpanded() {
+        JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+        JScrollBar bar = pane == null ? null : pane.getVerticalScrollBar();
+        int val = bar == null ? 0 : bar.getValue();
+
         isExpanded = !isExpanded;
+        if (exchange != null) {
+            exchange.isExpanded = isExpanded;
+        }
         updateHeights();
         updateLayout();
+
+        if (bar != null) {
+            bar.setValue(val);
+        }
     }
 }
