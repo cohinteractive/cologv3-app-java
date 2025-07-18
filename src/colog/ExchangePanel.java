@@ -22,6 +22,10 @@ public class ExchangePanel extends JPanel {
     private final JLabel expandLabel;
     private boolean isExpanded = false;
 
+    public ExchangePanel(Exchange ex) {
+        this(ex.timestamp, ex.prompt, ex.response, String.join(", ", ex.tags));
+    }
+
     public ExchangePanel(String timestamp, String prompt, String response, String tags) {
         this.promptText = prompt == null ? "" : prompt;
         this.responseText = response == null ? "" : response;

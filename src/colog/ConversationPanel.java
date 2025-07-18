@@ -1,26 +1,26 @@
 package colog;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.util.List;
 
 /**
- * Container for multiple ExchangePanels representing a conversation.
+ * Displays a conversation title followed by its exchange panels.
  */
 public class ConversationPanel extends JPanel {
-    public ConversationPanel(String title, List<ExchangePanel> exchanges) {
+    public ConversationPanel(Conversation conversation) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(new LineBorder(Color.DARK_GRAY));
-        setAlignmentX(LEFT_ALIGNMENT);
 
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        JLabel titleLabel = new JLabel(conversation.title);
+        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 16f));
         add(titleLabel);
 
-        for (ExchangePanel ex : exchanges) {
-            add(ex);
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        add(separator);
+
+        for (Exchange ex : conversation.exchanges) {
+            add(new ExchangePanel(ex));
         }
+
+        setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
     }
 }
