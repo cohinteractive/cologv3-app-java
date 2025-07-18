@@ -60,11 +60,14 @@ public class Main {
             }
             try {
                 Conversation conv = ConversationLoader.parseConversationFromFile(selected);
+                JScrollBar bar = scrollPane.getVerticalScrollBar();
+                int val = bar.getValue();
                 container.removeAll();
                 container.add(new ConversationPanel(conv));
                 container.revalidate();
                 container.repaint();
                 scrollPane.revalidate();
+                bar.setValue(val);
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(parent, "Error reading file: " + ex.getMessage(),
                         "Read Error", JOptionPane.ERROR_MESSAGE);

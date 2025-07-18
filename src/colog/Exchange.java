@@ -9,6 +9,7 @@ public class Exchange {
     public String response;
     public List<String> tags = new ArrayList<>();
     public String summary;
+    public boolean isExpanded = false;
 
     public Exchange(String timestamp, String prompt, String response) {
         this.timestamp = timestamp;
