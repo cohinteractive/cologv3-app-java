@@ -16,3 +16,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507181001][92718e8][FTR] Parsed mapping to build conversation exchanges
 [2507182035][d7103e5][FTR][REF] Finalized message parsing into exchanges
 [2507182050][b15314][FTR][REF] Added toggleable expand/collapse behavior in ExchangePanel
+[2507182159][c08061][FTR][REF] Refined ExchangePanel expand/collapse handling
