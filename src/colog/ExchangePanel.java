@@ -15,11 +15,12 @@ public class ExchangePanel extends JPanel {
     private final String promptText;
     private final String responseText;
 
+    private final JTextArea summaryArea;
     private final JTextArea promptArea;
     private final JTextArea responseArea;
     private final JLabel expandLabel;
     private final int lineHeight;
-    private boolean expanded = false;
+    private boolean isExpanded = false;
 
     public ExchangePanel(String timestamp, String prompt, String response, String tags) {
         this.promptText = prompt == null ? "" : prompt;
@@ -32,17 +33,39 @@ public class ExchangePanel extends JPanel {
         JTextArea metricsArea = new JTextArea();
         lineHeight = metricsArea.getFontMetrics(metricsArea.getFont()).getHeight();
 
+        JPanel leftPanel = new JPanel();
+        leftPanel.setOpaque(false);
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.X_AXIS));
+
+        expandLabel = new JLabel("\u2BC8");
+        expandLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        expandLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        expandLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                toggleExpanded();
+            }
+        });
+        leftPanel.add(expandLabel);
+
         JLabel timeLabel = new JLabel(timestamp);
         timeLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        add(timeLabel, BorderLayout.WEST);
+        leftPanel.add(timeLabel);
+        add(leftPanel, BorderLayout.WEST);
 
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setOpaque(false);
 
-        promptArea = createArea("");
+        summaryArea = createArea(firstLine(promptText));
+        textPanel.add(summaryArea);
+
+        promptArea = createArea(promptText);
+        promptArea.setVisible(false);
         textPanel.add(promptArea);
+
         responseArea = createArea(responseText);
+        responseArea.setVisible(false);
         textPanel.add(responseArea);
 
         add(textPanel, BorderLayout.CENTER);
@@ -55,20 +78,11 @@ public class ExchangePanel extends JPanel {
         tagsLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         rightPanel.add(tagsLabel);
 
-        expandLabel = new JLabel("\u2BC8");
-        expandLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 5));
-        expandLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        expandLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                toggleExpanded();
-            }
-        });
-        rightPanel.add(expandLabel);
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 
         add(rightPanel, BorderLayout.EAST);
 
-        collapse();
+        updateLayout();
     }
 
     private JTextArea createArea(String text) {
@@ -96,32 +110,22 @@ public class ExchangePanel extends JPanel {
         return lines;
     }
 
-    private void collapse() {
-        expanded = false;
-        promptArea.setText(firstLine(promptText));
-        responseArea.setVisible(false);
-        setPreferredSize(new Dimension(DEFAULT_WIDTH, lineHeight));
-        setMaximumSize(new Dimension(Integer.MAX_VALUE, lineHeight));
-        revalidate();
-    }
+    private void updateLayout() {
+        summaryArea.setVisible(!isExpanded);
+        promptArea.setVisible(isExpanded);
+        responseArea.setVisible(isExpanded);
+        expandLabel.setText(isExpanded ? "\u2BC6" : "\u2BC8");
 
-    private void expand() {
-        expanded = true;
-        promptArea.setText(promptText);
-        responseArea.setText(responseText);
-        responseArea.setVisible(true);
-        int lines = countLines(promptText) + countLines(responseText);
+        int lines = isExpanded ? countLines(promptText) + countLines(responseText) : 1;
         int height = lineHeight * lines;
         setPreferredSize(new Dimension(DEFAULT_WIDTH, height));
         setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
         revalidate();
+        repaint();
     }
 
     private void toggleExpanded() {
-        if (expanded) {
-            collapse();
-        } else {
-            expand();
-        }
+        isExpanded = !isExpanded;
+        updateLayout();
     }
 }
