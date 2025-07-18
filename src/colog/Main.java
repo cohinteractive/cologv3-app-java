@@ -59,7 +59,7 @@ public class Main {
                 return;
             }
             try {
-                Conversation conv = JsonParser.parseConversationFromFile(selected);
+                Conversation conv = ConversationLoader.parseConversationFromFile(selected);
                 container.removeAll();
                 for (Exchange ex : conv.exchanges) {
                     container.add(new ExchangePanel(ex.timestamp, ex.summary, String.join(", ", ex.tags)));
