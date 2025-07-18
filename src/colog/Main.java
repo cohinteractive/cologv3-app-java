@@ -62,7 +62,11 @@ public class Main {
                 Conversation conv = ConversationLoader.parseConversationFromFile(selected);
                 container.removeAll();
                 for (Exchange ex : conv.exchanges) {
-                    container.add(new ExchangePanel(ex.timestamp, ex.summary, String.join(", ", ex.tags)));
+                    container.add(new ExchangePanel(
+                            ex.timestamp,
+                            ex.prompt,
+                            ex.response,
+                            String.join(", ", ex.tags)));
                 }
                 container.revalidate();
                 container.repaint();
