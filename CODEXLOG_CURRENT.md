@@ -9,3 +9,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507172029][9b2e21][FTR] Added initial Swing app skeleton
 [2507172141][f62b84][FTR] Added Open menu with JSON preview
 [2507172329][1c9c44][FTR] Added scrollable conversation and exchange panels
+[2507180129][c4000c][FTR] Integrated JSON parser and dynamic row loading

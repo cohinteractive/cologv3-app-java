@@ -5,16 +5,19 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.*;
 import java.io.*;
-import java.util.List;
+
 
 public class Main {
     private static File lastDir;
+    private static JPanel container;
+    private static JScrollPane scrollPane;
+    private static JFrame frame;
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> createAndShowGUI());
     }
 
     private static void createAndShowGUI() {
-        JFrame frame = new JFrame("Colog V3");
+        frame = new JFrame("Colog V3");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setResizable(true);
@@ -33,25 +36,10 @@ public class Main {
         menuBar.add(fileMenu);
         frame.setJMenuBar(menuBar);
 
-        JPanel container = new JPanel();
+        container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        ConversationPanel c1 = new ConversationPanel("Conversation A", List.of(
-                new ExchangePanel("10:00", "Prompt about feature A", "tag1, tag2"),
-                new ExchangePanel("10:05", "Response summary A", "tag2")
-        ));
-
-        ConversationPanel c2 = new ConversationPanel("Conversation B", List.of(
-                new ExchangePanel("11:00", "Another prompt", "tagX"),
-                new ExchangePanel("11:05", "Another response", "tagY"),
-                new ExchangePanel("11:10", "Follow up question", "tagZ")
-        ));
-
-        container.add(c1);
-        container.add(Box.createRigidArea(new Dimension(0, 10)));
-        container.add(c2);
-
-        JScrollPane scrollPane = new JScrollPane(container);
+        scrollPane = new JScrollPane(container);
         frame.setContentPane(scrollPane);
 
         frame.setVisible(true);
@@ -70,24 +58,22 @@ public class Main {
                         "Invalid File", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            StringBuilder sb = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader(selected))) {
-                String line;
-                for (int i = 0; i < 10 && (line = reader.readLine()) != null; i++) {
-                    sb.append(line).append(System.lineSeparator());
+            try {
+                Conversation conv = JsonParser.parseConversationFromFile(selected);
+                container.removeAll();
+                for (Exchange ex : conv.exchanges) {
+                    container.add(new ExchangePanel(ex.timestamp, ex.summary, String.join(", ", ex.tags)));
                 }
+                container.revalidate();
+                container.repaint();
+                scrollPane.revalidate();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(parent, "Error reading file: " + ex.getMessage(),
                         "Read Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(parent, "Failed to parse JSON: " + ex.getMessage(),
+                        "Parse Error", JOptionPane.ERROR_MESSAGE);
             }
-
-            JTextArea area = new JTextArea(sb.toString(), 20, 60);
-            area.setEditable(false);
-            area.setCaretPosition(0);
-            JScrollPane scrollPane = new JScrollPane(area);
-            JOptionPane.showMessageDialog(parent, scrollPane, "File Preview",
-                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
