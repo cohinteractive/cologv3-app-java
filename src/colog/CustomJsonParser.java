@@ -14,36 +14,36 @@ public class CustomJsonParser {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                     .withZone(ZoneId.systemDefault());
 
+    private static class ParsedMessage {
+        String id;
+        String parentId;
+        String role;
+        String content;
+        long createTime;
+        List<String> children = new ArrayList<>();
+    }
+
     public static Conversation extractConversation(String rawJson) {
         String title = extractTitle(rawJson);
         Conversation conv = new Conversation(title == null ? "Untitled" : title);
 
         String mappingJson = extractMappingBlock(rawJson);
-        List<String> blocks = extractMessageBlocks(mappingJson);
+        Map<String, ParsedMessage> messages = parseMessages(mappingJson);
 
-        Map<String, String> blockById = new LinkedHashMap<>();
-        for (String b : blocks) {
-            String id = extractStringField(b, "id");
-            if (id != null) {
-                blockById.put(id, b);
-            }
-        }
+        for (ParsedMessage msg : messages.values()) {
+            if (!"user".equals(msg.role)) continue;
+            if (msg.children.isEmpty()) continue;
+            ParsedMessage child = messages.get(msg.children.get(0));
+            if (child == null) continue;
+            if (!"assistant".equals(child.role)) continue;
 
-        for (String b : blocks) {
-            String role = extractStringField(b, "role");
-            if (!"user".equals(role)) continue;
-            String prompt = extractPart0(b);
-            if (prompt == null || prompt.isEmpty()) continue;
+            String prompt = msg.content;
+            if (prompt == null || prompt.isBlank()) continue;
+            String response = child.content == null ? "" : child.content;
 
-            String childId = extractArrayFirst(b, "children");
-            if (childId == null) continue;
-            String childBlock = blockById.get(childId);
-            if (childBlock == null) continue;
-            String childRole = extractStringField(childBlock, "role");
-            if (!"assistant".equals(childRole)) continue;
-            String response = extractPart0(childBlock);
-            long time = extractLongField(b, "create_time");
-            String ts = TIME_FMT.format(Instant.ofEpochSecond(time));
+            String ts = msg.createTime > 0
+                    ? TIME_FMT.format(Instant.ofEpochSecond(msg.createTime))
+                    : "";
             conv.exchanges.add(new Exchange(ts, prompt, response));
         }
 
@@ -92,6 +92,26 @@ public class CustomJsonParser {
         return blocks;
     }
 
+    private static Map<String, ParsedMessage> parseMessages(String mappingBlock) {
+        List<String> blocks = extractMessageBlocks(mappingBlock);
+        Map<String, ParsedMessage> messages = new LinkedHashMap<>();
+        for (String b : blocks) {
+            String id = extractStringField(b, "id");
+            if (id == null) continue;
+
+            ParsedMessage pm = new ParsedMessage();
+            pm.id = id;
+            pm.parentId = extractStringField(b, "parent");
+            pm.role = extractStringField(b, "role");
+            pm.content = extractPart0(b);
+            pm.createTime = extractLongField(b, "create_time");
+            pm.children.addAll(extractArray(b, "children"));
+
+            messages.put(pm.id, pm);
+        }
+        return messages;
+    }
+
 
     private static String extractStringField(String json, String field) {
         int idx = json.indexOf("\"" + field + "\"");
@@ -136,6 +156,33 @@ public class CustomJsonParser {
         int q2 = json.indexOf('"', q1 + 1);
         if (q2 < 0) return null;
         return json.substring(q1 + 1, q2);
+    }
+
+    private static List<String> extractArray(String json, String field) {
+        List<String> result = new ArrayList<>();
+        int idx = json.indexOf("\"" + field + "\"");
+        if (idx < 0) return result;
+        int br = json.indexOf('[', idx);
+        if (br < 0) return result;
+        int end = br;
+        int depth = 0;
+        for (; end < json.length(); end++) {
+            char c = json.charAt(end);
+            if (c == '[') depth++;
+            if (c == ']') { depth--; if (depth == 0) break; }
+        }
+        if (end <= br) return result;
+        String arr = json.substring(br + 1, end);
+        int pos = 0;
+        while (true) {
+            int q1 = arr.indexOf('"', pos);
+            if (q1 < 0) break;
+            int q2 = arr.indexOf('"', q1 + 1);
+            if (q2 < 0) break;
+            result.add(arr.substring(q1 + 1, q2));
+            pos = q2 + 1;
+        }
+        return result;
     }
 
     private static String extractPart0(String json) {
