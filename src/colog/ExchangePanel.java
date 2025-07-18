@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
  */
 public class ExchangePanel extends JPanel {
     private static final int DEFAULT_WIDTH = 600;
+    private static final int PADDING = 10;
 
     private final String promptText;
     private final String responseText;
@@ -19,23 +20,18 @@ public class ExchangePanel extends JPanel {
     private final JTextArea promptArea;
     private final JTextArea responseArea;
     private final JLabel expandLabel;
-    private final int lineHeight;
     private boolean isExpanded = false;
 
     public ExchangePanel(String timestamp, String prompt, String response, String tags) {
         this.promptText = prompt == null ? "" : prompt;
         this.responseText = response == null ? "" : response;
 
-        setLayout(new BorderLayout());
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(new LineBorder(Color.LIGHT_GRAY));
 
-        // Create one area up-front to obtain font metrics for row height
-        JTextArea metricsArea = new JTextArea();
-        lineHeight = metricsArea.getFontMetrics(metricsArea.getFont()).getHeight();
-
-        JPanel leftPanel = new JPanel();
-        leftPanel.setOpaque(false);
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.X_AXIS));
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
+        header.setOpaque(false);
 
         expandLabel = new JLabel("\u2BC8");
         expandLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
@@ -46,42 +42,35 @@ public class ExchangePanel extends JPanel {
                 toggleExpanded();
             }
         });
-        leftPanel.add(expandLabel);
+        header.add(expandLabel);
 
         JLabel timeLabel = new JLabel(timestamp);
         timeLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        leftPanel.add(timeLabel);
-        add(leftPanel, BorderLayout.WEST);
+        header.add(timeLabel);
 
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setOpaque(false);
-
-        summaryArea = createArea(firstLine(promptText));
-        textPanel.add(summaryArea);
-
-        promptArea = createArea(promptText);
-        promptArea.setVisible(false);
-        textPanel.add(promptArea);
-
-        responseArea = createArea(responseText);
-        responseArea.setVisible(false);
-        textPanel.add(responseArea);
-
-        add(textPanel, BorderLayout.CENTER);
-
-        JPanel rightPanel = new JPanel();
-        rightPanel.setOpaque(false);
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.X_AXIS));
+        header.add(Box.createHorizontalGlue());
 
         JLabel tagsLabel = new JLabel(tags);
         tagsLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        rightPanel.add(tagsLabel);
+        header.add(tagsLabel);
+        header.setAlignmentX(LEFT_ALIGNMENT);
+        add(header);
 
-        rightPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        summaryArea = createArea(firstLine(promptText));
+        summaryArea.setAlignmentX(LEFT_ALIGNMENT);
+        add(summaryArea);
 
-        add(rightPanel, BorderLayout.EAST);
+        promptArea = createArea(promptText);
+        promptArea.setVisible(false);
+        promptArea.setAlignmentX(LEFT_ALIGNMENT);
+        add(promptArea);
 
+        responseArea = createArea(responseText);
+        responseArea.setVisible(false);
+        responseArea.setAlignmentX(LEFT_ALIGNMENT);
+        add(responseArea);
+
+        updateHeights();
         updateLayout();
     }
 
@@ -101,23 +90,29 @@ public class ExchangePanel extends JPanel {
         return idx >= 0 ? text.substring(0, idx) : text;
     }
 
-    private int countLines(String text) {
-        if (text == null || text.isEmpty()) return 1;
-        int lines = 1;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '\n') lines++;
-        }
-        return lines;
+    private int getAreaHeight(JTextArea area) {
+        FontMetrics fm = area.getFontMetrics(area.getFont());
+        area.setSize(DEFAULT_WIDTH, Short.MAX_VALUE);
+        int lines = area.getLineCount();
+        if (lines == 0) lines = 1;
+        return fm.getHeight() * lines;
+    }
+
+    private int collapsedHeight;
+    private int expandedHeight;
+
+    private void updateHeights() {
+        collapsedHeight = getAreaHeight(summaryArea) + PADDING;
+        expandedHeight = getAreaHeight(summaryArea) + getAreaHeight(promptArea) + getAreaHeight(responseArea) + PADDING;
     }
 
     private void updateLayout() {
-        summaryArea.setVisible(!isExpanded);
+        summaryArea.setVisible(true);
         promptArea.setVisible(isExpanded);
         responseArea.setVisible(isExpanded);
         expandLabel.setText(isExpanded ? "\u2BC6" : "\u2BC8");
 
-        int lines = isExpanded ? countLines(promptText) + countLines(responseText) : 1;
-        int height = lineHeight * lines;
+        int height = isExpanded ? expandedHeight : collapsedHeight;
         setPreferredSize(new Dimension(DEFAULT_WIDTH, height));
         setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
         revalidate();
@@ -126,6 +121,7 @@ public class ExchangePanel extends JPanel {
 
     private void toggleExpanded() {
         isExpanded = !isExpanded;
+        updateHeights();
         updateLayout();
     }
 }
