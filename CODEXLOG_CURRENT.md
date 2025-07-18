@@ -13,3 +13,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507180151][8b27e81][REF][FTR] Replaced org.json parser with stubbed custom classes
 [2507180609][d6a1da][FTR] Implemented manual ChatGPT JSON parsing
 [2507180712][65e07b][BUG][FTR] Improved ExchangePanel rendering and expand/collapse
+[2507181001][92718e8][FTR] Parsed mapping to build conversation exchanges
