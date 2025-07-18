@@ -18,10 +18,34 @@ public class CustomJsonParser {
         String title = extractTitle(rawJson);
         Conversation conv = new Conversation(title == null ? "Untitled" : title);
 
-        String mapping = extractMappingBlock(rawJson);
-        Map<String, String> messageBlocks = extractMessageBlocks(mapping);
-        List<Exchange> exchanges = extractPromptResponsePairs(messageBlocks);
-        conv.exchanges.addAll(exchanges);
+        String mappingJson = extractMappingBlock(rawJson);
+        List<String> blocks = extractMessageBlocks(mappingJson);
+
+        Map<String, String> blockById = new LinkedHashMap<>();
+        for (String b : blocks) {
+            String id = extractStringField(b, "id");
+            if (id != null) {
+                blockById.put(id, b);
+            }
+        }
+
+        for (String b : blocks) {
+            String role = extractStringField(b, "role");
+            if (!"user".equals(role)) continue;
+            String prompt = extractPart0(b);
+            if (prompt == null || prompt.isEmpty()) continue;
+
+            String childId = extractArrayFirst(b, "children");
+            if (childId == null) continue;
+            String childBlock = blockById.get(childId);
+            if (childBlock == null) continue;
+            String childRole = extractStringField(childBlock, "role");
+            if (!"assistant".equals(childRole)) continue;
+            String response = extractPart0(childBlock);
+            long time = extractLongField(b, "create_time");
+            String ts = TIME_FMT.format(Instant.ofEpochSecond(time));
+            conv.exchanges.add(new Exchange(ts, prompt, response));
+        }
 
         return conv;
     }
@@ -37,100 +61,37 @@ public class CustomJsonParser {
     }
 
     private static String extractMappingBlock(String json) {
-        int mapIndex = json.indexOf("\"mapping\"");
-        if (mapIndex < 0) return "";
-        int start = json.indexOf("{", mapIndex);
-        if (start < 0) return "";
+        int start = json.indexOf("\"mapping\"");
+        int braceStart = json.indexOf('{', start);
         int depth = 0;
-        for (int i = start; i < json.length(); i++) {
-            char c = json.charAt(i);
+        int end = braceStart;
+
+        for (; end < json.length(); end++) {
+            char c = json.charAt(end);
             if (c == '{') depth++;
-            else if (c == '}') {
-                depth--;
-                if (depth == 0) {
-                    return json.substring(start, i + 1);
-                }
-            }
+            if (c == '}') depth--;
+            if (depth == 0) break;
         }
-        return "";
+        return json.substring(braceStart, end + 1);
     }
 
-    private static Map<String, String> extractMessageBlocks(String mappingJson) {
-        Map<String, String> result = new LinkedHashMap<>();
-        if (mappingJson == null || mappingJson.isBlank()) return result;
-        int pos = mappingJson.indexOf('{') + 1;
-        while (pos > 0 && pos < mappingJson.length()) {
-            int q1 = mappingJson.indexOf('"', pos);
-            if (q1 < 0) break;
-            int q2 = mappingJson.indexOf('"', q1 + 1);
-            if (q2 < 0) break;
-            String id = mappingJson.substring(q1 + 1, q2);
-            int colon = mappingJson.indexOf(':', q2);
-            int brace = mappingJson.indexOf('{', colon);
-            if (brace < 0) break;
-            int depth = 0;
-            int i = brace;
-            for (; i < mappingJson.length(); i++) {
-                char c = mappingJson.charAt(i);
+    private static List<String> extractMessageBlocks(String mappingJson) {
+        List<String> blocks = new ArrayList<>();
+        int pos = 0;
+        while ((pos = mappingJson.indexOf("{", pos)) != -1) {
+            int depth = 0, start = pos, end = pos;
+            for (; end < mappingJson.length(); end++) {
+                char c = mappingJson.charAt(end);
                 if (c == '{') depth++;
-                else if (c == '}') {
-                    depth--;
-                    if (depth == 0) {
-                        i++; // include closing brace
-                        break;
-                    }
-                }
+                if (c == '}') depth--;
+                if (depth == 0) break;
             }
-            String block = mappingJson.substring(brace, i);
-            pos = i;
-            boolean hasRole = block.contains("\"role\":\"user\"") ||
-                    block.contains("\"role\": \"user\"") ||
-                    block.contains("\"role\":\"assistant\"") ||
-                    block.contains("\"role\": \"assistant\"");
-            if (block.contains("\"author\"") && block.contains("\"content\"") && hasRole) {
-                result.put(id, block);
-            }
-            if (pos < mappingJson.length() && mappingJson.charAt(pos) == ',') pos++;
+            blocks.add(mappingJson.substring(start, end + 1));
+            pos = end + 1;
         }
-        return result;
+        return blocks;
     }
 
-    private static class Node {
-        String id;
-        String parent;
-        String firstChild;
-        String role;
-        String text;
-        long time;
-    }
-
-    private static List<Exchange> extractPromptResponsePairs(Map<String, String> blocks) {
-        Map<String, Node> nodes = new LinkedHashMap<>();
-        for (Map.Entry<String, String> e : blocks.entrySet()) {
-            String id = e.getKey();
-            String block = e.getValue();
-            Node n = new Node();
-            n.id = id;
-            n.parent = extractStringField(block, "parent");
-            n.firstChild = extractArrayFirst(block, "children");
-            n.role = extractStringField(block, "role");
-            n.text = extractPart0(block);
-            n.time = extractLongField(block, "create_time");
-            nodes.put(id, n);
-        }
-
-        List<Exchange> exchanges = new ArrayList<>();
-        for (Node n : nodes.values()) {
-            if ("user".equals(n.role)) {
-                Node child = nodes.get(n.firstChild);
-                if (child != null && "assistant".equals(child.role)) {
-                    String ts = TIME_FMT.format(Instant.ofEpochSecond(n.time));
-                    exchanges.add(new Exchange(ts, n.text, child.text));
-                }
-            }
-        }
-        return exchanges;
-    }
 
     private static String extractStringField(String json, String field) {
         int idx = json.indexOf("\"" + field + "\"");
