@@ -42,3 +42,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507192301][e659dd][FTR][REF] Show conversation exchange counts
 [2507192318][9d93635][FTR][REF] Applied dark theme styling
 2507192338[03967f6][BUG][REF] Reduced padding in conversation and exchange panels
+[2507192352][6021439][BUG][REF] Hide preview line when exchange expanded
