@@ -6,6 +6,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class Main {
     private static JPanel container;
     private static JScrollPane scrollPane;
     private static JPanel summaryPanel;
+    private static JSplitPane splitPane;
     private static Map<Exchange, ExchangePanel> exchangeToPanel = new HashMap<>();
     private static JFrame frame;
     private static JTextField searchField;
@@ -74,20 +76,25 @@ public class Main {
             public void changedUpdate(DocumentEvent e) { applySearchAndTagFilter(); }
         });
 
-        JPanel rootPanel = new JPanel(new BorderLayout());
-        rootPanel.add(searchPanel, BorderLayout.NORTH);
+        frame.setLayout(new BorderLayout());
+        frame.add(searchPanel, BorderLayout.NORTH);
 
-        JSplitPane splitPane = new JSplitPane(
+        splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 summaryPanel,
                 scrollPane
         );
         splitPane.setDividerLocation(300);
-        rootPanel.add(splitPane, BorderLayout.CENTER);
-
-        frame.setContentPane(rootPanel);
+        frame.add(splitPane, BorderLayout.CENTER);
 
         TagFilter.setFilterListener(() -> applySearchAndTagFilter());
+
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                splitPane.setDividerLocation(0.3);
+            }
+        });
 
         frame.setVisible(true);
     }
@@ -137,6 +144,9 @@ public class Main {
                 container.repaint();
                 summaryPanel.revalidate();
                 summaryPanel.repaint();
+                splitPane.setEnabled(true);
+                splitPane.setDividerLocation(300);
+                splitPane.revalidate();
 
                 System.out.println("[INFO] Loaded " + conversations.size() + " conversation(s).");
             } catch (IOException ex) {
@@ -201,6 +211,7 @@ public class Main {
         summaryPanel.revalidate();
         summaryPanel.repaint();
         scrollPane.revalidate();
+        if (splitPane != null) splitPane.revalidate();
         bar.setValue(val);
     }
 
