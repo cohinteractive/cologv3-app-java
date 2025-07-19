@@ -1,10 +1,14 @@
 package colog;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Main {
@@ -12,6 +16,8 @@ public class Main {
     private static JPanel container;
     private static JScrollPane scrollPane;
     private static JFrame frame;
+    private static JTextField searchField;
+    private static List<Conversation> allConversations = new ArrayList<>();
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> createAndShowGUI());
     }
@@ -40,7 +46,27 @@ public class Main {
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
         scrollPane = new JScrollPane(container);
-        frame.setContentPane(scrollPane);
+
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchPanel.add(new JLabel("Search: "));
+        searchField = new JTextField(40);
+        searchPanel.add(searchField);
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { applyFilter(); }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) { applyFilter(); }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) { applyFilter(); }
+        });
+
+        JPanel rootPanel = new JPanel(new BorderLayout());
+        rootPanel.add(searchPanel, BorderLayout.NORTH);
+        rootPanel.add(scrollPane, BorderLayout.CENTER);
+
+        frame.setContentPane(rootPanel);
 
         frame.setVisible(true);
     }
@@ -59,17 +85,8 @@ public class Main {
                 return;
             }
             try {
-                java.util.List<Conversation> conversations = ConversationLoader.parseConversationsFromFile(selected);
-                JScrollBar bar = scrollPane.getVerticalScrollBar();
-                int val = bar.getValue();
-                container.removeAll();
-                for (Conversation c : conversations) {
-                    container.add(new ConversationPanel(c));
-                }
-                container.revalidate();
-                container.repaint();
-                scrollPane.revalidate();
-                bar.setValue(val);
+                allConversations = ConversationLoader.parseConversationsFromFile(selected);
+                applyFilter();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(parent, "Error reading file: " + ex.getMessage(),
                         "Read Error", JOptionPane.ERROR_MESSAGE);
@@ -78,5 +95,35 @@ public class Main {
                         "Parse Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+
+    private static void applyFilter() {
+        if (scrollPane == null) return;
+        String query = searchField.getText().toLowerCase();
+
+        JScrollBar bar = scrollPane.getVerticalScrollBar();
+        int val = bar.getValue();
+
+        container.removeAll();
+        for (Conversation c : allConversations) {
+            List<Exchange> matches = new ArrayList<>();
+            for (Exchange ex : c.exchanges) {
+                String tags = String.join(" ", ex.tags).toLowerCase();
+                if (query.isBlank() ||
+                        (ex.prompt != null && ex.prompt.toLowerCase().contains(query)) ||
+                        (ex.response != null && ex.response.toLowerCase().contains(query)) ||
+                        (ex.summary != null && ex.summary.toLowerCase().contains(query)) ||
+                        tags.contains(query)) {
+                    matches.add(ex);
+                }
+            }
+            if (!matches.isEmpty()) {
+                container.add(new ConversationPanel(c.title, matches));
+            }
+        }
+        container.revalidate();
+        container.repaint();
+        scrollPane.revalidate();
+        bar.setValue(val);
     }
 }
