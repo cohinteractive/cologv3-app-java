@@ -28,3 +28,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507190526][54acc15][BUG][FTR] Fixed exchange parsing and search filter logic
 
 [2507190651][abafd1e][BUG][FTR] Restored JSplitPane layout after load and resize
+[2507190807][b45b16][BUG][REF] Fixed text clipping and collapsed row height in ExchangePanel
