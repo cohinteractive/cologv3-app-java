@@ -37,3 +37,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507192149][a0e80f][FTR][REF] Updated conversation selection logic and scroll speed
 [2507192203][ae1d0d][FTR][REF] Formatted ExchangePanel prompt and response sections
 [2507192226][44e1493][FTR][REF] Added summary preview labels in ExchangePanel
+[2507192237][33686a5][FTR][REF] Indented response sections with wrapper panel
