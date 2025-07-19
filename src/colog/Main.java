@@ -106,8 +106,39 @@ public class Main {
                 return;
             }
             try {
-                allConversations = ConversationLoader.parseConversationsFromFile(selected);
-                applySearchAndTagFilter();
+                List<Conversation> conversations = ConversationLoader.parseConversationsFromFile(selected);
+
+                // Store parsed conversations so search/tag filters work
+                allConversations = conversations;
+
+                // Populate UI with newly loaded data
+                container.removeAll();
+                summaryPanel.removeAll();
+                exchangeToPanel.clear();
+                for (Conversation c : conversations) {
+                    ConversationPanel cp = new ConversationPanel(c);
+                    container.add(cp);
+
+                    java.util.List<ExchangePanel> eps = cp.getExchangePanels();
+                    for (int i = 0; i < c.exchanges.size(); i++) {
+                        Exchange ex = c.exchanges.get(i);
+                        ExchangePanel ep = eps.get(i);
+                        exchangeToPanel.put(ex, ep);
+
+                        JButton btn = new JButton(ex.summary);
+                        btn.setToolTipText(c.title);
+                        btn.setHorizontalAlignment(SwingConstants.LEFT);
+                        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, btn.getPreferredSize().height));
+                        btn.addActionListener(e -> ep.expandAndFocus());
+                        summaryPanel.add(btn);
+                    }
+                }
+                container.revalidate();
+                container.repaint();
+                summaryPanel.revalidate();
+                summaryPanel.repaint();
+
+                System.out.println("[INFO] Loaded " + conversations.size() + " conversation(s).");
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(parent, "Error reading file: " + ex.getMessage(),
                         "Read Error", JOptionPane.ERROR_MESSAGE);
