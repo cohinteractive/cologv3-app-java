@@ -56,20 +56,6 @@ public class ExchangePanel extends JPanel {
         header.add(timeLabel);
 
         header.add(Box.createHorizontalGlue());
-
-        for (String tag : tagsList) {
-            JLabel tagLabel = new JLabel("#" + tag);
-            tagLabel.setForeground(Color.BLUE.darker());
-            tagLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-            tagLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            tagLabel.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    TagFilter.setActiveTag(tag);
-                }
-            });
-            header.add(tagLabel);
-        }
         header.setAlignmentX(LEFT_ALIGNMENT);
         add(header);
 
@@ -88,6 +74,35 @@ public class ExchangePanel extends JPanel {
         responseArea.setVisible(false);
         responseArea.setAlignmentX(LEFT_ALIGNMENT);
         add(responseArea);
+
+        JPanel tagPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        tagPanel.setOpaque(false);
+        for (String tag : tagsList) {
+            final String t = tag;
+            JLabel tagLabel = new JLabel("#" + tag);
+            tagLabel.setForeground(new Color(30, 30, 200));
+            tagLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            tagLabel.setToolTipText("Click to filter by #" + tag);
+            tagLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    TagFilter.setActiveTag(t);
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    tagLabel.setFont(tagLabel.getFont().deriveFont(Font.BOLD));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    tagLabel.setFont(tagLabel.getFont().deriveFont(Font.PLAIN));
+                }
+            });
+            tagPanel.add(tagLabel);
+        }
+        tagPanel.setAlignmentX(LEFT_ALIGNMENT);
+        add(tagPanel);
 
         updateLayout();
     }
