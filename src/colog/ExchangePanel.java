@@ -2,7 +2,6 @@ package colog;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -23,6 +22,8 @@ public class ExchangePanel extends JPanel {
     private final JPanel promptSection;
     private final JPanel responseSection;
     private final JLabel expandLabel;
+    private final Component summarySpacing;
+    private final Component sectionSpacing;
     private boolean isExpanded = false;
     private Exchange exchange;
 
@@ -40,7 +41,8 @@ public class ExchangePanel extends JPanel {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(DARK_BG);
-        setBorder(new LineBorder(LIGHT_TEXT));
+        // Remove default line border for compact stacked layout
+        setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         JPanel header = new JPanel();
         header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
@@ -75,7 +77,8 @@ public class ExchangePanel extends JPanel {
         summaryArea.setForeground(LIGHT_TEXT);
         add(summaryArea);
 
-        add(Box.createVerticalStrut(4));
+        summarySpacing = Box.createVerticalStrut(4);
+        add(summarySpacing);
 
         promptArea = createArea(promptText);
         responseArea = createArea(responseText);
@@ -87,7 +90,8 @@ public class ExchangePanel extends JPanel {
         responseSection.setVisible(false);
 
         add(promptSection);
-        add(Box.createVerticalStrut(8));
+        sectionSpacing = Box.createVerticalStrut(8);
+        add(sectionSpacing);
         add(responseSection);
 
         JPanel tagPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
@@ -198,7 +202,22 @@ public class ExchangePanel extends JPanel {
         summaryArea.setVisible(true);
         promptSection.setVisible(isExpanded);
         responseSection.setVisible(isExpanded);
+        summarySpacing.setVisible(isExpanded);
+        sectionSpacing.setVisible(isExpanded);
         expandLabel.setText(isExpanded ? "\u2BC6" : "\u2BC8");
+
+        FontMetrics fm = getFontMetrics(getFont());
+        int lineHeight = fm.getHeight();
+        if (isExpanded) {
+            setPreferredSize(null);
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        } else {
+            int lines = 3; // header, summary, tag row
+            int height = lineHeight * lines;
+            Dimension d = new Dimension(Integer.MAX_VALUE, height);
+            setPreferredSize(d);
+            setMaximumSize(d);
+        }
 
         revalidate();
         repaint();
