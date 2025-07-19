@@ -23,6 +23,20 @@ public class CustomJsonParser {
         List<String> children = new ArrayList<>();
     }
 
+    private static List<String> inferTags(String prompt, String response) {
+        List<String> tags = new ArrayList<>();
+        String text = (prompt + " " + response).toLowerCase();
+
+        if (text.contains("bug") || text.contains("fix")) tags.add("bug");
+        if (text.contains("ui") || text.contains("layout")) tags.add("ui");
+        if (text.contains("api") || text.contains("request")) tags.add("api");
+        if (text.contains("performance")) tags.add("performance");
+        if (text.contains("refactor")) tags.add("refactor");
+        if (text.contains("firebase")) tags.add("firebase");
+
+        return tags;
+    }
+
     public static Conversation extractConversation(String rawJson) {
         String title = extractTitle(rawJson);
         Conversation conv = new Conversation(title == null ? "Untitled" : title);
@@ -44,7 +58,9 @@ public class CustomJsonParser {
             String ts = msg.createTime > 0
                     ? TIME_FMT.format(Instant.ofEpochSecond(msg.createTime))
                     : "";
-            conv.exchanges.add(new Exchange(ts, prompt, response));
+            Exchange ex = new Exchange(ts, prompt, response);
+            ex.tags = inferTags(prompt, response);
+            conv.exchanges.add(ex);
         }
 
         return conv;
