@@ -2,6 +2,7 @@ package colog;
 
 import javax.swing.*;
 import java.awt.*;
+import static colog.Theme.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ public class ConversationRowPanel extends JPanel {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setOpaque(true);
+        setBackground(DARK_BG);
 
         Font font = getFont();
         int fontHeight = getFontMetrics(font).getHeight();
@@ -68,6 +70,9 @@ public class ConversationRowPanel extends JPanel {
         l.setPreferredSize(d);
         l.setMaximumSize(d);
         l.setMinimumSize(d);
+        l.setForeground(LIGHT_TEXT);
+        l.setBackground(DARK_BG);
+        l.setOpaque(true);
         return l;
     }
 
@@ -95,6 +100,6 @@ public class ConversationRowPanel extends JPanel {
     }
 
     public void setSelected(boolean selected) {
-        setBackground(selected ? new Color(220, 220, 250) : null);
+        setBackground(selected ? new Color(50, 50, 80) : DARK_BG);
     }
 }

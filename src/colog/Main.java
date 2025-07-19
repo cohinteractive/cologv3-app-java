@@ -13,6 +13,7 @@ import java.util.List;
 
 import colog.TagFilter;
 import colog.ConversationRowPanel;
+import static colog.Theme.*;
 
 
 public class Main {
@@ -39,16 +40,25 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setResizable(true);
+        frame.getContentPane().setBackground(DARK_BG);
 
         JMenuBar menuBar = new JMenuBar();
+        menuBar.setBackground(DARK_BG);
+        menuBar.setForeground(LIGHT_TEXT);
         JMenu fileMenu = new JMenu("File");
+        fileMenu.setBackground(DARK_BG);
+        fileMenu.setForeground(LIGHT_TEXT);
 
         JMenuItem openItem = new JMenuItem("Open");
         openItem.addActionListener(e -> handleOpen(frame));
+        openItem.setBackground(DARK_BG);
+        openItem.setForeground(LIGHT_TEXT);
         fileMenu.add(openItem);
 
         JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(e -> System.exit(0));
+        exitItem.setBackground(DARK_BG);
+        exitItem.setForeground(LIGHT_TEXT);
         fileMenu.add(exitItem);
 
         menuBar.add(fileMenu);
@@ -56,23 +66,38 @@ public class Main {
 
         container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.setBackground(DARK_BG);
 
         scrollPane = new JScrollPane(container);
         scrollPane.getVerticalScrollBar().setUnitIncrement(24);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getViewport().setBackground(DARK_BG);
 
         conversationListPanel = new JPanel();
         conversationListPanel.setLayout(new BoxLayout(conversationListPanel, BoxLayout.Y_AXIS));
+        conversationListPanel.setBackground(DARK_BG);
         conversationScrollPane = new JScrollPane(conversationListPanel);
         conversationScrollPane.getVerticalScrollBar().setUnitIncrement(24);
+        conversationScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        conversationScrollPane.getViewport().setBackground(DARK_BG);
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        searchPanel.add(new JLabel("Search prompt/response:"));
+        searchPanel.setBackground(DARK_BG);
+        JLabel searchLabel = new JLabel("Search prompt/response:");
+        searchLabel.setForeground(LIGHT_TEXT);
+        searchPanel.add(searchLabel);
         searchField = new JTextField(40);
+        searchField.setBackground(DARK_BG);
+        searchField.setForeground(LIGHT_TEXT);
+        searchField.setCaretColor(LIGHT_TEXT);
         searchPanel.add(searchField);
         tagFilterStatus = new JLabel();
+        tagFilterStatus.setForeground(LIGHT_TEXT);
         searchPanel.add(tagFilterStatus);
         clearFilter = new JButton("Clear Tag Filter");
         clearFilter.addActionListener(e -> TagFilter.clear());
+        clearFilter.setBackground(DARK_BG);
+        clearFilter.setForeground(LIGHT_TEXT);
         searchPanel.add(clearFilter);
         clearFilter.setEnabled(false);
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -94,6 +119,7 @@ public class Main {
                 conversationScrollPane,
                 scrollPane
         );
+        splitPane.setBackground(DARK_BG);
         splitPane.setDividerLocation(300);
         frame.add(splitPane, BorderLayout.CENTER);
 
@@ -233,7 +259,7 @@ public class Main {
         String tag = TagFilter.getActiveTag();
         if (tag != null) {
             tagFilterStatus.setText("Filtering by tag: #" + tag);
-            tagFilterStatus.setForeground(new Color(100, 50, 0));
+            tagFilterStatus.setForeground(LIGHT_TEXT);
             clearFilter.setEnabled(true);
         } else {
             tagFilterStatus.setText("");
