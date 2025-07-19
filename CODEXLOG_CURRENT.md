@@ -25,3 +25,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507190200][4d491a][FTR][REF] Added summary sidebar panel with clickable navigation to exchanges
 [2507190211][1ed2b5][FTR][REF] Implemented tag-based filtering with clickable labels
 [2507190406][5e128d][BUG] Fixed UI refresh to show loaded conversations
+[2507190526][54acc15][BUG][FTR] Fixed exchange parsing and search filter logic

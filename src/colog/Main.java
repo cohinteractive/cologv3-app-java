@@ -160,30 +160,40 @@ public class Main {
         summaryPanel.removeAll();
         exchangeToPanel.clear();
 
-        for (Conversation c : allConversations) {
-            List<Exchange> matches = new ArrayList<>();
-            for (Exchange ex : c.exchanges) {
-                if (TagFilter.matches(ex) && matchesSearchQuery(ex, query)) {
-                    matches.add(ex);
-                }
-            }
-            if (!matches.isEmpty()) {
-                ConversationPanel cp = new ConversationPanel(c.title, matches);
-                container.add(cp);
+        List<Conversation> visibleConversations;
+        if (query.isEmpty() && TagFilter.getActiveTag() == null) {
+            visibleConversations = allConversations;
+        } else {
+            visibleConversations = allConversations.stream()
+                    .map(c -> {
+                        Conversation nc = new Conversation(c.title);
+                        for (Exchange ex : c.exchanges) {
+                            if (matchesSearchQuery(ex, query) && TagFilter.matches(ex)) {
+                                nc.exchanges.add(ex);
+                            }
+                        }
+                        return nc;
+                    })
+                    .filter(c -> !c.exchanges.isEmpty())
+                    .collect(java.util.stream.Collectors.toList());
+        }
 
-                java.util.List<ExchangePanel> eps = cp.getExchangePanels();
-                for (int i = 0; i < matches.size(); i++) {
-                    Exchange ex = matches.get(i);
-                    ExchangePanel ep = eps.get(i);
-                    exchangeToPanel.put(ex, ep);
+        for (Conversation c : visibleConversations) {
+            ConversationPanel cp = new ConversationPanel(c);
+            container.add(cp);
 
-                    JButton btn = new JButton(ex.summary);
-                    btn.setToolTipText(c.title);
-                    btn.setHorizontalAlignment(SwingConstants.LEFT);
-                    btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, btn.getPreferredSize().height));
-                    btn.addActionListener(e -> ep.expandAndFocus());
-                    summaryPanel.add(btn);
-                }
+            java.util.List<ExchangePanel> eps = cp.getExchangePanels();
+            for (int i = 0; i < c.exchanges.size(); i++) {
+                Exchange ex = c.exchanges.get(i);
+                ExchangePanel ep = eps.get(i);
+                exchangeToPanel.put(ex, ep);
+
+                JButton btn = new JButton(ex.summary);
+                btn.setToolTipText(c.title);
+                btn.setHorizontalAlignment(SwingConstants.LEFT);
+                btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, btn.getPreferredSize().height));
+                btn.addActionListener(e -> ep.expandAndFocus());
+                summaryPanel.add(btn);
             }
         }
         container.revalidate();
