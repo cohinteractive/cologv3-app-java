@@ -58,6 +58,7 @@ public class Main {
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
         scrollPane = new JScrollPane(container);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(24);
 
         conversationListPanel = new JPanel();
         conversationListPanel.setLayout(new BoxLayout(conversationListPanel, BoxLayout.Y_AXIS));
@@ -203,7 +204,7 @@ public class Main {
         conversationRows.clear();
         for (int i = 0; i < visibleConversations.size(); i++) {
             Conversation c = visibleConversations.get(i);
-            ConversationRowPanel row = new ConversationRowPanel(i + 1, c, idx -> selectConversation(idx));
+            ConversationRowPanel row = new ConversationRowPanel(i + 1, c);
             conversationRows.add(row);
             conversationListPanel.add(row);
         }
@@ -211,13 +212,18 @@ public class Main {
 
     private static void selectConversation(int index) {
         if (index < 0 || index >= visibleConversations.size()) return;
-        selectedConversationIndex = index;
+        selectConversation(visibleConversations.get(index));
+    }
+
+    public static void selectConversation(Conversation c) {
+        if (c == null) return;
+        selectedConversationIndex = visibleConversations.indexOf(c);
         container.removeAll();
-        container.add(new ConversationPanel(visibleConversations.get(index)));
+        container.add(new ConversationPanel(c));
         container.revalidate();
         container.repaint();
         for (int i = 0; i < conversationRows.size(); i++) {
-            conversationRows.get(i).setSelected(i == index);
+            conversationRows.get(i).setSelected(visibleConversations.get(i) == c);
         }
     }
 

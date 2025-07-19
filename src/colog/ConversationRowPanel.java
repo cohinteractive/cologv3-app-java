@@ -14,26 +14,22 @@ import java.util.Set;
  * Compact row representing a conversation in the sidebar.
  */
 public class ConversationRowPanel extends JPanel {
-    public interface RowClickListener {
-        void onRowClicked(int index);
-    }
+    // Simple row click handling now directly notifies Main
 
     private static final DateTimeFormatter IN_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter OUT_FMT = DateTimeFormatter.ofPattern("d/MM/yy H:mm:ss");
 
     private final int index;
     private final Conversation conversation;
-    private final RowClickListener listener;
 
     private final JLabel idLabel;
     private final JLabel timeLabel;
     private final JLabel titleLabel;
     private final JLabel tagLabel;
 
-    public ConversationRowPanel(int index, Conversation conversation, RowClickListener listener) {
+    public ConversationRowPanel(int index, Conversation conversation) {
         this.index = index;
         this.conversation = conversation;
-        this.listener = listener;
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setOpaque(true);
@@ -57,7 +53,7 @@ public class ConversationRowPanel extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (listener != null) listener.onRowClicked(index - 1);
+                Main.selectConversation(conversation);
             }
         });
     }
