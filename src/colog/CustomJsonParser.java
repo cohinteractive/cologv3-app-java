@@ -1,5 +1,7 @@
 package colog;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +37,60 @@ public class CustomJsonParser {
         if (text.contains("firebase")) tags.add("firebase");
 
         return tags;
+    }
+
+    public static List<Conversation> parseFromReader(BufferedReader reader) throws IOException {
+        List<String> conversationBlocks = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inString = false;
+        int braceDepth = 0;
+        boolean capturing = false;
+
+        int c;
+        while ((c = reader.read()) != -1) {
+            char ch = (char) c;
+
+            if (!capturing) {
+                if (Character.isWhitespace(ch) || ch == '[' || ch == ',') {
+                    continue;
+                }
+                if (ch == '{') {
+                    capturing = true;
+                    braceDepth = 1;
+                    current.append(ch);
+                }
+                continue;
+            }
+
+            current.append(ch);
+
+            if (ch == '"' && (current.length() < 2 || current.charAt(current.length() - 2) != '\\')) {
+                inString = !inString;
+            }
+
+            if (!inString) {
+                if (ch == '{') braceDepth++;
+                else if (ch == '}') {
+                    braceDepth--;
+                    if (braceDepth == 0) {
+                        conversationBlocks.add(current.toString().trim());
+                        current.setLength(0);
+                        capturing = false;
+                    }
+                }
+            }
+        }
+
+        List<Conversation> conversations = new ArrayList<>();
+        for (String block : conversationBlocks) {
+            Conversation cobj = extractConversationFromBlock(block);
+            conversations.add(cobj);
+        }
+        return conversations;
+    }
+
+    private static Conversation extractConversationFromBlock(String jsonBlock) {
+        return extractConversation(jsonBlock);
     }
 
     public static Conversation extractConversation(String rawJson) {
