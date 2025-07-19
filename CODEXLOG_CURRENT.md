@@ -20,3 +20,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507182311][8dff0d][FTR][REF] Grouped exchanges under conversation panels
 [2507182317][924969e][FTR][REF] Preserved expand state and scroll position
 [2507182325][49d901][FTR][REF] Added auto summary and tag inference
+[2507190051][e0b826][FTR][REF] Added support for multi-conversation JSON
