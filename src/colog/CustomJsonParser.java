@@ -91,7 +91,11 @@ public class CustomJsonParser {
             if (c == '}') depth--;
             if (depth == 0) break;
         }
-        return json.substring(braceStart, end + 1);
+        int safeEnd = Math.min(end + 1, json.length());
+        if (end + 1 > json.length()) {
+            System.out.println("[WARN] Trimming JSON end offset to avoid overflow.");
+        }
+        return json.substring(braceStart, safeEnd);
     }
 
     private static List<String> extractMessageBlocks(String mappingJson) {
@@ -122,7 +126,11 @@ public class CustomJsonParser {
                     }
                 } else if (c == '}') {
                     if (depth == 2 && start >= 0) {
-                        blocks.add(mappingJson.substring(start, i + 1));
+                        int safeEnd = Math.min(i + 1, mappingJson.length());
+                        if (i + 1 > mappingJson.length()) {
+                            System.out.println("[WARN] Trimming JSON end offset to avoid overflow.");
+                        }
+                        blocks.add(mappingJson.substring(start, safeEnd));
                         start = -1;
                     }
                     depth--;

@@ -31,3 +31,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507190807][b45b16][BUG][REF] Fixed text clipping and collapsed row height in ExchangePanel
 [2507190811][f4e8146][FTR] Improved tag label interactivity
 [2507190916][688e17][FTR][REF] Clarified search and tag filter UI
+[2507192036][b3ff80][BUG][ERR] Fixed off-by-one substring bounds in JSON parser
