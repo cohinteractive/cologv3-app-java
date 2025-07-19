@@ -63,6 +63,7 @@ public class Main {
         conversationListPanel = new JPanel();
         conversationListPanel.setLayout(new BoxLayout(conversationListPanel, BoxLayout.Y_AXIS));
         conversationScrollPane = new JScrollPane(conversationListPanel);
+        conversationScrollPane.getVerticalScrollBar().setUnitIncrement(24);
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.add(new JLabel("Search prompt/response:"));
