@@ -24,13 +24,13 @@ public class ExchangePanel extends JPanel {
     private Exchange exchange;
 
     public ExchangePanel(Exchange ex) {
-        this(ex.timestamp, ex.prompt, ex.response, String.join(", ", ex.tags));
+        this(ex.timestamp, ex.prompt, ex.response, ex.tags);
         this.exchange = ex;
         this.isExpanded = ex.isExpanded;
         updateLayout();
     }
 
-    private ExchangePanel(String timestamp, String prompt, String response, String tags) {
+    private ExchangePanel(String timestamp, String prompt, String response, java.util.List<String> tagsList) {
         this.promptText = prompt == null ? "" : prompt;
         this.responseText = response == null ? "" : response;
         this.exchange = null;
@@ -59,9 +59,19 @@ public class ExchangePanel extends JPanel {
 
         header.add(Box.createHorizontalGlue());
 
-        JLabel tagsLabel = new JLabel(tags);
-        tagsLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        header.add(tagsLabel);
+        for (String tag : tagsList) {
+            JLabel tagLabel = new JLabel("#" + tag);
+            tagLabel.setForeground(Color.BLUE.darker());
+            tagLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+            tagLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            tagLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    TagFilter.setActiveTag(tag);
+                }
+            });
+            header.add(tagLabel);
+        }
         header.setAlignmentX(LEFT_ALIGNMENT);
         add(header);
 

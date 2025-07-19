@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import colog.TagFilter;
+
 
 public class Main {
     private static File lastDir;
@@ -58,15 +60,18 @@ public class Main {
         searchPanel.add(new JLabel("Search: "));
         searchField = new JTextField(40);
         searchPanel.add(searchField);
+        JButton clearFilter = new JButton("Clear Tag Filter");
+        clearFilter.addActionListener(e -> TagFilter.clear());
+        searchPanel.add(clearFilter);
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { applyFilter(); }
+            public void insertUpdate(DocumentEvent e) { applySearchAndTagFilter(); }
 
             @Override
-            public void removeUpdate(DocumentEvent e) { applyFilter(); }
+            public void removeUpdate(DocumentEvent e) { applySearchAndTagFilter(); }
 
             @Override
-            public void changedUpdate(DocumentEvent e) { applyFilter(); }
+            public void changedUpdate(DocumentEvent e) { applySearchAndTagFilter(); }
         });
 
         JPanel rootPanel = new JPanel(new BorderLayout());
@@ -81,6 +86,8 @@ public class Main {
         rootPanel.add(splitPane, BorderLayout.CENTER);
 
         frame.setContentPane(rootPanel);
+
+        TagFilter.setFilterListener(() -> applySearchAndTagFilter());
 
         frame.setVisible(true);
     }
@@ -100,7 +107,7 @@ public class Main {
             }
             try {
                 allConversations = ConversationLoader.parseConversationsFromFile(selected);
-                applyFilter();
+                applySearchAndTagFilter();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(parent, "Error reading file: " + ex.getMessage(),
                         "Read Error", JOptionPane.ERROR_MESSAGE);
@@ -111,7 +118,7 @@ public class Main {
         }
     }
 
-    private static void applyFilter() {
+    private static void applySearchAndTagFilter() {
         if (scrollPane == null) return;
         String query = searchField.getText().toLowerCase();
 
@@ -125,12 +132,7 @@ public class Main {
         for (Conversation c : allConversations) {
             List<Exchange> matches = new ArrayList<>();
             for (Exchange ex : c.exchanges) {
-                String tags = String.join(" ", ex.tags).toLowerCase();
-                if (query.isBlank() ||
-                        (ex.prompt != null && ex.prompt.toLowerCase().contains(query)) ||
-                        (ex.response != null && ex.response.toLowerCase().contains(query)) ||
-                        (ex.summary != null && ex.summary.toLowerCase().contains(query)) ||
-                        tags.contains(query)) {
+                if (TagFilter.matches(ex) && matchesSearchQuery(ex, query)) {
                     matches.add(ex);
                 }
             }
@@ -159,5 +161,14 @@ public class Main {
         summaryPanel.repaint();
         scrollPane.revalidate();
         bar.setValue(val);
+    }
+
+    private static boolean matchesSearchQuery(Exchange ex, String query) {
+        if (query.isBlank()) return true;
+        String tags = String.join(" ", ex.tags).toLowerCase();
+        return (ex.prompt != null && ex.prompt.toLowerCase().contains(query)) ||
+               (ex.response != null && ex.response.toLowerCase().contains(query)) ||
+               (ex.summary != null && ex.summary.toLowerCase().contains(query)) ||
+               tags.contains(query);
     }
 }
