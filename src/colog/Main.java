@@ -10,19 +10,21 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 import colog.TagFilter;
+import colog.ConversationRowPanel;
 
 
 public class Main {
     private static File lastDir;
     private static JPanel container;
     private static JScrollPane scrollPane;
-    private static JPanel summaryPanel;
+    private static JPanel conversationListPanel;
+    private static JScrollPane conversationScrollPane;
     private static JSplitPane splitPane;
-    private static Map<Exchange, ExchangePanel> exchangeToPanel = new HashMap<>();
+    private static java.util.List<ConversationRowPanel> conversationRows = new ArrayList<>();
+    private static java.util.List<Conversation> visibleConversations = new ArrayList<>();
+    private static int selectedConversationIndex = -1;
     private static JFrame frame;
     private static JTextField searchField;
     private static JLabel tagFilterStatus;
@@ -57,8 +59,9 @@ public class Main {
 
         scrollPane = new JScrollPane(container);
 
-        summaryPanel = new JPanel();
-        summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
+        conversationListPanel = new JPanel();
+        conversationListPanel.setLayout(new BoxLayout(conversationListPanel, BoxLayout.Y_AXIS));
+        conversationScrollPane = new JScrollPane(conversationListPanel);
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.add(new JLabel("Search prompt/response:"));
@@ -86,7 +89,7 @@ public class Main {
 
         splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
-                summaryPanel,
+                conversationScrollPane,
                 scrollPane
         );
         splitPane.setDividerLocation(300);
@@ -127,32 +130,16 @@ public class Main {
                 // Store parsed conversations so search/tag filters work
                 allConversations = conversations;
 
-                // Populate UI with newly loaded data
+                conversationRows.clear();
+                conversationListPanel.removeAll();
                 container.removeAll();
-                summaryPanel.removeAll();
-                exchangeToPanel.clear();
-                for (Conversation c : conversations) {
-                    ConversationPanel cp = new ConversationPanel(c);
-                    container.add(cp);
-
-                    java.util.List<ExchangePanel> eps = cp.getExchangePanels();
-                    for (int i = 0; i < c.exchanges.size(); i++) {
-                        Exchange ex = c.exchanges.get(i);
-                        ExchangePanel ep = eps.get(i);
-                        exchangeToPanel.put(ex, ep);
-
-                        JButton btn = new JButton(ex.summary);
-                        btn.setToolTipText(c.title);
-                        btn.setHorizontalAlignment(SwingConstants.LEFT);
-                        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, btn.getPreferredSize().height));
-                        btn.addActionListener(e -> ep.expandAndFocus());
-                        summaryPanel.add(btn);
-                    }
+                visibleConversations = conversations;
+                buildConversationList();
+                if (!visibleConversations.isEmpty()) {
+                    selectConversation(0);
                 }
+                conversationListPanel.revalidate();
                 container.revalidate();
-                container.repaint();
-                summaryPanel.revalidate();
-                summaryPanel.repaint();
                 splitPane.setEnabled(true);
                 splitPane.setDividerLocation(300);
                 splitPane.revalidate();
@@ -176,14 +163,14 @@ public class Main {
         int val = bar.getValue();
 
         container.removeAll();
-        summaryPanel.removeAll();
-        exchangeToPanel.clear();
+        conversationListPanel.removeAll();
+        conversationRows.clear();
 
-        List<Conversation> visibleConversations;
+        List<Conversation> matches;
         if (query.isEmpty() && TagFilter.getActiveTag() == null) {
-            visibleConversations = allConversations;
+            matches = allConversations;
         } else {
-            visibleConversations = allConversations.stream()
+            matches = allConversations.stream()
                     .map(c -> {
                         Conversation nc = new Conversation(c.title);
                         for (Exchange ex : c.exchanges) {
@@ -196,32 +183,42 @@ public class Main {
                     .filter(c -> !c.exchanges.isEmpty())
                     .collect(java.util.stream.Collectors.toList());
         }
-
-        for (Conversation c : visibleConversations) {
-            ConversationPanel cp = new ConversationPanel(c);
-            container.add(cp);
-
-            java.util.List<ExchangePanel> eps = cp.getExchangePanels();
-            for (int i = 0; i < c.exchanges.size(); i++) {
-                Exchange ex = c.exchanges.get(i);
-                ExchangePanel ep = eps.get(i);
-                exchangeToPanel.put(ex, ep);
-
-                JButton btn = new JButton(ex.summary);
-                btn.setToolTipText(c.title);
-                btn.setHorizontalAlignment(SwingConstants.LEFT);
-                btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, btn.getPreferredSize().height));
-                btn.addActionListener(e -> ep.expandAndFocus());
-                summaryPanel.add(btn);
-            }
+        visibleConversations = matches;
+        buildConversationList();
+        if (!visibleConversations.isEmpty()) {
+            selectConversation(Math.min(selectedConversationIndex, visibleConversations.size() - 1));
+        } else {
+            selectedConversationIndex = -1;
+            container.revalidate();
+            container.repaint();
         }
-        container.revalidate();
-        container.repaint();
-        summaryPanel.revalidate();
-        summaryPanel.repaint();
+        conversationListPanel.revalidate();
         scrollPane.revalidate();
         if (splitPane != null) splitPane.revalidate();
         bar.setValue(val);
+    }
+
+    private static void buildConversationList() {
+        conversationListPanel.removeAll();
+        conversationRows.clear();
+        for (int i = 0; i < visibleConversations.size(); i++) {
+            Conversation c = visibleConversations.get(i);
+            ConversationRowPanel row = new ConversationRowPanel(i + 1, c, idx -> selectConversation(idx));
+            conversationRows.add(row);
+            conversationListPanel.add(row);
+        }
+    }
+
+    private static void selectConversation(int index) {
+        if (index < 0 || index >= visibleConversations.size()) return;
+        selectedConversationIndex = index;
+        container.removeAll();
+        container.add(new ConversationPanel(visibleConversations.get(index)));
+        container.revalidate();
+        container.repaint();
+        for (int i = 0; i < conversationRows.size(); i++) {
+            conversationRows.get(i).setSelected(i == index);
+        }
     }
 
     private static void updateTagFilterLabel() {

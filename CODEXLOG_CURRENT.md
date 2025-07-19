@@ -33,3 +33,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507190916][688e17][FTR][REF] Clarified search and tag filter UI
 [2507192036][b3ff80][BUG][ERR] Fixed off-by-one substring bounds in JSON parser
 [2507192110][3e9b29][FTR][REF] Refactored JSON loader to stream conversations via BufferedReader
+[2507192136][80764b8][FTR][REF] Scrollable conversation list sidebar
