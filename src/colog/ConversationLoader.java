@@ -43,7 +43,11 @@ public class ConversationLoader {
                 } else if (c == '}') {
                     depth--;
                     if (depth == 0 && start >= 0) {
-                        blocks.add(json.substring(start, i + 1));
+                        int safeEnd = Math.min(i + 1, json.length());
+                        if (i + 1 > json.length()) {
+                            System.out.println("[WARN] Trimming JSON end offset to avoid overflow.");
+                        }
+                        blocks.add(json.substring(start, safeEnd));
                         start = -1;
                     }
                 }
