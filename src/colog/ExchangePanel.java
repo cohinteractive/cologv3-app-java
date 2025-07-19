@@ -1,6 +1,7 @@
 package colog;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -17,6 +18,8 @@ public class ExchangePanel extends JPanel {
     private final JTextArea summaryArea;
     private final JTextArea promptArea;
     private final JTextArea responseArea;
+    private final JPanel promptSection;
+    private final JPanel responseSection;
     private final JLabel expandLabel;
     private boolean isExpanded = false;
     private Exchange exchange;
@@ -29,8 +32,8 @@ public class ExchangePanel extends JPanel {
     }
 
     private ExchangePanel(String timestamp, String prompt, String response, java.util.List<String> tagsList) {
-        this.promptText = prompt == null ? "" : prompt;
-        this.responseText = response == null ? "" : response;
+        this.promptText = prompt == null ? "" : prompt.replace("\\n", "\n");
+        this.responseText = response == null ? "" : response.replace("\\n", "\n");
         this.exchange = null;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -65,15 +68,20 @@ public class ExchangePanel extends JPanel {
         summaryArea.setAlignmentX(LEFT_ALIGNMENT);
         add(summaryArea);
 
-        promptArea = createArea(promptText);
-        promptArea.setVisible(false);
-        promptArea.setAlignmentX(LEFT_ALIGNMENT);
-        add(promptArea);
+        add(Box.createVerticalStrut(4));
 
+        promptArea = createArea(promptText);
         responseArea = createArea(responseText);
-        responseArea.setVisible(false);
-        responseArea.setAlignmentX(LEFT_ALIGNMENT);
-        add(responseArea);
+
+        promptSection = buildSection("Prompt", promptText, promptArea, new Color(230, 230, 230), Color.BLACK, false);
+        responseSection = buildSection("Response", responseText, responseArea, new Color(60, 60, 60), Color.WHITE, true);
+
+        promptSection.setVisible(false);
+        responseSection.setVisible(false);
+
+        add(promptSection);
+        add(Box.createVerticalStrut(8));
+        add(responseSection);
 
         JPanel tagPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         tagPanel.setOpaque(false);
@@ -108,6 +116,8 @@ public class ExchangePanel extends JPanel {
     }
 
     private JTextArea createArea(String text) {
+        if (text == null) text = "";
+        text = text.replace("\\n", "\n");
         JTextArea area = new JTextArea(text);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
@@ -119,6 +129,39 @@ public class ExchangePanel extends JPanel {
         return area;
     }
 
+    private JPanel buildSection(String labelText, String text, JTextArea area,
+                                Color bg, Color fg, boolean indent) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(bg);
+        panel.setOpaque(true);
+        panel.setAlignmentX(LEFT_ALIGNMENT);
+        panel.setBorder(new EmptyBorder(4, indent ? 12 : 4, 4, 4));
+
+        JLabel label = new JLabel(labelText);
+        label.setFont(label.getFont().deriveFont(Font.BOLD));
+        label.setForeground(fg);
+        panel.add(label);
+
+        JLabel summary = new JLabel("Summary: " + firstChars(text, 80));
+        summary.setFont(summary.getFont().deriveFont(summary.getFont().getSize2D() - 2f));
+        summary.setForeground(fg);
+        panel.add(summary);
+
+        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+
+        area.setForeground(fg);
+        panel.add(area);
+
+        return panel;
+    }
+
+    private static String firstChars(String text, int len) {
+        if (text == null) return "";
+        text = text.replace("\n", " ").replace("\\n", " ");
+        return text.length() > len ? text.substring(0, len) : text;
+    }
+
     private String firstLine(String text) {
         if (text == null) return "";
         int idx = text.indexOf('\n');
@@ -127,8 +170,8 @@ public class ExchangePanel extends JPanel {
 
     private void updateLayout() {
         summaryArea.setVisible(true);
-        promptArea.setVisible(isExpanded);
-        responseArea.setVisible(isExpanded);
+        promptSection.setVisible(isExpanded);
+        responseSection.setVisible(isExpanded);
         expandLabel.setText(isExpanded ? "\u2BC6" : "\u2BC8");
 
         revalidate();
