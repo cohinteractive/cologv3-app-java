@@ -136,23 +136,30 @@ public class ExchangePanel extends JPanel {
         panel.setBackground(bg);
         panel.setOpaque(true);
         panel.setAlignmentX(LEFT_ALIGNMENT);
-        panel.setBorder(new EmptyBorder(4, indent ? 12 : 4, 4, 4));
+        panel.setBorder(new EmptyBorder(4, 4, 4, 4));
+
+        JPanel wrapper = new JPanel();
+        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
+        wrapper.setBorder(BorderFactory.createEmptyBorder(0, indent ? 20 : 0, 0, 0));
+        wrapper.setOpaque(false);
 
         JLabel label = new JLabel(labelText);
         label.setFont(label.getFont().deriveFont(Font.BOLD));
         label.setForeground(fg);
-        panel.add(label);
+        wrapper.add(label);
 
         JLabel summaryLabel = new JLabel("Summary: " + summarize(text));
         summaryLabel.setFont(summaryLabel.getFont().deriveFont(Font.ITALIC, 11f));
         summaryLabel.setForeground(fg);
         summaryLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, summaryLabel.getPreferredSize().height));
-        panel.add(summaryLabel);
+        wrapper.add(summaryLabel);
 
-        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        wrapper.add(new JSeparator(SwingConstants.HORIZONTAL));
 
         area.setForeground(fg);
-        panel.add(area);
+        wrapper.add(area);
+
+        panel.add(wrapper);
 
         return panel;
     }
