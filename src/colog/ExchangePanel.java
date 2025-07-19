@@ -199,7 +199,7 @@ public class ExchangePanel extends JPanel {
     }
 
     private void updateLayout() {
-        summaryArea.setVisible(true);
+        summaryArea.setVisible(!isExpanded);
         promptSection.setVisible(isExpanded);
         responseSection.setVisible(isExpanded);
         summarySpacing.setVisible(isExpanded);
