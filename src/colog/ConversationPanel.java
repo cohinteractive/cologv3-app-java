@@ -32,7 +32,8 @@ public class ConversationPanel extends JPanel {
             add(ep);
         }
 
-        setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+        // Remove excess top/bottom padding so exchanges align tightly
+        setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
     }
 
     public java.util.List<ExchangePanel> getExchangePanels() {
