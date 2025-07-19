@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import static colog.Theme.*;
+
 /**
  * A single exchange row with timestamp, summary, tags, and expandable prompt/response text.
  */
@@ -37,7 +39,8 @@ public class ExchangePanel extends JPanel {
         this.exchange = null;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(new LineBorder(Color.LIGHT_GRAY));
+        setBackground(DARK_BG);
+        setBorder(new LineBorder(LIGHT_TEXT));
 
         JPanel header = new JPanel();
         header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
@@ -56,6 +59,8 @@ public class ExchangePanel extends JPanel {
 
         JLabel timeLabel = new JLabel(timestamp);
         timeLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        timeLabel.setForeground(LIGHT_TEXT);
+        expandLabel.setForeground(LIGHT_TEXT);
         header.add(timeLabel);
 
         header.add(Box.createHorizontalGlue());
@@ -66,6 +71,8 @@ public class ExchangePanel extends JPanel {
         summaryArea.setRows(1);
         summaryArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, summaryArea.getPreferredSize().height));
         summaryArea.setAlignmentX(LEFT_ALIGNMENT);
+        summaryArea.setBackground(DARK_BG);
+        summaryArea.setForeground(LIGHT_TEXT);
         add(summaryArea);
 
         add(Box.createVerticalStrut(4));
@@ -73,8 +80,8 @@ public class ExchangePanel extends JPanel {
         promptArea = createArea(promptText);
         responseArea = createArea(responseText);
 
-        promptSection = buildSection("Prompt", promptText, promptArea, new Color(230, 230, 230), Color.BLACK, false);
-        responseSection = buildSection("Response", responseText, responseArea, new Color(60, 60, 60), Color.WHITE, true);
+        promptSection = buildSection("Prompt", promptText, promptArea, PROMPT_BG, LIGHT_TEXT, false);
+        responseSection = buildSection("Response", responseText, responseArea, RESPONSE_BG, LIGHT_TEXT, true);
 
         promptSection.setVisible(false);
         responseSection.setVisible(false);
@@ -88,7 +95,10 @@ public class ExchangePanel extends JPanel {
         for (String tag : tagsList) {
             final String t = tag;
             JLabel tagLabel = new JLabel("#" + tag);
-            tagLabel.setForeground(new Color(30, 30, 200));
+            tagLabel.setForeground(LIGHT_TEXT);
+            tagLabel.setBackground(TAG_BG);
+            tagLabel.setOpaque(true);
+            tagLabel.setBorder(new EmptyBorder(0, 4, 0, 4));
             tagLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             tagLabel.setToolTipText("Click to filter by #" + tag);
             tagLabel.addMouseListener(new MouseAdapter() {
@@ -121,7 +131,9 @@ public class ExchangePanel extends JPanel {
         JTextArea area = new JTextArea(text);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
-        area.setOpaque(false);
+        area.setOpaque(true);
+        area.setBackground(DARK_BG);
+        area.setForeground(LIGHT_TEXT);
         area.setEditable(false);
         area.setFocusable(false);
         area.setBorder(null);
@@ -146,17 +158,22 @@ public class ExchangePanel extends JPanel {
         JLabel label = new JLabel(labelText);
         label.setFont(label.getFont().deriveFont(Font.BOLD));
         label.setForeground(fg);
+        label.setBackground(bg);
+        label.setOpaque(true);
         wrapper.add(label);
 
         JLabel summaryLabel = new JLabel("Summary: " + summarize(text));
         summaryLabel.setFont(summaryLabel.getFont().deriveFont(Font.ITALIC, 11f));
         summaryLabel.setForeground(fg);
+        summaryLabel.setBackground(bg);
+        summaryLabel.setOpaque(true);
         summaryLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, summaryLabel.getPreferredSize().height));
         wrapper.add(summaryLabel);
 
         wrapper.add(new JSeparator(SwingConstants.HORIZONTAL));
 
         area.setForeground(fg);
+        area.setBackground(bg);
         wrapper.add(area);
 
         panel.add(wrapper);
