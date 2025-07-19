@@ -59,11 +59,13 @@ public class Main {
                 return;
             }
             try {
-                Conversation conv = ConversationLoader.parseConversationFromFile(selected);
+                java.util.List<Conversation> conversations = ConversationLoader.parseConversationsFromFile(selected);
                 JScrollBar bar = scrollPane.getVerticalScrollBar();
                 int val = bar.getValue();
                 container.removeAll();
-                container.add(new ConversationPanel(conv));
+                for (Conversation c : conversations) {
+                    container.add(new ConversationPanel(c));
+                }
                 container.revalidate();
                 container.repaint();
                 scrollPane.revalidate();

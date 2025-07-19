@@ -16,8 +16,8 @@ Colog V3 fixes this by turning your chat history into a **project memory system*
 
 ## ✨ Features
 
-- **ChatGPT JSON Importer**  
-  Parse exported `.json` files and convert them into structured `Exchange` objects (prompt + response).
+- **ChatGPT JSON Importer**
+  Parse exported `.json` files and convert them into structured conversations and exchanges. Supports files containing multiple conversations.
 
 - **Conversation & Project Grouping**  
   Organize exchanges by conversation and associate conversations with larger projects.
