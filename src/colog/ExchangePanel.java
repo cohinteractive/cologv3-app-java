@@ -143,10 +143,11 @@ public class ExchangePanel extends JPanel {
         label.setForeground(fg);
         panel.add(label);
 
-        JLabel summary = new JLabel("Summary: " + firstChars(text, 80));
-        summary.setFont(summary.getFont().deriveFont(summary.getFont().getSize2D() - 2f));
-        summary.setForeground(fg);
-        panel.add(summary);
+        JLabel summaryLabel = new JLabel("Summary: " + summarize(text));
+        summaryLabel.setFont(summaryLabel.getFont().deriveFont(Font.ITALIC, 11f));
+        summaryLabel.setForeground(fg);
+        summaryLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, summaryLabel.getPreferredSize().height));
+        panel.add(summaryLabel);
 
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
 
@@ -156,10 +157,11 @@ public class ExchangePanel extends JPanel {
         return panel;
     }
 
-    private static String firstChars(String text, int len) {
+    private static String summarize(String text) {
         if (text == null) return "";
-        text = text.replace("\n", " ").replace("\\n", " ");
-        return text.length() > len ? text.substring(0, len) : text;
+        String summary = text.replaceAll("\\s+", " ").strip();
+        if (summary.length() > 80) summary = summary.substring(0, 80) + "…";
+        return summary;
     }
 
     private String firstLine(String text) {
