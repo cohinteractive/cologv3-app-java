@@ -9,12 +9,16 @@ import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 
 public class Main {
     private static File lastDir;
     private static JPanel container;
     private static JScrollPane scrollPane;
+    private static JPanel summaryPanel;
+    private static Map<Exchange, ExchangePanel> exchangeToPanel = new HashMap<>();
     private static JFrame frame;
     private static JTextField searchField;
     private static List<Conversation> allConversations = new ArrayList<>();
@@ -47,6 +51,9 @@ public class Main {
 
         scrollPane = new JScrollPane(container);
 
+        summaryPanel = new JPanel();
+        summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
+
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.add(new JLabel("Search: "));
         searchField = new JTextField(40);
@@ -64,7 +71,14 @@ public class Main {
 
         JPanel rootPanel = new JPanel(new BorderLayout());
         rootPanel.add(searchPanel, BorderLayout.NORTH);
-        rootPanel.add(scrollPane, BorderLayout.CENTER);
+
+        JSplitPane splitPane = new JSplitPane(
+                JSplitPane.HORIZONTAL_SPLIT,
+                summaryPanel,
+                scrollPane
+        );
+        splitPane.setDividerLocation(300);
+        rootPanel.add(splitPane, BorderLayout.CENTER);
 
         frame.setContentPane(rootPanel);
 
@@ -105,6 +119,9 @@ public class Main {
         int val = bar.getValue();
 
         container.removeAll();
+        summaryPanel.removeAll();
+        exchangeToPanel.clear();
+
         for (Conversation c : allConversations) {
             List<Exchange> matches = new ArrayList<>();
             for (Exchange ex : c.exchanges) {
@@ -118,11 +135,28 @@ public class Main {
                 }
             }
             if (!matches.isEmpty()) {
-                container.add(new ConversationPanel(c.title, matches));
+                ConversationPanel cp = new ConversationPanel(c.title, matches);
+                container.add(cp);
+
+                java.util.List<ExchangePanel> eps = cp.getExchangePanels();
+                for (int i = 0; i < matches.size(); i++) {
+                    Exchange ex = matches.get(i);
+                    ExchangePanel ep = eps.get(i);
+                    exchangeToPanel.put(ex, ep);
+
+                    JButton btn = new JButton(ex.summary);
+                    btn.setToolTipText(c.title);
+                    btn.setHorizontalAlignment(SwingConstants.LEFT);
+                    btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, btn.getPreferredSize().height));
+                    btn.addActionListener(e -> ep.expandAndFocus());
+                    summaryPanel.add(btn);
+                }
             }
         }
         container.revalidate();
         container.repaint();
+        summaryPanel.revalidate();
+        summaryPanel.repaint();
         scrollPane.revalidate();
         bar.setValue(val);
     }
