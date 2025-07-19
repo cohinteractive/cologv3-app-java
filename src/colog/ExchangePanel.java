@@ -144,4 +144,14 @@ public class ExchangePanel extends JPanel {
             bar.setValue(val);
         }
     }
+
+    /**
+     * Expands this panel if collapsed and scrolls it into view.
+     */
+    public void expandAndFocus() {
+        if (!isExpanded) {
+            toggleExpanded();
+        }
+        scrollRectToVisible(getBounds());
+    }
 }
