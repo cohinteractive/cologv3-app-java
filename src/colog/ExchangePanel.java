@@ -10,8 +10,6 @@ import java.awt.event.MouseEvent;
  * A single exchange row with timestamp, summary, tags, and expandable prompt/response text.
  */
 public class ExchangePanel extends JPanel {
-    private static final int DEFAULT_WIDTH = 600;
-    private static final int PADDING = 10;
 
     private final String promptText;
     private final String responseText;
@@ -76,6 +74,8 @@ public class ExchangePanel extends JPanel {
         add(header);
 
         summaryArea = createArea(firstLine(promptText));
+        summaryArea.setRows(1);
+        summaryArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, summaryArea.getPreferredSize().height));
         summaryArea.setAlignmentX(LEFT_ALIGNMENT);
         add(summaryArea);
 
@@ -89,7 +89,6 @@ public class ExchangePanel extends JPanel {
         responseArea.setAlignmentX(LEFT_ALIGNMENT);
         add(responseArea);
 
-        updateHeights();
         updateLayout();
     }
 
@@ -97,8 +96,10 @@ public class ExchangePanel extends JPanel {
         JTextArea area = new JTextArea(text);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
-        area.setEditable(false);
         area.setOpaque(false);
+        area.setEditable(false);
+        area.setFocusable(false);
+        area.setBorder(null);
         area.setAlignmentX(LEFT_ALIGNMENT);
         return area;
     }
@@ -109,31 +110,12 @@ public class ExchangePanel extends JPanel {
         return idx >= 0 ? text.substring(0, idx) : text;
     }
 
-    private int getAreaHeight(JTextArea area) {
-        FontMetrics fm = area.getFontMetrics(area.getFont());
-        area.setSize(DEFAULT_WIDTH, Short.MAX_VALUE);
-        int lines = area.getLineCount();
-        if (lines == 0) lines = 1;
-        return fm.getHeight() * lines;
-    }
-
-    private int collapsedHeight;
-    private int expandedHeight;
-
-    private void updateHeights() {
-        collapsedHeight = getAreaHeight(summaryArea) + PADDING;
-        expandedHeight = getAreaHeight(summaryArea) + getAreaHeight(promptArea) + getAreaHeight(responseArea) + PADDING;
-    }
-
     private void updateLayout() {
         summaryArea.setVisible(true);
         promptArea.setVisible(isExpanded);
         responseArea.setVisible(isExpanded);
         expandLabel.setText(isExpanded ? "\u2BC6" : "\u2BC8");
 
-        int height = isExpanded ? expandedHeight : collapsedHeight;
-        setPreferredSize(new Dimension(DEFAULT_WIDTH, height));
-        setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
         revalidate();
         repaint();
     }
@@ -147,7 +129,6 @@ public class ExchangePanel extends JPanel {
         if (exchange != null) {
             exchange.isExpanded = isExpanded;
         }
-        updateHeights();
         updateLayout();
 
         if (bar != null) {
