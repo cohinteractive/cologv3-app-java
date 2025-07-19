@@ -18,9 +18,15 @@ public class Exchange {
         this.summary = generateSummary(prompt, response);
     }
 
-    private String generateSummary(String prompt, String response) {
-        if (prompt == null || prompt.isBlank()) return "No summary";
-        int end = prompt.indexOf('\n');
-        return end > 0 ? prompt.substring(0, end).trim() : prompt.trim();
+    private static String generateSummary(String prompt, String response) {
+        if (prompt != null && !prompt.isBlank()) {
+            String cleaned = prompt.strip().replaceAll("[\\r\\n]+", " ");
+            return cleaned.length() > 200 ? cleaned.substring(0, 200) + "…" : cleaned;
+        }
+        if (response != null && !response.isBlank()) {
+            String cleaned = response.strip().replaceAll("[\\r\\n]+", " ");
+            return cleaned.length() > 200 ? cleaned.substring(0, 200) + "…" : cleaned;
+        }
+        return "(no content)";
     }
 }
