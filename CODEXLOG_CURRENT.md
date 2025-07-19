@@ -35,3 +35,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507192110][3e9b29][FTR][REF] Refactored JSON loader to stream conversations via BufferedReader
 [2507192136][80764b8][FTR][REF] Scrollable conversation list sidebar
 [2507192149][a0e80f][FTR][REF] Updated conversation selection logic and scroll speed
+[2507192203][ae1d0d][FTR][REF] Formatted ExchangePanel prompt and response sections
