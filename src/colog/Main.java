@@ -25,6 +25,8 @@ public class Main {
     private static Map<Exchange, ExchangePanel> exchangeToPanel = new HashMap<>();
     private static JFrame frame;
     private static JTextField searchField;
+    private static JLabel tagFilterStatus;
+    private static JButton clearFilter;
     private static List<Conversation> allConversations = new ArrayList<>();
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> createAndShowGUI());
@@ -59,12 +61,15 @@ public class Main {
         summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        searchPanel.add(new JLabel("Search: "));
+        searchPanel.add(new JLabel("Search prompt/response:"));
         searchField = new JTextField(40);
         searchPanel.add(searchField);
-        JButton clearFilter = new JButton("Clear Tag Filter");
+        tagFilterStatus = new JLabel();
+        searchPanel.add(tagFilterStatus);
+        clearFilter = new JButton("Clear Tag Filter");
         clearFilter.addActionListener(e -> TagFilter.clear());
         searchPanel.add(clearFilter);
+        clearFilter.setEnabled(false);
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) { applySearchAndTagFilter(); }
@@ -87,7 +92,11 @@ public class Main {
         splitPane.setDividerLocation(300);
         frame.add(splitPane, BorderLayout.CENTER);
 
-        TagFilter.setFilterListener(() -> applySearchAndTagFilter());
+        TagFilter.setFilterListener(() -> {
+            updateTagFilterLabel();
+            applySearchAndTagFilter();
+        });
+        updateTagFilterLabel();
 
         frame.addComponentListener(new ComponentAdapter() {
             @Override
@@ -213,6 +222,19 @@ public class Main {
         scrollPane.revalidate();
         if (splitPane != null) splitPane.revalidate();
         bar.setValue(val);
+    }
+
+    private static void updateTagFilterLabel() {
+        if (tagFilterStatus == null || clearFilter == null) return;
+        String tag = TagFilter.getActiveTag();
+        if (tag != null) {
+            tagFilterStatus.setText("Filtering by tag: #" + tag);
+            tagFilterStatus.setForeground(new Color(100, 50, 0));
+            clearFilter.setEnabled(true);
+        } else {
+            tagFilterStatus.setText("");
+            clearFilter.setEnabled(false);
+        }
     }
 
     private static boolean matchesSearchQuery(Exchange ex, String query) {
