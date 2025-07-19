@@ -24,6 +24,7 @@ public class ConversationRowPanel extends JPanel {
 
     private final JLabel idLabel;
     private final JLabel timeLabel;
+    private final JLabel countLabel;
     private final JLabel titleLabel;
     private final JLabel tagLabel;
 
@@ -37,12 +38,14 @@ public class ConversationRowPanel extends JPanel {
         Font font = getFont();
         int fontHeight = getFontMetrics(font).getHeight();
 
-        idLabel = createLabel("#" + index, 40, SwingConstants.LEFT, fontHeight);
+        idLabel = createLabel("#" + index, 30, SwingConstants.LEFT, fontHeight);
+        countLabel = createLabel("\u00D7" + conversation.exchanges.size(), 40, SwingConstants.RIGHT, fontHeight);
         timeLabel = createLabel(formatTimestamp(conversation), 110, SwingConstants.LEFT, fontHeight);
         titleLabel = createLabel(conversation.title, 240, SwingConstants.LEFT, fontHeight);
         tagLabel = createLabel(buildTagSummary(conversation), 100, SwingConstants.RIGHT, fontHeight);
 
         add(idLabel);
+        add(countLabel);
         add(timeLabel);
         add(titleLabel);
         add(Box.createHorizontalGlue());

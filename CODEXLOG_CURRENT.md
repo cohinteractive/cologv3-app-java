@@ -39,3 +39,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507192226][44e1493][FTR][REF] Added summary preview labels in ExchangePanel
 [2507192237][33686a5][FTR][REF] Indented response sections with wrapper panel
 [2507192254][ac94830][FTR][REF] Matched scroll speed for left panel
+[2507192301][e659dd][FTR][REF] Show conversation exchange counts
