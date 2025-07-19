@@ -63,6 +63,9 @@ public class CustomJsonParser {
             conv.exchanges.add(ex);
         }
 
+        System.out.println("[DEBUG] Extracted " + conv.exchanges.size() +
+                " exchanges from conversation '" + title + "'");
+
         return conv;
     }
 
@@ -93,17 +96,38 @@ public class CustomJsonParser {
 
     private static List<String> extractMessageBlocks(String mappingJson) {
         List<String> blocks = new ArrayList<>();
-        int pos = 0;
-        while ((pos = mappingJson.indexOf("{", pos)) != -1) {
-            int depth = 0, start = pos, end = pos;
-            for (; end < mappingJson.length(); end++) {
-                char c = mappingJson.charAt(end);
-                if (c == '{') depth++;
-                if (c == '}') depth--;
-                if (depth == 0) break;
+        boolean inString = false;
+        boolean escape = false;
+        int depth = 0;
+        int start = -1;
+        for (int i = 0; i < mappingJson.length(); i++) {
+            char c = mappingJson.charAt(i);
+            if (escape) {
+                escape = false;
+                continue;
             }
-            blocks.add(mappingJson.substring(start, end + 1));
-            pos = end + 1;
+            if (c == '\\') {
+                escape = true;
+                continue;
+            }
+            if (c == '"') {
+                inString = !inString;
+                continue;
+            }
+            if (!inString) {
+                if (c == '{') {
+                    depth++;
+                    if (depth == 2) {
+                        start = i;
+                    }
+                } else if (c == '}') {
+                    if (depth == 2 && start >= 0) {
+                        blocks.add(mappingJson.substring(start, i + 1));
+                        start = -1;
+                    }
+                    depth--;
+                }
+            }
         }
         return blocks;
     }

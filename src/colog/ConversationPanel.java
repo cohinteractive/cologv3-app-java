@@ -23,6 +23,9 @@ public class ConversationPanel extends JPanel {
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         add(separator);
 
+        if (visibleExchanges.isEmpty()) {
+            add(new JLabel("(No exchanges)"));
+        }
         for (Exchange ex : visibleExchanges) {
             ExchangePanel ep = new ExchangePanel(ex);
             panels.add(ep);
