@@ -26,15 +26,15 @@ public class ConversationHeaderRowPanel extends JPanel {
         row.setBackground(bg);
         row.setAlignmentX(LEFT_ALIGNMENT);
 
-        row.add(createLabel("Index", 40, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createCell("Index", 40, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Prompt Count", 60, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createCell("Prompt Count", 60, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Date/Time", 140, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createCell("Date/Time", 140, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Conversation Title", 300, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createCell("Conversation Title", 300, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Tags", 200, SwingConstants.RIGHT, fontHeight, font, fg, bg));
+        row.add(createCell("Tags", 200, SwingConstants.RIGHT, fontHeight, font, fg, bg));
 
         row.setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight));
         row.setMaximumSize(new Dimension(Short.MAX_VALUE, fontHeight));
@@ -50,10 +50,24 @@ public class ConversationHeaderRowPanel extends JPanel {
         l.setPreferredSize(d);
         l.setMaximumSize(d);
         l.setMinimumSize(d);
+        l.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         l.setForeground(fg);
         l.setBackground(bg);
         l.setOpaque(true);
         return l;
+    }
+
+    private JPanel createCell(String text, int width, int align, int height, Font f, Color fg, Color bg) {
+        JLabel label = createLabel(text, width, align, height, f, fg, bg);
+        JPanel cell = new JPanel();
+        cell.setLayout(new BoxLayout(cell, BoxLayout.X_AXIS));
+        cell.setOpaque(false);
+        Dimension d = new Dimension(width, height);
+        cell.setPreferredSize(d);
+        cell.setMaximumSize(d);
+        cell.setMinimumSize(d);
+        cell.add(label);
+        return cell;
     }
 
     private JSeparator createVLine(int height) {

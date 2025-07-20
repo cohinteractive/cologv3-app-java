@@ -84,7 +84,7 @@ public class Main {
         conversationScrollPane = new JScrollPane(conversationListPanel);
         conversationScrollPane.getVerticalScrollBar().setUnitIncrement(24);
         conversationScrollPane.setBorder(BorderFactory.createEmptyBorder());
-        conversationScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        conversationScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         conversationScrollPane.getViewport().setBackground(DARK_BG);
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -251,6 +251,9 @@ public class Main {
             conversationRows.add(row);
             conversationListPanel.add(row);
         }
+        Dimension listSize = new Dimension(744, 0);
+        conversationListPanel.setPreferredSize(listSize);
+        conversationListPanel.setMinimumSize(listSize);
     }
 
     private static void selectConversation(int index) {

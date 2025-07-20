@@ -54,15 +54,15 @@ public class ConversationRowPanel extends JPanel {
         row.setBackground(DARK_BG);
         row.setAlignmentX(LEFT_ALIGNMENT);
 
-        row.add(idLabel);
+        row.add(createCell(idLabel, 40, rowHeight));
         row.add(createVLine(rowHeight));
-        row.add(countLabel);
+        row.add(createCell(countLabel, 60, rowHeight));
         row.add(createVLine(rowHeight));
-        row.add(timeLabel);
+        row.add(createCell(timeLabel, 140, rowHeight));
         row.add(createVLine(rowHeight));
-        row.add(titleLabel);
+        row.add(createCell(titleLabel, 300, rowHeight));
         row.add(createVLine(rowHeight));
-        row.add(tagLabel);
+        row.add(createCell(tagLabel, 200, rowHeight));
 
         row.setPreferredSize(new Dimension(Short.MAX_VALUE, rowHeight));
         row.setMaximumSize(new Dimension(Short.MAX_VALUE, rowHeight));
@@ -90,10 +90,23 @@ public class ConversationRowPanel extends JPanel {
         l.setPreferredSize(d);
         l.setMaximumSize(d);
         l.setMinimumSize(d);
+        l.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         l.setForeground(LIGHT_TEXT);
         l.setBackground(DARK_BG);
         l.setOpaque(true);
         return l;
+    }
+
+    private JPanel createCell(JLabel label, int width, int height) {
+        JPanel cell = new JPanel();
+        cell.setLayout(new BoxLayout(cell, BoxLayout.X_AXIS));
+        cell.setOpaque(false);
+        Dimension d = new Dimension(width, height);
+        cell.setPreferredSize(d);
+        cell.setMaximumSize(d);
+        cell.setMinimumSize(d);
+        cell.add(label);
+        return cell;
     }
 
     private JSeparator createVLine(int height) {
