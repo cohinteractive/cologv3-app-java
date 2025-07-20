@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import static colog.Theme.*;
+import static colog.UIStyle.*;
 
 /**
  * A single exchange row with timestamp, summary, tags, and expandable prompt/response text.
@@ -49,6 +50,7 @@ public class ExchangePanel extends JPanel {
         header.setOpaque(false);
 
         expandLabel = new JLabel("\u2BC8");
+        expandLabel.setFont(BASE_FONT);
         expandLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         expandLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         expandLabel.addMouseListener(new MouseAdapter() {
@@ -60,6 +62,7 @@ public class ExchangePanel extends JPanel {
         header.add(expandLabel);
 
         JLabel timeLabel = new JLabel(timestamp);
+        timeLabel.setFont(BASE_FONT);
         timeLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         timeLabel.setForeground(LIGHT_TEXT);
         expandLabel.setForeground(LIGHT_TEXT);
@@ -70,6 +73,7 @@ public class ExchangePanel extends JPanel {
         add(header);
 
         summaryArea = createArea(firstLine(promptText));
+        summaryArea.setFont(BASE_FONT);
         summaryArea.setRows(1);
         summaryArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, summaryArea.getPreferredSize().height));
         summaryArea.setAlignmentX(LEFT_ALIGNMENT);
@@ -81,7 +85,9 @@ public class ExchangePanel extends JPanel {
         add(summarySpacing);
 
         promptArea = createArea(promptText);
+        promptArea.setFont(BASE_FONT);
         responseArea = createArea(responseText);
+        responseArea.setFont(BASE_FONT);
 
         promptSection = buildSection("Prompt", promptText, promptArea, PROMPT_BG, LIGHT_TEXT, false);
         responseSection = buildSection("Response", responseText, responseArea, RESPONSE_BG, LIGHT_TEXT, true);
@@ -99,6 +105,7 @@ public class ExchangePanel extends JPanel {
         for (String tag : tagsList) {
             final String t = tag;
             JLabel tagLabel = new JLabel("#" + tag);
+            tagLabel.setFont(BASE_FONT);
             tagLabel.setForeground(LIGHT_TEXT);
             tagLabel.setBackground(TAG_BG);
             tagLabel.setOpaque(true);
@@ -133,6 +140,7 @@ public class ExchangePanel extends JPanel {
         if (text == null) text = "";
         text = text.replace("\\n", "\n");
         JTextArea area = new JTextArea(text);
+        area.setFont(BASE_FONT);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         area.setOpaque(true);
@@ -160,14 +168,14 @@ public class ExchangePanel extends JPanel {
         wrapper.setOpaque(false);
 
         JLabel label = new JLabel(labelText);
-        label.setFont(label.getFont().deriveFont(Font.BOLD));
+        label.setFont(BASE_FONT.deriveFont(Font.BOLD));
         label.setForeground(fg);
         label.setBackground(bg);
         label.setOpaque(true);
         wrapper.add(label);
 
         JLabel summaryLabel = new JLabel("Summary: " + summarize(text));
-        summaryLabel.setFont(summaryLabel.getFont().deriveFont(Font.ITALIC, 11f));
+        summaryLabel.setFont(BASE_FONT.deriveFont(Font.ITALIC, 11f));
         summaryLabel.setForeground(fg);
         summaryLabel.setBackground(bg);
         summaryLabel.setOpaque(true);
@@ -206,7 +214,7 @@ public class ExchangePanel extends JPanel {
         sectionSpacing.setVisible(isExpanded);
         expandLabel.setText(isExpanded ? "\u2BC6" : "\u2BC8");
 
-        FontMetrics fm = getFontMetrics(getFont());
+        FontMetrics fm = getFontMetrics(BASE_FONT);
         int lineHeight = fm.getHeight();
         if (isExpanded) {
             setPreferredSize(null);

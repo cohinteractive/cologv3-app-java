@@ -2,6 +2,7 @@ package colog;
 
 import javax.swing.*;
 import java.awt.*;
+import static colog.UIStyle.*;
 
 /**
  * Displays a conversation title followed by its exchange panels.
@@ -17,14 +18,16 @@ public class ConversationPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 16f));
+        titleLabel.setFont(BASE_FONT.deriveFont(Font.BOLD, 18f));
         add(titleLabel);
 
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         add(separator);
 
         if (visibleExchanges.isEmpty()) {
-            add(new JLabel("(No exchanges)"));
+            JLabel empty = new JLabel("(No exchanges)");
+            empty.setFont(BASE_FONT);
+            add(empty);
         }
         for (Exchange ex : visibleExchanges) {
             ExchangePanel ep = new ExchangePanel(ex);
