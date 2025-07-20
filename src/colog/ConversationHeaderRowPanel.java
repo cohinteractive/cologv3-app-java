@@ -11,7 +11,7 @@ public class ConversationHeaderRowPanel extends JPanel {
     public ConversationHeaderRowPanel() {
         Color bg = new Color(40, 40, 40);
         Color fg = new Color(200, 200, 200);
-        Font font = BASE_FONT.deriveFont(Font.BOLD, BASE_FONT.getSize() - 1f);
+        Font font = BASE_FONT.deriveFont(Font.BOLD);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(true);
@@ -26,13 +26,13 @@ public class ConversationHeaderRowPanel extends JPanel {
         row.setBackground(bg);
         row.setAlignmentX(LEFT_ALIGNMENT);
 
-        row.add(createLabel("#", 40, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createLabel("Index", 40, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Ex", 60, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createLabel("Prompt Count", 60, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
         row.add(createLabel("Date/Time", 140, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Title", 300, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createLabel("Conversation Title", 300, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
         row.add(createLabel("Tags", 200, SwingConstants.RIGHT, fontHeight, font, fg, bg));
 
