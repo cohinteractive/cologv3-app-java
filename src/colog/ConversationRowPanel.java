@@ -52,13 +52,10 @@ public class ConversationRowPanel extends JPanel {
         row.setBackground(DARK_BG);
         row.setAlignmentX(LEFT_ALIGNMENT);
 
-        row.add(createCell(idLabel, 80, rowHeight));
-        row.add(createVLine(rowHeight));
-        row.add(createCell(countLabel, 120, rowHeight));
-        row.add(createVLine(rowHeight));
-        row.add(createCell(timeLabel, 140, rowHeight));
-        row.add(createVLine(rowHeight));
-        row.add(createCell(titleLabel, 300, rowHeight));
+        row.add(createCell(idLabel, 80, rowHeight, true));
+        row.add(createCell(countLabel, 120, rowHeight, true));
+        row.add(createCell(timeLabel, 140, rowHeight, true));
+        row.add(createCell(titleLabel, 300, rowHeight, false));
 
         row.setPreferredSize(new Dimension(Short.MAX_VALUE, rowHeight));
         row.setMaximumSize(new Dimension(Short.MAX_VALUE, rowHeight));
@@ -86,14 +83,14 @@ public class ConversationRowPanel extends JPanel {
         l.setPreferredSize(d);
         l.setMaximumSize(d);
         l.setMinimumSize(d);
-        l.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        l.setBorder(BorderFactory.createEmptyBorder());
         l.setForeground(LIGHT_TEXT);
         l.setBackground(DARK_BG);
         l.setOpaque(true);
         return l;
     }
 
-    private JPanel createCell(JLabel label, int width, int height) {
+    private JPanel createCell(JLabel label, int width, int height, boolean addRightBorder) {
         JPanel cell = new JPanel();
         cell.setLayout(new BoxLayout(cell, BoxLayout.X_AXIS));
         cell.setOpaque(false);
@@ -101,16 +98,13 @@ public class ConversationRowPanel extends JPanel {
         cell.setPreferredSize(d);
         cell.setMaximumSize(d);
         cell.setMinimumSize(d);
+        if (addRightBorder) {
+            label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(60, 60, 60)));
+        }
         cell.add(label);
         return cell;
     }
 
-    private JSeparator createVLine(int height) {
-        JSeparator vLine = new JSeparator(SwingConstants.VERTICAL);
-        vLine.setPreferredSize(new Dimension(1, height));
-        vLine.setForeground(new Color(60, 60, 60));
-        return vLine;
-    }
 
     private static String formatTimestamp(Conversation conversation) {
         if (conversation.exchanges.isEmpty()) return "";

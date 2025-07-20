@@ -25,14 +25,12 @@ public class ConversationHeaderRowPanel extends JPanel {
         row.setOpaque(true);
         row.setBackground(bg);
         row.setAlignmentX(LEFT_ALIGNMENT);
+        row.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(60, 60, 60)));
 
-        row.add(createCell("Index", 80, SwingConstants.LEFT, fontHeight, font, fg, bg));
-        row.add(createVLine(fontHeight));
-        row.add(createCell("Prompt Count", 120, SwingConstants.LEFT, fontHeight, font, fg, bg));
-        row.add(createVLine(fontHeight));
-        row.add(createCell("Date/Time", 140, SwingConstants.LEFT, fontHeight, font, fg, bg));
-        row.add(createVLine(fontHeight));
-        row.add(createCell("Conversation Title", 300, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createCell("Index", 80, SwingConstants.LEFT, fontHeight, font, fg, bg, true));
+        row.add(createCell("Prompt Count", 120, SwingConstants.LEFT, fontHeight, font, fg, bg, true));
+        row.add(createCell("Date/Time", 140, SwingConstants.LEFT, fontHeight, font, fg, bg, true));
+        row.add(createCell("Conversation Title", 300, SwingConstants.LEFT, fontHeight, font, fg, bg, false));
 
         row.setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight));
         row.setMaximumSize(new Dimension(Short.MAX_VALUE, fontHeight));
@@ -48,15 +46,18 @@ public class ConversationHeaderRowPanel extends JPanel {
         l.setPreferredSize(d);
         l.setMaximumSize(d);
         l.setMinimumSize(d);
-        l.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        l.setBorder(BorderFactory.createEmptyBorder());
         l.setForeground(fg);
         l.setBackground(bg);
         l.setOpaque(true);
         return l;
     }
 
-    private JPanel createCell(String text, int width, int align, int height, Font f, Color fg, Color bg) {
+    private JPanel createCell(String text, int width, int align, int height, Font f, Color fg, Color bg, boolean addRightBorder) {
         JLabel label = createLabel(text, width, align, height, f, fg, bg);
+        if (addRightBorder) {
+            label.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(60, 60, 60)));
+        }
         JPanel cell = new JPanel();
         cell.setLayout(new BoxLayout(cell, BoxLayout.X_AXIS));
         cell.setOpaque(false);
@@ -68,10 +69,4 @@ public class ConversationHeaderRowPanel extends JPanel {
         return cell;
     }
 
-    private JSeparator createVLine(int height) {
-        JSeparator vLine = new JSeparator(SwingConstants.VERTICAL);
-        vLine.setPreferredSize(new Dimension(1, height));
-        vLine.setForeground(new Color(60, 60, 60));
-        return vLine;
-    }
 }
