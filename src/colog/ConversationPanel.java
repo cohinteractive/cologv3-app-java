@@ -25,7 +25,7 @@ public class ConversationPanel extends JPanel {
         titlePanel.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
 
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        titleLabel.setFont(BASE_FONT.deriveFont(Font.BOLD, BASE_FONT.getSize2D() + 2f));
         titleLabel.setForeground(new Color(220, 220, 220));
         titlePanel.add(titleLabel);
 
