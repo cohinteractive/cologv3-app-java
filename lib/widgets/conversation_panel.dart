@@ -35,6 +35,9 @@ class _ConversationPanelState extends State<ConversationPanel>
     }
 
     final colorScheme = Theme.of(context).colorScheme;
+    // Colors used for prompt and response containers
+    const promptBg = Color(0xFF0D47A1); // dark blue
+    const responseBg = Color(0xFF424242); // dark grey
 
     return Container(
       color: colorScheme.background,
@@ -65,35 +68,36 @@ class _ConversationPanelState extends State<ConversationPanel>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceVariant,
+                        color: promptBg,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         ex.prompt,
                         maxLines: expanded ? null : 1,
-                        overflow:
-                            expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        overflow: expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade300,
+                            ),
                       ),
                     ),
                     if (ex.response != null) ...[
                       const SizedBox(height: 8),
                       Container(
+                        margin: const EdgeInsets.only(left: 16),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: colorScheme.surface,
+                          color: responseBg,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           ex.response!,
                           maxLines: expanded ? null : 1,
-                          overflow: expanded
-                              ? TextOverflow.visible
-                              : TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          overflow:
+                              expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Colors.grey.shade200,
+                              ),
                         ),
                       ),
                     ],
