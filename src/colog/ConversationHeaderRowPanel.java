@@ -26,15 +26,13 @@ public class ConversationHeaderRowPanel extends JPanel {
         row.setBackground(bg);
         row.setAlignmentX(LEFT_ALIGNMENT);
 
-        row.add(createCell("Index", 40, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createCell("Index", 80, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createCell("Prompt Count", 60, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createCell("Prompt Count", 120, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
         row.add(createCell("Date/Time", 140, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
         row.add(createCell("Conversation Title", 300, SwingConstants.LEFT, fontHeight, font, fg, bg));
-        row.add(createVLine(fontHeight));
-        row.add(createCell("Tags", 200, SwingConstants.RIGHT, fontHeight, font, fg, bg));
 
         row.setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight));
         row.setMaximumSize(new Dimension(Short.MAX_VALUE, fontHeight));

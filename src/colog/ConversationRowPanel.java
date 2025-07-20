@@ -28,7 +28,6 @@ public class ConversationRowPanel extends JPanel {
     private final JLabel timeLabel;
     private final JLabel countLabel;
     private final JLabel titleLabel;
-    private final JLabel tagLabel;
     private final JPanel row;
 
     public ConversationRowPanel(int index, Conversation conversation) {
@@ -42,11 +41,10 @@ public class ConversationRowPanel extends JPanel {
         FontMetrics fm = getFontMetrics(BASE_FONT);
         int rowHeight = fm.getHeight();
 
-        idLabel = createLabel("#" + index, 40, SwingConstants.LEFT, rowHeight);
-        countLabel = createLabel(Integer.toString(conversation.exchanges.size()), 60, SwingConstants.LEFT, rowHeight);
+        idLabel = createLabel("#" + index, 80, SwingConstants.LEFT, rowHeight);
+        countLabel = createLabel(Integer.toString(conversation.exchanges.size()), 120, SwingConstants.LEFT, rowHeight);
         timeLabel = createLabel(formatTimestamp(conversation), 140, SwingConstants.LEFT, rowHeight);
         titleLabel = createLabel(conversation.title, 300, SwingConstants.LEFT, rowHeight);
-        tagLabel = createLabel(buildTagSummary(conversation), 200, SwingConstants.RIGHT, rowHeight);
 
         row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
@@ -54,15 +52,13 @@ public class ConversationRowPanel extends JPanel {
         row.setBackground(DARK_BG);
         row.setAlignmentX(LEFT_ALIGNMENT);
 
-        row.add(createCell(idLabel, 40, rowHeight));
+        row.add(createCell(idLabel, 80, rowHeight));
         row.add(createVLine(rowHeight));
-        row.add(createCell(countLabel, 60, rowHeight));
+        row.add(createCell(countLabel, 120, rowHeight));
         row.add(createVLine(rowHeight));
         row.add(createCell(timeLabel, 140, rowHeight));
         row.add(createVLine(rowHeight));
         row.add(createCell(titleLabel, 300, rowHeight));
-        row.add(createVLine(rowHeight));
-        row.add(createCell(tagLabel, 200, rowHeight));
 
         row.setPreferredSize(new Dimension(Short.MAX_VALUE, rowHeight));
         row.setMaximumSize(new Dimension(Short.MAX_VALUE, rowHeight));
