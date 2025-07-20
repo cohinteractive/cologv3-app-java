@@ -39,3 +39,16 @@
 - Integrate Exchange rendering using parsed Exchange model objects
 - Preserve escape characters in rendered text (e.g., newlines shown correctly)
 - Load and render full conversations from large JSON files efficiently
+- Render a vertical, scrollable list of conversations in the left panel
+- Display conversation metadata (index, timestamp, title) using two-line layout
+- Add divider lines beneath each conversation entry for visual separation
+- Remove left border; use smart spacing for visual cleanliness
+- Highlight the selected conversation on click by inverting colors
+- Ensure only one conversation is highlighted at a time (de-highlight others)
+- Keep the selected conversation visually pinned during scroll
+- Deselect conversation via right-click
+- Add right-click context menu to conversation entries with:
+  - Custom<Clicked Element> stubbed function
+  - About stubbed function
+- Show the selected conversation's prompt/response view in the right panel
+- Ensure left and right panels scroll independently

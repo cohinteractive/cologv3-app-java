@@ -68,3 +68,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507202119][e05fac][FTR][ERR] Added non-blocking JSON load error panel
 [250721hhmm][f37ba41][FTR][REF] Added Exchange object to encapsulate prompt-response pairs, updated JSON parsing and view logic
 [250721hhmm][aaaece][DOC][SNC] Restructured TASKS.md and reorganized roadmap
+[250721hhmm][c047c3][SNC][DOC] Added structured tasks for conversation list UI implementation and updated CURRENT_CONTEXT.md to reflect active work
