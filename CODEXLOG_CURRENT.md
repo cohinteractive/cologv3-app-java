@@ -44,3 +44,4 @@ This file records all Codex-generated changes and implementations in this projec
 2507192338[03967f6][BUG][REF] Reduced padding in conversation and exchange panels
 [2507192352][6021439][BUG][REF] Hide preview line when exchange expanded
 [2507200003][799493][FTR][REF] Increased global font size and updated layouts
+[2507200036][f910cb][FTR][REF] Set window to 800x600 and center on startup
