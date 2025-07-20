@@ -74,3 +74,5 @@ This file records all Codex-generated changes and implementations in this projec
 [2507202313][c6222f][FTR][UI] Added expand/collapse toggle for exchanges in ConversationPanel
 [2507202330][6fd307][REF][UI] Styled prompt and response sections with indentation and background differentiation
 [2507202330][1644128][REF][UI] Styled prompt and response sections with indentation and background differentiation
+
+[2507212342][bd269b][FTR][UI] Added two-line prompt/response summary preview for collapsed exchanges
