@@ -39,7 +39,7 @@ public class Main {
     private static void createAndShowGUI() {
         frame = new JFrame("Colog V3");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(1600, 900);
         frame.setResizable(true);
         frame.getContentPane().setBackground(DARK_BG);
 
@@ -147,7 +147,7 @@ public class Main {
         });
 
         frame.pack();
-        frame.setSize(800, 600);
+        frame.setSize(1600, 900);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
@@ -194,6 +194,7 @@ public class Main {
                         "Parse Error", JOptionPane.ERROR_MESSAGE);
             }
             frame.pack();
+            frame.setSize(1600, 900);
         }
     }
 
