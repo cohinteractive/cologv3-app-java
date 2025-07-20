@@ -76,3 +76,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507202330][1644128][REF][UI] Styled prompt and response sections with indentation and background differentiation
 
 [2507212342][bd269b][FTR][UI] Added two-line prompt/response summary preview for collapsed exchanges
+[2507202355][ec794b][FTR][UI] Linked ConversationPanel to update based on selected conversation from sidebar

@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/conversation.dart';
 import 'services/json_loader.dart';
-import 'widgets/conversation_view.dart';
+import 'widgets/conversation_list.dart';
 import 'widgets/conversation_panel.dart';
 import 'widgets/menu_bar.dart';
 import 'widgets/error_panel.dart';
@@ -110,7 +110,15 @@ class _HomePageState extends State<HomePage> {
         children: [
           Expanded(
             flex: 1,
-            child: ConversationView(conversations: _conversations!),
+            child: ConversationList(
+              conversations: _conversations!,
+              selected: _selectedConversation,
+              onSelected: (c) {
+                setState(() {
+                  _selectedConversation = c;
+                });
+              },
+            ),
           ),
           Expanded(
             flex: 2,
