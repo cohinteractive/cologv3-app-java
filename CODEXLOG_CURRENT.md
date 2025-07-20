@@ -70,3 +70,4 @@ This file records all Codex-generated changes and implementations in this projec
 [250721hhmm][aaaece][DOC][SNC] Restructured TASKS.md and reorganized roadmap
 [250721hhmm][c047c3][SNC][DOC] Added structured tasks for conversation list UI implementation and updated CURRENT_CONTEXT.md to reflect active work
 [2507212230][339de53][FTR][UI] Added ConversationPanel widget with placeholder layout and integrated into main UI
+[2507202247][2b5b2f][FTR][UI] Rendered all exchanges in scrollable list inside ConversationPanel
