@@ -22,17 +22,24 @@ public class ConversationPanel extends JPanel {
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.X_AXIS));
         titlePanel.setBackground(new Color(32, 32, 32));
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(8, 12, 4, 12));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
 
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
         titleLabel.setForeground(new Color(220, 220, 220));
         titlePanel.add(titleLabel);
+
+        FontMetrics fm = getFontMetrics(titleLabel.getFont());
+        int height = fm.getHeight() + 8; // 4px top/bottom padding
+        Dimension d = new Dimension(Short.MAX_VALUE, height);
+        titlePanel.setPreferredSize(d);
+        titlePanel.setMaximumSize(d);
         titlePanel.setAlignmentX(LEFT_ALIGNMENT);
         add(titlePanel);
 
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setForeground(new Color(80, 80, 80));
+        separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         add(separator);
 
         if (visibleExchanges.isEmpty()) {
