@@ -99,21 +99,21 @@ Colog V3 helps you *capture, structure, and reuse* your development conversation
 
 ### 🎯 Goals
 
-- **Simplicity**
-- **Minimal tooling**
-- **Total control over source code**
-- **Codex-friendly, low-friction architecture**
+- **Cross-platform UI flexibility**
+- **Maintainable modern codebase**
+- **Codex-friendly, declarative structure**
+- **Future compatibility with minimal maintenance overhead**
 
 ### ⚙️ Platform & Tools
 
-| Component           | Choice                   | Notes |
-|---------------------|---------------------------|-------|
-| Language            | Java 21+                  | Modern features but stable and predictable |
-| UI Toolkit          | Swing                     | Lightweight, portable, no heavy UI dependencies |
-| Build System        | None                      | No Gradle, no Maven — compilation via simple scripts or IDE |
-| LLM Integration     | Optional API (e.g. OpenAI)| Local inference optional in future |
-| Version Control     | Git                       | Local + GitHub remote |
-| Coding Model        | Codex-led implementation  | ChatGPT manages design, Codex writes code, user reviews/fixes |
+| Component           | Choice                      | Notes |
+|---------------------|------------------------------|-------|
+| Language            | Dart                         | Primary language for Flutter |
+| Framework           | Flutter (latest stable)      | For building desktop/mobile/web app |
+| Editor              | VS Code                      | Codex-friendly and extensible |
+| Coding Model        | Codex-led implementation     | ChatGPT handles design and coordination, Codex implements |
+| Versioning          | Git + GitHub                 | Used for all source control |
+| Dependency Policy   | Use latest stable packages   | Avoid future compatibility cascades |
 
 ---
 
