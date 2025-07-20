@@ -149,6 +149,7 @@ public class ExchangePanel extends JPanel {
         area.setEditable(false);
         area.setFocusable(false);
         area.setBorder(null);
+        area.setMargin(new Insets(0, 0, 0, 0));
         area.setAlignmentX(LEFT_ALIGNMENT);
         return area;
     }
@@ -160,11 +161,11 @@ public class ExchangePanel extends JPanel {
         panel.setBackground(bg);
         panel.setOpaque(true);
         panel.setAlignmentX(LEFT_ALIGNMENT);
-        panel.setBorder(new EmptyBorder(4, 4, 4, 4));
+        panel.setBorder(new EmptyBorder(4, 0, 4, 0));
 
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
-        wrapper.setBorder(BorderFactory.createEmptyBorder(0, indent ? 20 : 0, 0, 0));
+        wrapper.setBorder(BorderFactory.createEmptyBorder(0, indent ? 15 : 0, 0, 0));
         wrapper.setOpaque(false);
 
         JLabel label = new JLabel(labelText);

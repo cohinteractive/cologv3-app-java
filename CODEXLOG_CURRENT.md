@@ -50,3 +50,4 @@ This file records all Codex-generated changes and implementations in this projec
 
 [2507200104][bd134d4][BUG][REF] Styled conversation title panel
 [2507200120][8ad7d2][BUG][REF] Adjusted conversation title sizing and removed extra padding
+[2507200152][43fb49][BUG][REF] Fixed excessive indent in ExchangePanel layout
