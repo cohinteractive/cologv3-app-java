@@ -24,18 +24,20 @@ public class ConversationHeaderRowPanel extends JPanel {
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
         row.setOpaque(true);
         row.setBackground(bg);
+        row.setAlignmentX(LEFT_ALIGNMENT);
 
-        row.add(createLabel("#", 30, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createLabel("#", 40, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Ex", 40, SwingConstants.RIGHT, fontHeight, font, fg, bg));
+        row.add(createLabel("Ex", 60, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Date/Time", 110, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createLabel("Date/Time", 140, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(createLabel("Title", 240, SwingConstants.LEFT, fontHeight, font, fg, bg));
+        row.add(createLabel("Title", 300, SwingConstants.LEFT, fontHeight, font, fg, bg));
         row.add(createVLine(fontHeight));
-        row.add(Box.createHorizontalGlue());
+        row.add(createLabel("Tags", 200, SwingConstants.RIGHT, fontHeight, font, fg, bg));
 
         row.setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight));
+        row.setMaximumSize(new Dimension(Short.MAX_VALUE, fontHeight));
         add(row);
         setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight + 1));
     }

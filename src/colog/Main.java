@@ -84,6 +84,7 @@ public class Main {
         conversationScrollPane = new JScrollPane(conversationListPanel);
         conversationScrollPane.getVerticalScrollBar().setUnitIncrement(24);
         conversationScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        conversationScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         conversationScrollPane.getViewport().setBackground(DARK_BG);
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
