@@ -14,6 +14,7 @@ import java.util.List;
 import colog.TagFilter;
 import colog.ConversationRowPanel;
 import static colog.Theme.*;
+import static colog.UIStyle.*;
 
 
 public class Main {
@@ -45,20 +46,24 @@ public class Main {
         JMenuBar menuBar = new JMenuBar();
         menuBar.setBackground(DARK_BG);
         menuBar.setForeground(LIGHT_TEXT);
+        menuBar.setFont(BASE_FONT);
         JMenu fileMenu = new JMenu("File");
         fileMenu.setBackground(DARK_BG);
         fileMenu.setForeground(LIGHT_TEXT);
+        fileMenu.setFont(BASE_FONT);
 
         JMenuItem openItem = new JMenuItem("Open");
         openItem.addActionListener(e -> handleOpen(frame));
         openItem.setBackground(DARK_BG);
         openItem.setForeground(LIGHT_TEXT);
+        openItem.setFont(BASE_FONT);
         fileMenu.add(openItem);
 
         JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(e -> System.exit(0));
         exitItem.setBackground(DARK_BG);
         exitItem.setForeground(LIGHT_TEXT);
+        exitItem.setFont(BASE_FONT);
         fileMenu.add(exitItem);
 
         menuBar.add(fileMenu);
@@ -85,19 +90,23 @@ public class Main {
         searchPanel.setBackground(DARK_BG);
         JLabel searchLabel = new JLabel("Search prompt/response:");
         searchLabel.setForeground(LIGHT_TEXT);
+        searchLabel.setFont(BASE_FONT);
         searchPanel.add(searchLabel);
         searchField = new JTextField(40);
         searchField.setBackground(DARK_BG);
         searchField.setForeground(LIGHT_TEXT);
         searchField.setCaretColor(LIGHT_TEXT);
+        searchField.setFont(BASE_FONT);
         searchPanel.add(searchField);
         tagFilterStatus = new JLabel();
         tagFilterStatus.setForeground(LIGHT_TEXT);
+        tagFilterStatus.setFont(BASE_FONT);
         searchPanel.add(tagFilterStatus);
         clearFilter = new JButton("Clear Tag Filter");
         clearFilter.addActionListener(e -> TagFilter.clear());
         clearFilter.setBackground(DARK_BG);
         clearFilter.setForeground(LIGHT_TEXT);
+        clearFilter.setFont(BASE_FONT);
         searchPanel.add(clearFilter);
         clearFilter.setEnabled(false);
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -136,6 +145,7 @@ public class Main {
             }
         });
 
+        frame.pack();
         frame.setVisible(true);
     }
 
@@ -180,6 +190,7 @@ public class Main {
                 JOptionPane.showMessageDialog(parent, "Failed to parse JSON: " + ex.getMessage(),
                         "Parse Error", JOptionPane.ERROR_MESSAGE);
             }
+            frame.pack();
         }
     }
 

@@ -3,6 +3,7 @@ package colog;
 import javax.swing.*;
 import java.awt.*;
 import static colog.Theme.*;
+import static colog.UIStyle.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
@@ -37,8 +38,8 @@ public class ConversationRowPanel extends JPanel {
         setOpaque(true);
         setBackground(DARK_BG);
 
-        Font font = getFont();
-        int fontHeight = getFontMetrics(font).getHeight();
+        FontMetrics fm = getFontMetrics(BASE_FONT);
+        int fontHeight = fm.getHeight();
 
         idLabel = createLabel("#" + index, 30, SwingConstants.LEFT, fontHeight);
         countLabel = createLabel("\u00D7" + conversation.exchanges.size(), 40, SwingConstants.RIGHT, fontHeight);
@@ -65,6 +66,7 @@ public class ConversationRowPanel extends JPanel {
 
     private JLabel createLabel(String text, int width, int align, int height) {
         JLabel l = new JLabel(text);
+        l.setFont(BASE_FONT);
         l.setHorizontalAlignment(align);
         Dimension d = new Dimension(width, height);
         l.setPreferredSize(d);
