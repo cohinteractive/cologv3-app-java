@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/conversation.dart';
+import '../models/exchange.dart';
 
 class ConversationPanel extends StatefulWidget {
   final Conversation? conversation;
@@ -13,6 +14,8 @@ class ConversationPanel extends StatefulWidget {
 class _ConversationPanelState extends State<ConversationPanel>
     with TickerProviderStateMixin {
   final Set<int> _expanded = <int>{};
+  static const promptBg = Color(0xFF0D47A1); // dark blue
+  static const responseBg = Color(0xFF424242); // dark grey
 
   @override
   void didUpdateWidget(covariant ConversationPanel oldWidget) {
@@ -35,9 +38,6 @@ class _ConversationPanelState extends State<ConversationPanel>
     }
 
     final colorScheme = Theme.of(context).colorScheme;
-    // Colors used for prompt and response containers
-    const promptBg = Color(0xFF0D47A1); // dark blue
-    const responseBg = Color(0xFF424242); // dark grey
 
     return Container(
       color: colorScheme.background,
@@ -62,52 +62,101 @@ class _ConversationPanelState extends State<ConversationPanel>
               child: AnimatedSize(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeInOut,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: promptBg,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        ex.prompt,
-                        maxLines: expanded ? null : 1,
-                        overflow: expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade300,
+                child: expanded
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: promptBg,
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                      ),
-                    ),
-                    if (ex.response != null) ...[
-                      const SizedBox(height: 8),
-                      Container(
-                        margin: const EdgeInsets.only(left: 16),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: responseBg,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          ex.response!,
-                          maxLines: expanded ? null : 1,
-                          overflow:
-                              expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey.shade200,
+                            child: Text(
+                              ex.prompt,
+                              maxLines: null,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade300,
+                                  ),
+                            ),
+                          ),
+                          if (ex.response != null) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              margin: const EdgeInsets.only(left: 16),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: responseBg,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                              child: Text(
+                                ex.response!,
+                                maxLines: null,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: Colors.grey.shade200,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      )
+                    : _buildCollapsedPreview(context, ex),
               ),
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildCollapsedPreview(BuildContext context, Exchange ex) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: promptBg,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            ex.prompt,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade300,
+                ),
+          ),
+        ),
+        if (ex.response != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Container(
+              margin: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: responseBg,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                ex.response!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.grey.shade200,
+                    ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
