@@ -242,6 +242,7 @@ public class Main {
     private static void buildConversationList() {
         conversationListPanel.removeAll();
         conversationRows.clear();
+        conversationListPanel.add(new ConversationHeaderRowPanel());
         for (int i = 0; i < visibleConversations.size(); i++) {
             Conversation c = visibleConversations.get(i);
             ConversationRowPanel row = new ConversationRowPanel(i + 1, c);
