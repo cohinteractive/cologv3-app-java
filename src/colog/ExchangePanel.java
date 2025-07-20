@@ -102,7 +102,7 @@ public class ExchangePanel extends JPanel {
         wrapper.add(label);
 
         JLabel summaryLabel = new JLabel("Summary: " + summarize(text));
-        summaryLabel.setFont(BASE_FONT.deriveFont(Font.ITALIC, 11f));
+        summaryLabel.setFont(BASE_FONT.deriveFont(Font.ITALIC, BASE_FONT.getSize2D() - 1f));
         summaryLabel.setForeground(fg);
         summaryLabel.setBackground(bg);
         summaryLabel.setOpaque(true);

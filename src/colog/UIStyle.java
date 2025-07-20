@@ -7,5 +7,5 @@ import java.awt.Font;
  */
 public class UIStyle {
     /** Base font applied across the UI */
-    public static final Font BASE_FONT = new Font("SansSerif", Font.PLAIN, 12);
+    public static final Font BASE_FONT = new Font("SansSerif", Font.PLAIN, 14);
 }
