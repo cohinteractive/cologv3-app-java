@@ -5,6 +5,11 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'models/conversation.dart';
+import 'services/json_loader.dart';
+import 'widgets/conversation_view.dart';
+import 'widgets/menu_bar.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows) {
@@ -29,7 +34,7 @@ class CologApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const darkBlue = Color(0xFF0B1E2D);
     return MaterialApp(
-      title: 'Colog V3',
+      title: '',
       theme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark(
@@ -52,6 +57,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Conversation>? _conversations;
+  bool _loading = false;
   Future<void> _openJsonFile() async {
     final prefs = await SharedPreferences.getInstance();
     final initialDir = prefs.getString('last_dir');
@@ -62,7 +69,12 @@ class _HomePageState extends State<HomePage> {
     );
     if (file != null) {
       prefs.setString('last_dir', File(file.path).parent.path);
-      // TODO: handle loaded JSON file
+      setState(() => _loading = true);
+      final convs = await JsonLoader.loadConversations(file.path);
+      setState(() {
+        _conversations = convs;
+        _loading = false;
+      });
     }
   }
 
@@ -72,31 +84,21 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget body;
+    if (_loading) {
+      body = const Center(child: CircularProgressIndicator());
+    } else if (_conversations != null) {
+      body = ConversationView(conversations: _conversations!);
+    } else {
+      body = const Center(child: Text('Welcome to Colog V3'));
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Colog V3'),
-        actions: [
-          MenuBar(children: [
-            SubmenuButton(
-              menuChildren: [
-                MenuItemButton(
-                  onPressed: _openJsonFile,
-                  child: const Text('Open'),
-                ),
-                const SizedBox(height: 8),
-                MenuItemButton(
-                  onPressed: _exitApp,
-                  child: const Text('Exit'),
-                ),
-              ],
-              child: const Text('File'),
-            ),
-          ])
-        ],
+        titleSpacing: 0,
+        leading: AppMenuBar(onOpen: _openJsonFile, onExit: _exitApp),
       ),
-      body: const Center(
-        child: Text('Welcome to Colog V3'),
-      ),
+      body: body,
     );
   }
 }
