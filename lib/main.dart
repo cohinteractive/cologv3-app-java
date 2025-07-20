@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'models/conversation.dart';
 import 'services/json_loader.dart';
 import 'widgets/conversation_view.dart';
+import 'widgets/conversation_panel.dart';
 import 'widgets/menu_bar.dart';
 import 'widgets/error_panel.dart';
 
@@ -59,6 +60,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Conversation>? _conversations;
+  Conversation? _selectedConversation;
   bool _loading = false;
   String? _error;
   Future<void> _openJsonFile() async {
@@ -79,6 +81,7 @@ class _HomePageState extends State<HomePage> {
         final convs = await JsonLoader.loadConversations(file.path);
         setState(() {
           _conversations = convs;
+          _selectedConversation = null;
           _loading = false;
         });
       } on JsonLoadException catch (e) {
@@ -103,7 +106,18 @@ class _HomePageState extends State<HomePage> {
     } else if (_error != null) {
       body = ErrorPanel(message: _error!);
     } else if (_conversations != null) {
-      body = ConversationView(conversations: _conversations!);
+      body = Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: ConversationView(conversations: _conversations!),
+          ),
+          Expanded(
+            flex: 2,
+            child: ConversationPanel(conversation: _selectedConversation),
+          ),
+        ],
+      );
     } else {
       body = const Center(child: Text('Welcome to Colog V3'));
     }
