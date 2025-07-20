@@ -67,3 +67,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507212106][c4d10d][FTR][REF] Replaced app title, repositioned File menu, added full ChatGPT JSON loader with structured display and escaped character rendering
 [2507202119][e05fac][FTR][ERR] Added non-blocking JSON load error panel
 [250721hhmm][f37ba41][FTR][REF] Added Exchange object to encapsulate prompt-response pairs, updated JSON parsing and view logic
+[250721hhmm][aaaece][DOC][SNC] Restructured TASKS.md and reorganized roadmap

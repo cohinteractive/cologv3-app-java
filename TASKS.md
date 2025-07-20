@@ -2,22 +2,19 @@
 
 ## ✅ Completed
 - Placeholder for completed tasks
-
-## 🚧 In Progress
-- None
-- Improve tag labels with clickable styling and hover feedback
-- Increase global font size to improve readability
-- Fix right panel background not applying dark theme on initial file load
-
-## 🔜 Upcoming
-- Set up initial project structure and documentation
-- Define build and run scripts
-
 - Add initial Flutter app skeleton
 - Implement file selection and JSON preview
 - Display scrollable conversation and exchange views
 - Integrate custom JSON parser for ChatGPT export format
 - Build dynamic mapping of JSON into Exchanges grouped by Conversation
+- Apply dark theme styling throughout
+- Add conversation list header panel with labels
+
+
+## 🕰️ Legacy Tasks (Pre-UI Redesign)
+- Set up initial project structure and documentation
+- Define build and run scripts
+
 - Support toggleable expand/collapse per Exchange
 - Preserve expand state and scroll position
 - Automatically summarize exchanges and infer tags
@@ -30,6 +27,15 @@
 - Display preview summary lines per exchange
 - Indent responses in a wrapper panel
 - Show exchange counts in conversation rows
-- Apply dark theme styling throughout
-- Add conversation list header panel with labels
 
+## 🔜 Upcoming
+- Implement expandable Exchange panels that toggle on click
+- Add hover-based action icons (e.g., summarize, collapse) on Exchange containers
+- Visually delineate prompt/response pairs using background color and indentation
+- Create a collapsible left sidebar for browsing collapsed conversation titles
+- Add responsive layout with central content column and left/right padding
+- Enable fast, smooth scrolling for large conversation files
+- Display styled inline error panel on JSON parse failure (non-blocking)
+- Integrate Exchange rendering using parsed Exchange model objects
+- Preserve escape characters in rendered text (e.g., newlines shown correctly)
+- Load and render full conversations from large JSON files efficiently
