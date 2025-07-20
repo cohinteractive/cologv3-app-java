@@ -13,9 +13,15 @@ class JsonLoader {
 }
 
 Future<List<Conversation>> _parseFile(String path) async {
-  final raw = await File(path).readAsString();
-  final data = jsonDecode(raw);
-  return _parseData(data);
+  try {
+    final raw = await File(path).readAsString();
+    final data = jsonDecode(raw);
+    return _parseData(data);
+  } on FormatException catch (e) {
+    throw JsonLoadException(e.message);
+  } on Exception catch (e) {
+    throw JsonLoadException(e.toString());
+  }
 }
 
 List<Conversation> _parseData(dynamic data) {
@@ -97,4 +103,12 @@ String _extractText(Map msg) {
     }
   }
   return '';
+}
+
+class JsonLoadException implements Exception {
+  final String message;
+  JsonLoadException(this.message);
+
+  @override
+  String toString() => message;
 }
