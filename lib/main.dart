@@ -9,6 +9,7 @@ import 'models/conversation.dart';
 import 'services/json_loader.dart';
 import 'widgets/conversation_view.dart';
 import 'widgets/menu_bar.dart';
+import 'widgets/error_panel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,6 +60,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Conversation>? _conversations;
   bool _loading = false;
+  String? _error;
   Future<void> _openJsonFile() async {
     final prefs = await SharedPreferences.getInstance();
     final initialDir = prefs.getString('last_dir');
@@ -69,12 +71,23 @@ class _HomePageState extends State<HomePage> {
     );
     if (file != null) {
       prefs.setString('last_dir', File(file.path).parent.path);
-      setState(() => _loading = true);
-      final convs = await JsonLoader.loadConversations(file.path);
       setState(() {
-        _conversations = convs;
-        _loading = false;
+        _loading = true;
+        _error = null;
       });
+      try {
+        final convs = await JsonLoader.loadConversations(file.path);
+        setState(() {
+          _conversations = convs;
+          _loading = false;
+        });
+      } on JsonLoadException catch (e) {
+        setState(() {
+          _conversations = null;
+          _error = e.message;
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -87,6 +100,8 @@ class _HomePageState extends State<HomePage> {
     Widget body;
     if (_loading) {
       body = const Center(child: CircularProgressIndicator());
+    } else if (_error != null) {
+      body = ErrorPanel(message: _error!);
     } else if (_conversations != null) {
       body = ConversationView(conversations: _conversations!);
     } else {
