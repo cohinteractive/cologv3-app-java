@@ -18,10 +18,12 @@ public class ConversationPanel extends JPanel {
     public ConversationPanel(String title, java.util.List<Exchange> visibleExchanges) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(DARK_BG);
+        setOpaque(true);
 
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.X_AXIS));
         titlePanel.setBackground(new Color(32, 32, 32));
+        titlePanel.setOpaque(true);
         titlePanel.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
 
         JLabel titleLabel = new JLabel(title);
