@@ -29,12 +29,13 @@ public class ConversationRowPanel extends JPanel {
     private final JLabel countLabel;
     private final JLabel titleLabel;
     private final JLabel tagLabel;
+    private final JPanel row;
 
     public ConversationRowPanel(int index, Conversation conversation) {
         this.index = index;
         this.conversation = conversation;
 
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(true);
         setBackground(DARK_BG);
 
@@ -47,14 +48,30 @@ public class ConversationRowPanel extends JPanel {
         titleLabel = createLabel(conversation.title, 240, SwingConstants.LEFT, fontHeight);
         tagLabel = createLabel(buildTagSummary(conversation), 100, SwingConstants.RIGHT, fontHeight);
 
-        add(idLabel);
-        add(countLabel);
-        add(timeLabel);
-        add(titleLabel);
-        add(Box.createHorizontalGlue());
-        add(tagLabel);
+        row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        row.setOpaque(true);
+        row.setBackground(DARK_BG);
 
-        setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight));
+        row.add(idLabel);
+        row.add(createVLine(fontHeight));
+        row.add(countLabel);
+        row.add(createVLine(fontHeight));
+        row.add(timeLabel);
+        row.add(createVLine(fontHeight));
+        row.add(titleLabel);
+        row.add(createVLine(fontHeight));
+        row.add(Box.createHorizontalGlue());
+        row.add(tagLabel);
+
+        row.setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight));
+        add(row);
+
+        JSeparator hLine = new JSeparator(SwingConstants.HORIZONTAL);
+        hLine.setForeground(new Color(60, 60, 60));
+        add(hLine);
+
+        setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight + 1));
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -76,6 +93,13 @@ public class ConversationRowPanel extends JPanel {
         l.setBackground(DARK_BG);
         l.setOpaque(true);
         return l;
+    }
+
+    private JSeparator createVLine(int height) {
+        JSeparator vLine = new JSeparator(SwingConstants.VERTICAL);
+        vLine.setPreferredSize(new Dimension(1, height));
+        vLine.setForeground(new Color(60, 60, 60));
+        return vLine;
     }
 
     private static String formatTimestamp(Conversation conversation) {
@@ -102,6 +126,8 @@ public class ConversationRowPanel extends JPanel {
     }
 
     public void setSelected(boolean selected) {
-        setBackground(selected ? new Color(50, 50, 80) : DARK_BG);
+        Color bg = selected ? new Color(50, 50, 80) : DARK_BG;
+        setBackground(bg);
+        row.setBackground(bg);
     }
 }
