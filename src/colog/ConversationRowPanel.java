@@ -40,38 +40,39 @@ public class ConversationRowPanel extends JPanel {
         setBackground(DARK_BG);
 
         FontMetrics fm = getFontMetrics(BASE_FONT);
-        int fontHeight = fm.getHeight();
+        int rowHeight = fm.getHeight();
 
-        idLabel = createLabel("#" + index, 30, SwingConstants.LEFT, fontHeight);
-        countLabel = createLabel("\u00D7" + conversation.exchanges.size(), 40, SwingConstants.RIGHT, fontHeight);
-        timeLabel = createLabel(formatTimestamp(conversation), 110, SwingConstants.LEFT, fontHeight);
-        titleLabel = createLabel(conversation.title, 240, SwingConstants.LEFT, fontHeight);
-        tagLabel = createLabel(buildTagSummary(conversation), 100, SwingConstants.RIGHT, fontHeight);
+        idLabel = createLabel("#" + index, 40, SwingConstants.LEFT, rowHeight);
+        countLabel = createLabel(Integer.toString(conversation.exchanges.size()), 60, SwingConstants.LEFT, rowHeight);
+        timeLabel = createLabel(formatTimestamp(conversation), 140, SwingConstants.LEFT, rowHeight);
+        titleLabel = createLabel(conversation.title, 300, SwingConstants.LEFT, rowHeight);
+        tagLabel = createLabel(buildTagSummary(conversation), 200, SwingConstants.RIGHT, rowHeight);
 
         row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
         row.setOpaque(true);
         row.setBackground(DARK_BG);
+        row.setAlignmentX(LEFT_ALIGNMENT);
 
         row.add(idLabel);
-        row.add(createVLine(fontHeight));
+        row.add(createVLine(rowHeight));
         row.add(countLabel);
-        row.add(createVLine(fontHeight));
+        row.add(createVLine(rowHeight));
         row.add(timeLabel);
-        row.add(createVLine(fontHeight));
+        row.add(createVLine(rowHeight));
         row.add(titleLabel);
-        row.add(createVLine(fontHeight));
-        row.add(Box.createHorizontalGlue());
+        row.add(createVLine(rowHeight));
         row.add(tagLabel);
 
-        row.setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight));
+        row.setPreferredSize(new Dimension(Short.MAX_VALUE, rowHeight));
+        row.setMaximumSize(new Dimension(Short.MAX_VALUE, rowHeight));
         add(row);
 
         JSeparator hLine = new JSeparator(SwingConstants.HORIZONTAL);
         hLine.setForeground(new Color(60, 60, 60));
         add(hLine);
 
-        setPreferredSize(new Dimension(Short.MAX_VALUE, fontHeight + 1));
+        setPreferredSize(new Dimension(Short.MAX_VALUE, rowHeight + 1));
 
         addMouseListener(new MouseAdapter() {
             @Override
