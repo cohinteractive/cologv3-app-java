@@ -72,20 +72,28 @@ public class Main {
         container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
         container.setBackground(DARK_BG);
+        container.setOpaque(true);
 
         scrollPane = new JScrollPane(container);
         scrollPane.getVerticalScrollBar().setUnitIncrement(24);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setBackground(DARK_BG);
+        scrollPane.setOpaque(true);
         scrollPane.getViewport().setBackground(DARK_BG);
+        scrollPane.getViewport().setOpaque(true);
 
         conversationListPanel = new JPanel();
         conversationListPanel.setLayout(new BoxLayout(conversationListPanel, BoxLayout.Y_AXIS));
         conversationListPanel.setBackground(DARK_BG);
+        conversationListPanel.setOpaque(true);
         conversationScrollPane = new JScrollPane(conversationListPanel);
         conversationScrollPane.getVerticalScrollBar().setUnitIncrement(24);
         conversationScrollPane.setBorder(BorderFactory.createEmptyBorder());
         conversationScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        conversationScrollPane.setBackground(DARK_BG);
+        conversationScrollPane.setOpaque(true);
         conversationScrollPane.getViewport().setBackground(DARK_BG);
+        conversationScrollPane.getViewport().setOpaque(true);
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.setBackground(DARK_BG);

@@ -40,6 +40,7 @@ public class ExchangePanel extends JPanel {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(DARK_BG);
+        setOpaque(true);
         setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         expandLabel = new JLabel("\u2BC8");
