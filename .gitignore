@@ -1,0 +1,53 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+flutter_*.png
+generated_plugin_registrant.dart
+
+# Dependency and environment
+pubspec.lock
+.env
+.env.*
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Android
+android/local.properties
+
+# iOS
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/.symlinks/
+ios/Pods/
+ios/Runner.xcworkspace
+ios/Runner.xcodeproj/project.xcworkspace/
+ios/build/
+
+# Web
+web/generated_plugin_registrant.dart
+
+# Windows
+windows/runner/GeneratedPluginRegistrant.*
+windows/.vs/
+windows/Flutter/ephemeral/
+windows/build/
+
+# MacOS
+macos/Flutter/ephemeral/
+macos/Pods/
+macos/Runner.xcworkspace/
+macos/build/
+
+# Linux
+linux/Flutter/ephemeral/
+linux/build/
