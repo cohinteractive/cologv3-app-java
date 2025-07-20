@@ -16,15 +16,11 @@ public class ExchangePanel extends JPanel {
 
     private final String promptText;
     private final String responseText;
+    private final String timestamp;
+    private final java.util.List<String> tags;
 
-    private final JTextArea summaryArea;
-    private final JTextArea promptArea;
-    private final JTextArea responseArea;
-    private final JPanel promptSection;
-    private final JPanel responseSection;
     private final JLabel expandLabel;
-    private final Component summarySpacing;
-    private final Component sectionSpacing;
+    private final JLabel timestampLabel;
     private boolean isExpanded = false;
     private Exchange exchange;
 
@@ -36,22 +32,20 @@ public class ExchangePanel extends JPanel {
     }
 
     private ExchangePanel(String timestamp, String prompt, String response, java.util.List<String> tagsList) {
+        this.timestamp = timestamp;
         this.promptText = prompt == null ? "" : prompt.replace("\\n", "\n");
         this.responseText = response == null ? "" : response.replace("\\n", "\n");
+        this.tags = new java.util.ArrayList<>(tagsList);
         this.exchange = null;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(DARK_BG);
-        // Remove default line border for compact stacked layout
         setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
-        JPanel header = new JPanel();
-        header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
-        header.setOpaque(false);
 
         expandLabel = new JLabel("\u2BC8");
         expandLabel.setFont(BASE_FONT);
         expandLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        expandLabel.setForeground(LIGHT_TEXT);
         expandLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         expandLabel.addMouseListener(new MouseAdapter() {
             @Override
@@ -59,79 +53,11 @@ public class ExchangePanel extends JPanel {
                 toggleExpanded();
             }
         });
-        header.add(expandLabel);
 
-        JLabel timeLabel = new JLabel(timestamp);
-        timeLabel.setFont(BASE_FONT);
-        timeLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        timeLabel.setForeground(LIGHT_TEXT);
-        expandLabel.setForeground(LIGHT_TEXT);
-        header.add(timeLabel);
-
-        header.add(Box.createHorizontalGlue());
-        header.setAlignmentX(LEFT_ALIGNMENT);
-        add(header);
-
-        summaryArea = createArea(firstLine(promptText));
-        summaryArea.setFont(BASE_FONT);
-        summaryArea.setRows(1);
-        summaryArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, summaryArea.getPreferredSize().height));
-        summaryArea.setAlignmentX(LEFT_ALIGNMENT);
-        summaryArea.setBackground(DARK_BG);
-        summaryArea.setForeground(LIGHT_TEXT);
-        add(summaryArea);
-
-        summarySpacing = Box.createVerticalStrut(4);
-        add(summarySpacing);
-
-        promptArea = createArea(promptText);
-        promptArea.setFont(BASE_FONT);
-        responseArea = createArea(responseText);
-        responseArea.setFont(BASE_FONT);
-
-        promptSection = buildSection("Prompt", promptText, promptArea, PROMPT_BG, LIGHT_TEXT, false);
-        responseSection = buildSection("Response", responseText, responseArea, RESPONSE_BG, LIGHT_TEXT, true);
-
-        promptSection.setVisible(false);
-        responseSection.setVisible(false);
-
-        add(promptSection);
-        sectionSpacing = Box.createVerticalStrut(8);
-        add(sectionSpacing);
-        add(responseSection);
-
-        JPanel tagPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
-        tagPanel.setOpaque(false);
-        for (String tag : tagsList) {
-            final String t = tag;
-            JLabel tagLabel = new JLabel("#" + tag);
-            tagLabel.setFont(BASE_FONT);
-            tagLabel.setForeground(LIGHT_TEXT);
-            tagLabel.setBackground(TAG_BG);
-            tagLabel.setOpaque(true);
-            tagLabel.setBorder(new EmptyBorder(0, 4, 0, 4));
-            tagLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            tagLabel.setToolTipText("Click to filter by #" + tag);
-            tagLabel.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    TagFilter.setActiveTag(t);
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    tagLabel.setFont(tagLabel.getFont().deriveFont(Font.BOLD));
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    tagLabel.setFont(tagLabel.getFont().deriveFont(Font.PLAIN));
-                }
-            });
-            tagPanel.add(tagLabel);
-        }
-        tagPanel.setAlignmentX(LEFT_ALIGNMENT);
-        add(tagPanel);
+        timestampLabel = new JLabel(timestamp);
+        timestampLabel.setFont(BASE_FONT);
+        timestampLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        timestampLabel.setForeground(LIGHT_TEXT);
 
         updateLayout();
     }
@@ -201,28 +127,73 @@ public class ExchangePanel extends JPanel {
         return summary;
     }
 
-    private String firstLine(String text) {
-        if (text == null) return "";
-        int idx = text.indexOf('\n');
-        return idx >= 0 ? text.substring(0, idx) : text;
+    private JPanel buildTagPanel() {
+        JPanel tagPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        tagPanel.setOpaque(false);
+        for (String tag : tags) {
+            final String t = tag;
+            JLabel tagLabel = new JLabel("#" + tag);
+            tagLabel.setFont(BASE_FONT);
+            tagLabel.setForeground(LIGHT_TEXT);
+            tagLabel.setBackground(TAG_BG);
+            tagLabel.setOpaque(true);
+            tagLabel.setBorder(new EmptyBorder(0, 4, 0, 4));
+            tagLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            tagLabel.setToolTipText("Click to filter by #" + tag);
+            tagLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    TagFilter.setActiveTag(t);
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    tagLabel.setFont(tagLabel.getFont().deriveFont(Font.BOLD));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    tagLabel.setFont(tagLabel.getFont().deriveFont(Font.PLAIN));
+                }
+            });
+            tagPanel.add(tagLabel);
+        }
+        return tagPanel;
     }
 
     private void updateLayout() {
-        summaryArea.setVisible(!isExpanded);
-        promptSection.setVisible(isExpanded);
-        responseSection.setVisible(isExpanded);
-        summarySpacing.setVisible(isExpanded);
-        sectionSpacing.setVisible(isExpanded);
+        removeAll();
+
         expandLabel.setText(isExpanded ? "\u2BC6" : "\u2BC8");
 
+        JPanel topRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        topRow.setOpaque(false);
+        topRow.add(expandLabel);
+        topRow.add(timestampLabel);
+        topRow.setAlignmentX(LEFT_ALIGNMENT);
+        add(topRow);
+
+        JLabel summaryLabel = new JLabel(summarize(promptText));
+        summaryLabel.setFont(BASE_FONT);
+        summaryLabel.setForeground(LIGHT_TEXT);
+        summaryLabel.setAlignmentX(LEFT_ALIGNMENT);
+        add(summaryLabel);
+
+        if (isExpanded) {
+            add(buildSection("Prompt", promptText, createArea(promptText), PROMPT_BG, LIGHT_TEXT, false));
+            add(Box.createVerticalStrut(8));
+            add(buildSection("Response", responseText, createArea(responseText), RESPONSE_BG, LIGHT_TEXT, true));
+            JPanel tagPanel = buildTagPanel();
+            tagPanel.setAlignmentX(LEFT_ALIGNMENT);
+            add(tagPanel);
+        }
+
         FontMetrics fm = getFontMetrics(BASE_FONT);
-        int lineHeight = fm.getHeight();
         if (isExpanded) {
             setPreferredSize(null);
             setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         } else {
-            int lines = 3; // header, summary, tag row
-            int height = lineHeight * lines;
+            int height = fm.getHeight() * 2; // top row + summary
             Dimension d = new Dimension(Integer.MAX_VALUE, height);
             setPreferredSize(d);
             setMaximumSize(d);
