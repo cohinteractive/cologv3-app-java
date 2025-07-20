@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: _openJsonFile,
                   child: const Text('Open'),
                 ),
-                const MenuDivider(),
+                const SizedBox(height: 8),
                 MenuItemButton(
                   onPressed: _exitApp,
                   child: const Text('Exit'),
