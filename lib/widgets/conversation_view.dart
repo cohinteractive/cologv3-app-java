@@ -50,12 +50,13 @@ class ConversationView extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
-          child: Text('User : ${ex.user.replaceAll("\r", "")}') ,
+          child: Text('User : ${ex.prompt.replaceAll("\r", "")}'),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 24.0, bottom: 4.0),
-          child: Text('Agent : ${ex.agent.replaceAll("\r", "")}'),
-        ),
+        if (ex.response != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 24.0, bottom: 4.0),
+            child: Text('Agent : ${ex.response!.replaceAll("\r", "")}'),
+          ),
         const Divider(height: 16),
       ],
     );

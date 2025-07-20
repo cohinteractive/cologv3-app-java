@@ -1,13 +1,13 @@
 class Exchange {
-  final String user;
-  final String agent;
-  final DateTime userTime;
-  final DateTime agentTime;
+  final String prompt;
+  final String? response;
+  final DateTime? promptTimestamp;
+  final DateTime? responseTimestamp;
 
   Exchange({
-    required this.user,
-    required this.agent,
-    required this.userTime,
-    required this.agentTime,
+    required this.prompt,
+    required this.promptTimestamp,
+    this.response,
+    this.responseTimestamp,
   });
 }
