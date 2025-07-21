@@ -192,7 +192,7 @@ class _ExchangeTile extends StatelessWidget {
             maxLines: null,
             style: Theme.of(context)
                 .textTheme
-                .bodyLarge
+                .bodySmall
                 ?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.grey.shade300,
@@ -213,7 +213,7 @@ class _ExchangeTile extends StatelessWidget {
               maxLines: null,
               style: Theme.of(context)
                   .textTheme
-                  .bodyMedium
+                  .bodySmall
                   ?.copyWith(
                     color: Colors.grey.shade200,
                   ),
