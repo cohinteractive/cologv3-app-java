@@ -168,11 +168,11 @@ class _ExchangeTile extends StatelessWidget {
     return InkWell(
       onTap: onToggle,
       child: AnimatedSize(
+        alignment: Alignment.topCenter,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        child: expanded
-            ? _buildExpanded(context)
-            : _buildCollapsed(context),
+        child:
+            expanded ? _buildExpanded(context) : _buildCollapsed(context),
       ),
     );
   }
