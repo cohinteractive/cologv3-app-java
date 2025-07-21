@@ -84,3 +84,5 @@ This file records all Codex-generated changes and implementations in this projec
 [2507210352][366d9e7][REF][UI] Styled conversation list with vertical index box, stacked title and metadata rows, and enhanced layout
 [2507210436][f33617][BUG][UI] Fixed missing response rendering for last exchange
 [2507210816][b2c7c7b][REF][UI] Updated index box color to medium-bright blue for improved readability
+
+[250721hhmm][8fe075][BUG][UI] Normalized prompt and response font sizes in expanded exchange views
