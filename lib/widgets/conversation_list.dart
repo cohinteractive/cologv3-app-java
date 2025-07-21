@@ -48,7 +48,7 @@ class ConversationList extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(vertical: 2),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFB8860B), // dark gold
+                      color: const Color(0xFF1976D2), // medium-bright blue
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text('${index + 1}',
