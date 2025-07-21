@@ -36,34 +36,34 @@ class _ConversationPanelState extends State<ConversationPanel>
   }
 
   @override
-  Widget build(BuildContext context) {
-    final conversation = widget.conversation;
-    if (conversation == null) {
-      return const Center(child: Text('No conversation selected'));
-    }
+Widget build(BuildContext context) {
+  final conversation = widget.conversation;
+  if (conversation == null) {
+    return const Center(child: Text('No conversation selected'));
+  }
 
-    final exchanges = conversation.exchanges;
-    if (exchanges.isEmpty) {
-      return const Center(child: Text('No exchanges found.'));
-    }
+  final exchanges = conversation.exchanges;
+  if (exchanges.isEmpty) {
+    return const Center(child: Text('No exchanges found.'));
+  }
 
-    final colorScheme = Theme.of(context).colorScheme;
+  final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      color: colorScheme.background,
-      child: Scrollbar(
+  return Container(
+    color: colorScheme.background,
+    child: Scrollbar(
+      controller: _scrollController,
+      thumbVisibility: true,
+      child: ListView.builder(
         controller: _scrollController,
-        thumbVisibility: true,
-        child: ListView.builder(
-          controller: _scrollController,
-          padding: const EdgeInsets.all(16),
-          itemCount: exchanges.length,
-          itemBuilder: (context, index) {
-            final ex = exchanges[index];
-            final expanded = _expanded.contains(index);
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: InkWell(
+        padding: const EdgeInsets.all(16),
+        itemCount: exchanges.length,
+        itemBuilder: (context, index) {
+          final ex = exchanges[index];
+          final expanded = _expanded.contains(index);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: InkWell(
               onTap: () {
                 setState(() {
                   if (expanded) {
@@ -127,8 +127,10 @@ class _ConversationPanelState extends State<ConversationPanel>
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildCollapsedPreview(BuildContext context, Exchange ex) {
     return Column(

@@ -45,8 +45,8 @@ class CologApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: darkBlue,
         scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: true,
-          trackVisibility: true,
+          thumbVisibility: MaterialStateProperty.all(true),
+          trackVisibility: MaterialStateProperty.all(true),
           radius: const Radius.circular(4),
           thickness: MaterialStateProperty.all(8),
           thumbColor: MaterialStateProperty.all(Colors.grey),
