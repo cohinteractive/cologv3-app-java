@@ -16,6 +16,9 @@ class _ConversationPanelState extends State<ConversationPanel>
   final Map<String, Set<int>> _expandedMap = <String, Set<int>>{};
   Set<int> _expanded = <int>{};
   final ScrollController _scrollController = ScrollController();
+  final Map<int, Alignment> _alignmentMap = <int, Alignment>{};
+  final Map<int, GlobalKey> _promptKeys = <int, GlobalKey>{};
+  final Map<int, GlobalKey> _responseKeys = <int, GlobalKey>{};
   static const promptBg = Color(0xFF0D47A1); // dark blue
   static const responseBg = Color(0xFF424242); // dark grey
 
@@ -79,18 +82,37 @@ Widget build(BuildContext context) {
         itemBuilder: (context, index) {
           final ex = exchanges[index];
           final expanded = _expanded.contains(index);
+          final alignment = _alignmentMap[index] ?? Alignment.topCenter;
+          final pKey = _promptKeys[index] ??= GlobalKey();
+          final rKey = _responseKeys[index] ??= GlobalKey();
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: _ExchangeTile(
               key: ValueKey('ex_$index'),
               exchange: ex,
               expanded: expanded,
-              onToggle: () {
+              alignment: alignment,
+              promptKey: pKey,
+              responseKey: rKey,
+              onToggle: (align, anchorKey) {
+                final beforeBox = anchorKey.currentContext?.findRenderObject() as RenderBox?;
+                final beforeOffset = beforeBox?.localToGlobal(Offset.zero);
                 setState(() {
                   if (expanded) {
                     _expanded.remove(index);
                   } else {
                     _expanded.add(index);
+                  }
+                  _alignmentMap[index] = align;
+                });
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final afterBox = anchorKey.currentContext?.findRenderObject() as RenderBox?;
+                  final afterOffset = afterBox?.localToGlobal(Offset.zero);
+                  if (beforeOffset != null && afterOffset != null) {
+                    final delta = afterOffset.dy - beforeOffset.dy;
+                    if (delta != 0) {
+                      _scrollController.jumpTo(_scrollController.offset + delta);
+                    }
                   }
                 });
               },
@@ -154,26 +176,28 @@ Widget build(BuildContext context) {
 class _ExchangeTile extends StatelessWidget {
   final Exchange exchange;
   final bool expanded;
-  final VoidCallback onToggle;
+  final Alignment alignment;
+  final GlobalKey promptKey;
+  final GlobalKey responseKey;
+  final void Function(Alignment, GlobalKey) onToggle;
 
   const _ExchangeTile({
     super.key,
     required this.exchange,
     required this.expanded,
+    required this.alignment,
+    required this.promptKey,
+    required this.responseKey,
     required this.onToggle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onToggle,
-      child: AnimatedSize(
-        alignment: Alignment.topCenter,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        child:
-            expanded ? _buildExpanded(context) : _buildCollapsed(context),
-      ),
+    return AnimatedSize(
+      alignment: alignment,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      child: expanded ? _buildExpanded(context) : _buildCollapsed(context),
     );
   }
 
@@ -181,42 +205,50 @@ class _ExchangeTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: _ConversationPanelState.promptBg,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            exchange.prompt,
-            maxLines: null,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade300,
-                ),
-          ),
-        ),
-        if (exchange.response != null) ...[
-          const SizedBox(height: 8),
-          Container(
-            margin: const EdgeInsets.only(left: 16),
+        GestureDetector(
+          onTap: () => onToggle(Alignment.topCenter, promptKey),
+          child: Container(
+            key: promptKey,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: _ConversationPanelState.responseBg,
+              color: _ConversationPanelState.promptBg,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              exchange.response!,
+              exchange.prompt,
               maxLines: null,
               style: Theme.of(context)
                   .textTheme
                   .bodySmall
                   ?.copyWith(
-                    color: Colors.grey.shade200,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade300,
                   ),
+            ),
+          ),
+        ),
+        if (exchange.response != null) ...[
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () => onToggle(Alignment.bottomCenter, responseKey),
+            child: Container(
+              key: responseKey,
+              margin: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _ConversationPanelState.responseBg,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                exchange.response!,
+                maxLines: null,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(
+                      color: Colors.grey.shade200,
+                    ),
+              ),
             ),
           ),
         ],
@@ -228,39 +260,47 @@ class _ExchangeTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: _ConversationPanelState.promptBg,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            exchange.prompt,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade300,
-                ),
+        GestureDetector(
+          onTap: () => onToggle(Alignment.topCenter, promptKey),
+          child: Container(
+            key: promptKey,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _ConversationPanelState.promptBg,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              exchange.prompt,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade300,
+                  ),
+            ),
           ),
         ),
         if (exchange.response != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Container(
-              margin: const EdgeInsets.only(left: 16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _ConversationPanelState.responseBg,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                exchange.response!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade200,
-                    ),
+            child: GestureDetector(
+              onTap: () => onToggle(Alignment.bottomCenter, responseKey),
+              child: Container(
+                key: responseKey,
+                margin: const EdgeInsets.only(left: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _ConversationPanelState.responseBg,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  exchange.response!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey.shade200,
+                      ),
+                ),
               ),
             ),
           ),
