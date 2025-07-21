@@ -47,24 +47,23 @@ Conversation _parseConversation(Map raw) {
       ? DateTime.fromMillisecondsSinceEpoch((tsSeconds * 1000).toInt())
       : DateTime.now();
   final mapping = raw['mapping'] as Map? ?? {};
-  final messages = <Map>[];
+  final nodes = <Map<String, dynamic>>[];
   for (final node in mapping.values) {
-    if (node is Map) {
-      final msg = node['message'];
-      if (msg is Map) messages.add(msg);
+    if (node is Map<String, dynamic> && node['message'] is Map) {
+      nodes.add(Map<String, dynamic>.from(node));
     }
   }
 
-  messages.sort((a, b) {
-    final at = a['create_time'];
-    final bt = b['create_time'];
+  nodes.sort((a, b) {
+    final at = a['message']?['create_time'];
+    final bt = b['message']?['create_time'];
     if (at is num && bt is num) return at.compareTo(bt);
     return 0;
   });
 
   final exchanges = <Exchange>[];
-  for (int i = 0; i < messages.length; i++) {
-    final msg = messages[i];
+  for (final node in nodes) {
+    final msg = node['message'] as Map;
     final author = msg['author'];
     if (author is Map && author['role'] == 'user') {
       final promptText = _extractText(msg);
@@ -75,25 +74,21 @@ Conversation _parseConversation(Map raw) {
 
       String? responseText;
       DateTime? responseTime;
-
-      int j = i + 1;
-      while (j < messages.length) {
-        final nextMsg = messages[j];
-        final nextAuthor = nextMsg['author'];
-        if (nextAuthor is Map && nextAuthor['role'] == 'assistant') {
-          responseText = _extractText(nextMsg);
-          final respSec = nextMsg['create_time'];
-          responseTime = respSec is num
-              ? DateTime.fromMillisecondsSinceEpoch((respSec * 1000).toInt())
-              : null;
-          i = j; // skip up to assistant message
-          break;
-        } else if (nextAuthor is Map && nextAuthor['role'] == 'user') {
-          // Next user message found before an assistant response
-          i = j - 1; // adjust for loop increment
-          break;
+      final children = node['children'];
+      if (children is List && children.isNotEmpty) {
+        final firstId = children.first;
+        final childNode = mapping[firstId];
+        if (childNode is Map && childNode['message'] is Map) {
+          final nextMsg = childNode['message'] as Map;
+          final nextAuthor = nextMsg['author'];
+          if (nextAuthor is Map && nextAuthor['role'] == 'assistant') {
+            responseText = _extractText(nextMsg);
+            final respSec = nextMsg['create_time'];
+            responseTime = respSec is num
+                ? DateTime.fromMillisecondsSinceEpoch((respSec * 1000).toInt())
+                : null;
+          }
         }
-        j++;
       }
 
       exchanges.add(Exchange(
