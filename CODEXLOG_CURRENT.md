@@ -79,3 +79,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507202355][ec794b][FTR][UI] Linked ConversationPanel to update based on selected conversation from sidebar
 [2507210002][e6de5e][FTR][UI] Reset scroll position to top when switching conversations in ConversationPanel
 [250721hhmm][20824a8][REF][UI] Styled ConversationPanel scrollbar to match sidebar and ensured responsive scrolling
+[2507210113][e2fc9a][FTR][UI] Preserved per-conversation expand/collapse state in ConversationPanel

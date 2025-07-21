@@ -13,10 +13,20 @@ class ConversationPanel extends StatefulWidget {
 
 class _ConversationPanelState extends State<ConversationPanel>
     with TickerProviderStateMixin {
-  final Set<int> _expanded = <int>{};
+  final Map<String, Set<int>> _expandedMap = <String, Set<int>>{};
+  Set<int> _expanded = <int>{};
   final ScrollController _scrollController = ScrollController();
   static const promptBg = Color(0xFF0D47A1); // dark blue
   static const responseBg = Color(0xFF424242); // dark grey
+
+  @override
+  void initState() {
+    super.initState();
+    final conv = widget.conversation;
+    if (conv != null) {
+      _expanded = _expandedMap[_keyFor(conv)] ?? <int>{};
+    }
+  }
 
   @override
   void dispose() {
@@ -28,7 +38,14 @@ class _ConversationPanelState extends State<ConversationPanel>
   void didUpdateWidget(covariant ConversationPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.conversation != widget.conversation) {
-      _expanded.clear();
+      final oldConv = oldWidget.conversation;
+      if (oldConv != null) {
+        _expandedMap[_keyFor(oldConv)] = _expanded;
+      }
+      final newConv = widget.conversation;
+      _expanded = newConv != null
+          ? (_expandedMap[_keyFor(newConv)] ?? <int>{})
+          : <int>{};
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(0);
       }
@@ -175,4 +192,7 @@ Widget build(BuildContext context) {
       ],
     );
   }
+
+  String _keyFor(Conversation conv) =>
+      '${conv.title}_${conv.timestamp.millisecondsSinceEpoch}';
 }
