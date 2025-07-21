@@ -2,11 +2,12 @@
 
 ## 🧭 Current Focus
 
-We are implementing the **conversation list display and interaction system** on the left panel of the app interface. This includes rendering a scrollable list of conversation titles with associated metadata (index, timestamp, title), clickable and right-clickable interactions, and visually distinguishing the selected conversation. The selected conversation populates the right panel with its exchanges, and the UI should reflect a modern, minimalistic, and highly navigable interface.
+We are beginning **major UI modifications** to improve usability and polish. This includes fixing display issues in the conversation and exchange panels, enhancing expand/collapse animations, and introducing contextual menus.
 
 ## 🧱 Key Work Areas
 
-- Fluid sidebar UI with clear delineation between conversations
-- Highlighting and deselection mechanics
-- Right-click context menu with stubbed functionality
-- Responsive layout: scrollable left index and right exchange view
+- Fix missing response display in exchanges
+- Improve expand/collapse animations for exchanges
+- Add a 3-dot hover menu to each conversation label and exchange (prompt/response)
+- Show context menu on clicking the 3-dot menu with one option: “About”
+- Implement the “About” dialog showing app name, version, author, and copyright
