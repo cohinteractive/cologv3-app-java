@@ -14,14 +14,24 @@ class ConversationPanel extends StatefulWidget {
 class _ConversationPanelState extends State<ConversationPanel>
     with TickerProviderStateMixin {
   final Set<int> _expanded = <int>{};
+  final ScrollController _scrollController = ScrollController();
   static const promptBg = Color(0xFF0D47A1); // dark blue
   static const responseBg = Color(0xFF424242); // dark grey
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   void didUpdateWidget(covariant ConversationPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.conversation != widget.conversation) {
       _expanded.clear();
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
     }
   }
 
@@ -42,6 +52,7 @@ class _ConversationPanelState extends State<ConversationPanel>
     return Container(
       color: colorScheme.background,
       child: ListView.builder(
+        controller: _scrollController,
         padding: const EdgeInsets.all(16),
         itemCount: exchanges.length,
         itemBuilder: (context, index) {

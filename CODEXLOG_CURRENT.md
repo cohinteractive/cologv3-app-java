@@ -77,3 +77,4 @@ This file records all Codex-generated changes and implementations in this projec
 
 [2507212342][bd269b][FTR][UI] Added two-line prompt/response summary preview for collapsed exchanges
 [2507202355][ec794b][FTR][UI] Linked ConversationPanel to update based on selected conversation from sidebar
+[2507210002][e6de5e][FTR][UI] Reset scroll position to top when switching conversations in ConversationPanel
