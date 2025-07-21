@@ -9,6 +9,11 @@
 - Build dynamic mapping of JSON into Exchanges grouped by Conversation
 - Apply dark theme styling throughout
 - Add conversation list header panel with labels
+- App opens in dark mode with menu bar and File > Open/Exit
+- Left panel lists conversations with index, title, exchange count, and timestamp
+- Clicking a conversation highlights it and populates the right panel with exchanges
+- Clicking an exchange expands/collapses to show full text
+- Dark theme with distinct colors and white fonts for readability
 
 
 ## 🕰️ Legacy Tasks (Pre-UI Redesign)
@@ -52,3 +57,8 @@
   - About stubbed function
 - Show the selected conversation's prompt/response view in the right panel
 - Ensure left and right panels scroll independently
+- Fix missing response display in exchanges
+- Improve expand/collapse animations to feel more natural and anchored
+- Add 3-dot hover menu to conversation labels and exchanges
+- Implement context menu triggered by 3-dot menu with single “About” option
+- Create “About” dialog with app name, version, author, and copyright
