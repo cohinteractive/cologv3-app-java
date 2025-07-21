@@ -74,14 +74,18 @@ Widget build(BuildContext context) {
       child: ListView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.all(16),
+        addAutomaticKeepAlives: false,
         itemCount: exchanges.length,
         itemBuilder: (context, index) {
           final ex = exchanges[index];
           final expanded = _expanded.contains(index);
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: InkWell(
-              onTap: () {
+            child: _ExchangeTile(
+              key: ValueKey('ex_$index'),
+              exchange: ex,
+              expanded: expanded,
+              onToggle: () {
                 setState(() {
                   if (expanded) {
                     _expanded.remove(index);
@@ -90,56 +94,6 @@ Widget build(BuildContext context) {
                   }
                 });
               },
-              child: AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                child: expanded
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: promptBg,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              ex.prompt,
-                              maxLines: null,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey.shade300,
-                                  ),
-                            ),
-                          ),
-                          if (ex.response != null) ...[
-                            const SizedBox(height: 8),
-                            Container(
-                              margin: const EdgeInsets.only(left: 16),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: responseBg,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                ex.response!,
-                                maxLines: null,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      color: Colors.grey.shade200,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      )
-                    : _buildCollapsedPreview(context, ex),
-              ),
             ),
           );
         },
@@ -195,4 +149,122 @@ Widget build(BuildContext context) {
 
   String _keyFor(Conversation conv) =>
       '${conv.title}_${conv.timestamp.millisecondsSinceEpoch}';
+}
+
+class _ExchangeTile extends StatelessWidget {
+  final Exchange exchange;
+  final bool expanded;
+  final VoidCallback onToggle;
+
+  const _ExchangeTile({
+    super.key,
+    required this.exchange,
+    required this.expanded,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onToggle,
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        child: expanded
+            ? _buildExpanded(context)
+            : _buildCollapsed(context),
+      ),
+    );
+  }
+
+  Widget _buildExpanded(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _ConversationPanelState.promptBg,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            exchange.prompt,
+            maxLines: null,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade300,
+                ),
+          ),
+        ),
+        if (exchange.response != null) ...[
+          const SizedBox(height: 8),
+          Container(
+            margin: const EdgeInsets.only(left: 16),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _ConversationPanelState.responseBg,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              exchange.response!,
+              maxLines: null,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(
+                    color: Colors.grey.shade200,
+                  ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildCollapsed(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _ConversationPanelState.promptBg,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            exchange.prompt,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade300,
+                ),
+          ),
+        ),
+        if (exchange.response != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Container(
+              margin: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _ConversationPanelState.responseBg,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                exchange.response!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.grey.shade200,
+                    ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 }
