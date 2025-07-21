@@ -22,6 +22,15 @@ class ConversationList extends StatelessWidget {
       itemBuilder: (context, index) {
         final conv = conversations[index];
         final selectedConv = conv == selected;
+        final metaStyle = Theme.of(context)
+            .textTheme
+            .bodySmall
+            ?.copyWith(color: Colors.grey.shade400);
+
+        final lastUpdated = _lastUpdate(conv);
+        final metaText =
+            '${conv.exchanges.length} exchanges • Last updated $lastUpdated';
+
         return Material(
           color: selectedConv
               ? colorScheme.primary.withOpacity(0.2)
@@ -29,11 +38,46 @@ class ConversationList extends StatelessWidget {
           child: InkWell(
             onTap: () => onSelected(conv),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              child: Text(
-                conv.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 40,
+                    width: 24,
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFB8860B), // dark gold
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text('${index + 1}',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          conv.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          metaText,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: metaStyle,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -41,4 +85,13 @@ class ConversationList extends StatelessWidget {
       },
     );
   }
+}
+
+String _lastUpdate(Conversation c) {
+  DateTime? ts;
+  for (final ex in c.exchanges) {
+    ts = ex.responseTimestamp ?? ex.promptTimestamp ?? ts;
+  }
+  ts ??= c.timestamp;
+  return '${ts.year}-${ts.month.toString().padLeft(2, '0')}-${ts.day.toString().padLeft(2, '0')}';
 }

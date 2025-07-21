@@ -87,6 +87,17 @@ class _HomePageState extends State<HomePage> {
       });
       try {
         final convs = await JsonLoader.loadConversations(file.path);
+        convs.sort((a, b) {
+          DateTime getLast(Conversation c) {
+            DateTime? ts;
+            for (final ex in c.exchanges) {
+              ts = ex.responseTimestamp ?? ex.promptTimestamp ?? ts;
+            }
+            return ts ?? c.timestamp;
+          }
+
+          return getLast(b).compareTo(getLast(a));
+        });
         setState(() {
           _conversations = convs;
           _selectedConversation = null;
