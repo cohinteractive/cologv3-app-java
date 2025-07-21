@@ -76,8 +76,9 @@ Conversation _parseConversation(Map raw) {
       String? responseText;
       DateTime? responseTime;
 
-      if (i + 1 < messages.length) {
-        final nextMsg = messages[i + 1];
+      int j = i + 1;
+      while (j < messages.length) {
+        final nextMsg = messages[j];
         final nextAuthor = nextMsg['author'];
         if (nextAuthor is Map && nextAuthor['role'] == 'assistant') {
           responseText = _extractText(nextMsg);
@@ -85,8 +86,14 @@ Conversation _parseConversation(Map raw) {
           responseTime = respSec is num
               ? DateTime.fromMillisecondsSinceEpoch((respSec * 1000).toInt())
               : null;
-          i++; // skip assistant
+          i = j; // skip up to assistant message
+          break;
+        } else if (nextAuthor is Map && nextAuthor['role'] == 'user') {
+          // Next user message found before an assistant response
+          i = j - 1; // adjust for loop increment
+          break;
         }
+        j++;
       }
 
       exchanges.add(Exchange(
