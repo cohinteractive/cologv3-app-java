@@ -51,16 +51,19 @@ class _ConversationPanelState extends State<ConversationPanel>
 
     return Container(
       color: colorScheme.background,
-      child: ListView.builder(
+      child: Scrollbar(
         controller: _scrollController,
-        padding: const EdgeInsets.all(16),
-        itemCount: exchanges.length,
-        itemBuilder: (context, index) {
-          final ex = exchanges[index];
-          final expanded = _expanded.contains(index);
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: InkWell(
+        thumbVisibility: true,
+        child: ListView.builder(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(16),
+          itemCount: exchanges.length,
+          itemBuilder: (context, index) {
+            final ex = exchanges[index];
+            final expanded = _expanded.contains(index);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: InkWell(
               onTap: () {
                 setState(() {
                   if (expanded) {
