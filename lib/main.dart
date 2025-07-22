@@ -168,76 +168,81 @@ class _HomePageState extends State<HomePage> {
       body = ErrorPanel(message: _error!);
     } else if (_conversations != null) {
       final filtered = _filteredConversations();
-      body = Row(
+      body = Column(
         children: [
           Expanded(
-            flex: 1,
-            child: Column(
+            child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-                  child: SizedBox(
-                    height: 20,
-                    child: Builder(
-                      builder: (context) {
-                        final style = Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(fontSize: 12, color: Colors.grey);
-                        final countText = _searchQuery.isEmpty
-                            ? 'Conversations: ${_conversations!.length}'
-                            : 'Conversations: ${filtered.length} / ${_conversations!.length}';
-                        final timeStr = DateFormat('h:mm a').format(_currentTime);
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _currentFilePath ?? '',
-                                style: style,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Text(countText, style: style),
-                            const SizedBox(width: 8),
-                            Text(timeStr, style: style),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: const InputDecoration(
-                      hintText: 'Search...',
-                      isDense: true,
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: 'Search...',
+                            isDense: true,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _searchQuery = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: ConversationList(
+                          conversations: filtered,
+                          selected: _selectedConversation,
+                          onSelected: (c) {
+                            setState(() {
+                              _selectedConversation = c;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
-                  child: ConversationList(
-                    conversations: filtered,
-                    selected: _selectedConversation,
-                    onSelected: (c) {
-                      setState(() {
-                        _selectedConversation = c;
-                      });
-                    },
-                  ),
+                  flex: 2,
+                  child: ConversationPanel(conversation: _selectedConversation),
                 ),
               ],
             ),
           ),
-          Expanded(
-            flex: 2,
-            child: ConversationPanel(conversation: _selectedConversation),
+          Container(
+            height: 24,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            color: Theme.of(context).colorScheme.surface,
+            child: Builder(
+              builder: (context) {
+                final style = Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(fontSize: 12, color: Colors.grey);
+                final countText = _searchQuery.isEmpty
+                    ? 'Conversations: ${_conversations!.length}'
+                    : 'Conversations: ${filtered.length} / ${_conversations!.length}';
+                final timeStr = DateFormat('h:mm a').format(_currentTime);
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _currentFilePath ?? '',
+                        style: style,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(countText, style: style),
+                    const SizedBox(width: 8),
+                    Text(timeStr, style: style),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       );

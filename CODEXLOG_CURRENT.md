@@ -111,3 +111,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507232210][5ef516][FTR][UI] Added live search bar to conversation list panel and implemented case-insensitive substring filtering across prompts and responses
 [2507232222][5242f4][BUG][UI] Truncated long single-line prompt/response previews to one visual line in collapsed view using ellipsis
 [2507222231][64b31f][FTR][UI] Added left panel status line showing file path, filtered/total conversation count, and current time
+[2507232249][5001bc][REF][UI] Moved status line to bottom of window and expanded layout to show file path, filtered/total conversation count, and system time
