@@ -93,3 +93,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507212237][1b897a5][DOC][SNC] Updated context and tasks
 [2507220542][bbf5e8f][SNC][DOC] Archived TASKS.md and moved tasks into atomic task sets
 [2507220621][8f3b54][BUG][UI] Fixed response lookup to capture first assistant child in JsonLoader
+[2507220631][92fb41][TST][UI] Added debugPrint on exchange expand to log conversation, index, and prompt/response preview
