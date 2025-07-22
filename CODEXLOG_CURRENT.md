@@ -102,3 +102,6 @@ This file records all Codex-generated changes and implementations in this projec
 [2507221039][39153c][FTR][UI] Implemented hover-triggered 3-dot contextual menu with About dialog for conversations and exchanges
 [2507221053][ce62222][REF][UI] Normalized font styling and fixed text wrapping to avoid 3-dot hover menu overlap
 [2507221231][2eb147][DOC] Added merge strategy design tasks
+[2507221232][e1468c2][SNC][DOC] Added milestone1 instruction template tasks
+[2507221232][6efba4f][DOC] Added tasks for context parcel and memory format
+
