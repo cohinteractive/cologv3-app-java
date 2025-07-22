@@ -46,11 +46,15 @@ Conversation _parseConversation(Map raw) {
   final ts = tsSeconds is num
       ? DateTime.fromMillisecondsSinceEpoch((tsSeconds * 1000).toInt())
       : DateTime.now();
-  final mapping = raw['mapping'] as Map? ?? {};
+  final fullMapping = raw['mapping'] as Map? ?? {};
+  final mapping = <String, Map<String, dynamic>>{};
   final nodes = <Map<String, dynamic>>[];
-  for (final node in mapping.values) {
+  for (final entry in fullMapping.entries) {
+    final node = entry.value;
     if (node is Map<String, dynamic> && node['message'] is Map) {
-      nodes.add(Map<String, dynamic>.from(node));
+      final copy = Map<String, dynamic>.from(node);
+      nodes.add(copy);
+      mapping[entry.key] = copy;
     }
   }
 
@@ -77,7 +81,7 @@ Conversation _parseConversation(Map raw) {
       final children = node['children'];
       if (children is List) {
         for (final id in children) {
-          final childNode = mapping[id];
+          final childNode = fullMapping[id];
           if (childNode is Map && childNode['message'] is Map) {
             final nextMsg = childNode['message'] as Map;
             final nextAuthor = nextMsg['author'];
@@ -94,12 +98,22 @@ Conversation _parseConversation(Map raw) {
         }
       }
 
-      exchanges.add(Exchange(
-        prompt: promptText,
-        promptTimestamp: promptTime,
-        response: responseText,
-        responseTimestamp: responseTime,
-      ));
+      final promptIsEmpty = promptText.trim().isEmpty;
+      final responseIsEmpty = responseText == null || responseText!.trim().isEmpty;
+      if (!promptIsEmpty || !responseIsEmpty) {
+        final normalizedPrompt =
+            promptIsEmpty ? '[[ Empty Prompt ]]' : promptText;
+        final normalizedResponse = responseIsEmpty
+            ? '[[ Empty Response ]]'
+            : responseText!;
+
+        exchanges.add(Exchange(
+          prompt: normalizedPrompt,
+          promptTimestamp: promptTime,
+          response: normalizedResponse,
+          responseTimestamp: responseTime,
+        ));
+      }
     }
   }
 
