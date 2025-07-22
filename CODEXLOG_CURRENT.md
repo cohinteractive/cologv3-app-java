@@ -1,7 +1,5 @@
 # Codex Activity Log
-
 This file records all Codex-generated changes and implementations in this project.
-
 ---
 [2507170201] Initialized Codex activity logging system and created CODEXLOG.md
 [2507170201][4f8aac][SNC][DOC] Injected task-based development workflow structure (AGENTS.md excluded)
@@ -80,7 +78,6 @@ This file records all Codex-generated changes and implementations in this projec
 [2507210352][366d9e7][REF][UI] Styled conversation list with vertical index box, stacked title and metadata rows, and enhanced layout
 [2507210436][f33617][BUG][UI] Fixed missing response rendering for last exchange
 [2507210816][b2c7c7b][REF][UI] Updated index box color to medium-bright blue for improved readability
-
 [250721hhmm][8fe075][BUG][UI] Normalized prompt and response font sizes in expanded exchange views
 [2507210830][1a9ec7][REF][UI] Refined expand/collapse animations to anchor on prompt and animate content downward/upward naturally
 [2507210854][d478ecf][BUG][UI] Fixed last exchange skipping response rendering in both collapsed and expanded views
@@ -109,3 +106,5 @@ This file records all Codex-generated changes and implementations in this projec
 [2507221251][d40f6e][DOC] Added manual review and editing tasks
 [2507221251][3512291][DOC] Added CLI context build runner tasks
 [2507221256][bf53e23][DOC] Added memory injection tasks
+[2507221256][d50a76][DOC] Added feature module routing tasks
+[2507221256][ed7fe8][DOC] Added context role tagging tasks
