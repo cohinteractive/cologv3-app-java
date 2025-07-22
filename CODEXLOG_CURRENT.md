@@ -3,7 +3,6 @@
 This file records all Codex-generated changes and implementations in this project.
 
 ---
-
 [2507170201] Initialized Codex activity logging system and created CODEXLOG.md
 [2507170201][4f8aac][SNC][DOC] Injected task-based development workflow structure (AGENTS.md excluded)
 [2507172029][9b2e21][FTR] Added initial Swing app skeleton
@@ -26,7 +25,6 @@ This file records all Codex-generated changes and implementations in this projec
 [2507190211][1ed2b5][FTR][REF] Implemented tag-based filtering with clickable labels
 [2507190406][5e128d][BUG] Fixed UI refresh to show loaded conversations
 [2507190526][54acc15][BUG][FTR] Fixed exchange parsing and search filter logic
-
 [2507190651][abafd1e][BUG][FTR] Restored JSplitPane layout after load and resize
 [2507190807][b45b16][BUG][REF] Fixed text clipping and collapsed row height in ExchangePanel
 [2507190811][f4e8146][FTR] Improved tag label interactivity
@@ -47,7 +45,6 @@ This file records all Codex-generated changes and implementations in this projec
 [2507200036][f910cb][FTR][REF] Set window to 800x600 and center on startup
 [2507200049][32d453][FTR][REF] Added separator lines in conversation rows
 [2507200053][55b60c][FTR] Added conversation list header panel
-
 [2507200104][bd134d4][BUG][REF] Styled conversation title panel
 [2507200120][8ad7d2][BUG][REF] Adjusted conversation title sizing and removed extra padding
 [2507200152][43fb49][BUG][REF] Fixed excessive indent in ExchangePanel layout
@@ -74,7 +71,6 @@ This file records all Codex-generated changes and implementations in this projec
 [2507202313][c6222f][FTR][UI] Added expand/collapse toggle for exchanges in ConversationPanel
 [2507202330][6fd307][REF][UI] Styled prompt and response sections with indentation and background differentiation
 [2507202330][1644128][REF][UI] Styled prompt and response sections with indentation and background differentiation
-
 [2507212342][bd269b][FTR][UI] Added two-line prompt/response summary preview for collapsed exchanges
 [2507202355][ec794b][FTR][UI] Linked ConversationPanel to update based on selected conversation from sidebar
 [2507210002][e6de5e][FTR][UI] Reset scroll position to top when switching conversations in ConversationPanel
@@ -87,7 +83,6 @@ This file records all Codex-generated changes and implementations in this projec
 
 [250721hhmm][8fe075][BUG][UI] Normalized prompt and response font sizes in expanded exchange views
 [2507210830][1a9ec7][REF][UI] Refined expand/collapse animations to anchor on prompt and animate content downward/upward naturally
-
 [2507210854][d478ecf][BUG][UI] Fixed last exchange skipping response rendering in both collapsed and expanded views
 [2507210907][a15feb][REF][UI] Added section-aware expand/collapse animations anchored to tapped region
 [2507212237][1b897a5][DOC][SNC] Updated context and tasks
@@ -104,5 +99,6 @@ This file records all Codex-generated changes and implementations in this projec
 [2507221231][2eb147][DOC] Added merge strategy design tasks
 [2507221232][e1468c2][SNC][DOC] Added milestone1 instruction template tasks
 [2507221232][6efba4f][DOC] Added tasks for context parcel and memory format
-
 [2507221239][f7e2e3][DOC] Added iterative merging loop tasks
+[2507221237][3ccb04f][DOC] Added debug logging and state tracking tasks
+[2507221238][38fa76e][DOC] Added single exchange processor tasks
