@@ -22,6 +22,10 @@ class _ConversationPanelState extends State<ConversationPanel>
   final Map<int, GlobalKey> _responseKeys = <int, GlobalKey>{};
   static const promptBg = Color(0xFF0D47A1); // dark blue
   static const responseBg = Color(0xFF424242); // dark grey
+  static const textStyle = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+  );
 
   @override
   void initState() {
@@ -138,19 +142,17 @@ Widget build(BuildContext context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 12, 40, 12),
           decoration: BoxDecoration(
             color: promptBg,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             ex.prompt,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade300,
-                ),
+            style: _ConversationPanelState.textStyle
+                .copyWith(color: Colors.grey.shade300),
+            softWrap: true,
+            overflow: TextOverflow.visible,
           ),
         ),
         if (ex.response != null)
@@ -158,18 +160,17 @@ Widget build(BuildContext context) {
             padding: const EdgeInsets.only(top: 4),
             child: Container(
               margin: const EdgeInsets.only(left: 16),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 12, 40, 12),
               decoration: BoxDecoration(
                 color: responseBg,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 ex.response!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade200,
-                    ),
+                style: _ConversationPanelState.textStyle
+                    .copyWith(color: Colors.grey.shade200),
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
           ),
@@ -257,7 +258,7 @@ class _ExchangeTileState extends State<_ExchangeTile>
         child: Stack(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 12, 40, 12),
               decoration: BoxDecoration(
                 color: _ConversationPanelState.promptBg,
                 borderRadius: BorderRadius.circular(8),
@@ -271,12 +272,10 @@ class _ExchangeTileState extends State<_ExchangeTile>
                     alignment: Alignment.centerLeft,
                     child: Text(
                       first,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade300,
-                          ),
+                      style: _ConversationPanelState.textStyle
+                          .copyWith(color: Colors.grey.shade300),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
                     ),
                   ),
                   AnimatedSize(
@@ -288,13 +287,10 @@ class _ExchangeTileState extends State<_ExchangeTile>
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               rest,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey.shade300,
-                                  ),
+                              style: _ConversationPanelState.textStyle
+                                  .copyWith(color: Colors.grey.shade300),
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
                             ),
                           )
                         : const SizedBox.shrink(),
@@ -342,7 +338,7 @@ class _ExchangeTileState extends State<_ExchangeTile>
           children: [
             Container(
               margin: const EdgeInsets.only(left: 16),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 12, 40, 12),
               decoration: BoxDecoration(
                 color: _ConversationPanelState.responseBg,
                 borderRadius: BorderRadius.circular(8),
@@ -356,14 +352,10 @@ class _ExchangeTileState extends State<_ExchangeTile>
                     alignment: Alignment.centerLeft,
                     child: Text(
                       first,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(
-                            color: Colors.grey.shade200,
-                          ),
+                      style: _ConversationPanelState.textStyle
+                          .copyWith(color: Colors.grey.shade200),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
                     ),
                   ),
                   AnimatedSize(
@@ -375,12 +367,10 @@ class _ExchangeTileState extends State<_ExchangeTile>
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               rest,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: Colors.grey.shade200,
-                                  ),
+                              style: _ConversationPanelState.textStyle
+                                  .copyWith(color: Colors.grey.shade200),
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
                             ),
                           )
                         : const SizedBox.shrink(),
