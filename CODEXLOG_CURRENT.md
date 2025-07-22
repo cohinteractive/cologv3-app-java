@@ -91,3 +91,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507210854][d478ecf][BUG][UI] Fixed last exchange skipping response rendering in both collapsed and expanded views
 [2507210907][a15feb][REF][UI] Added section-aware expand/collapse animations anchored to tapped region
 [2507212237][1b897a5][DOC][SNC] Updated context and tasks
+[2507220542][bbf5e8f][SNC][DOC] Archived TASKS.md and moved tasks into atomic task sets
