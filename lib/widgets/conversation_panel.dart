@@ -151,8 +151,9 @@ Widget build(BuildContext context) {
             ex.prompt,
             style: _ConversationPanelState.textStyle
                 .copyWith(color: Colors.grey.shade300),
-            softWrap: true,
-            overflow: TextOverflow.visible,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            softWrap: false,
           ),
         ),
         if (ex.response != null)
@@ -169,8 +170,9 @@ Widget build(BuildContext context) {
                 ex.response!,
                 style: _ConversationPanelState.textStyle
                     .copyWith(color: Colors.grey.shade200),
-                softWrap: true,
-                overflow: TextOverflow.visible,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
               ),
             ),
           ),
@@ -274,8 +276,10 @@ class _ExchangeTileState extends State<_ExchangeTile>
                       first,
                       style: _ConversationPanelState.textStyle
                           .copyWith(color: Colors.grey.shade300),
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
+                      maxLines: expand ? null : 1,
+                      overflow:
+                          expand ? TextOverflow.visible : TextOverflow.ellipsis,
+                      softWrap: expand,
                     ),
                   ),
                   AnimatedSize(
@@ -354,8 +358,10 @@ class _ExchangeTileState extends State<_ExchangeTile>
                       first,
                       style: _ConversationPanelState.textStyle
                           .copyWith(color: Colors.grey.shade200),
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
+                      maxLines: expand ? null : 1,
+                      overflow:
+                          expand ? TextOverflow.visible : TextOverflow.ellipsis,
+                      softWrap: expand,
                     ),
                   ),
                   AnimatedSize(
