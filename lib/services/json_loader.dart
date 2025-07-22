@@ -53,6 +53,7 @@ Conversation _parseConversation(Map raw) {
     final node = entry.value;
     if (node is Map<String, dynamic> && node['message'] is Map) {
       final copy = Map<String, dynamic>.from(node);
+      copy['id'] = entry.key;
       nodes.add(copy);
       mapping[entry.key] = copy;
     }
@@ -78,28 +79,22 @@ Conversation _parseConversation(Map raw) {
 
       String? responseText;
       DateTime? responseTime;
-      final children = node['children'];
-      if (children is List) {
-        for (final id in children) {
-          final childNode = fullMapping[id];
-          if (childNode is Map && childNode['message'] is Map) {
-            final nextMsg = childNode['message'] as Map;
-            final nextAuthor = nextMsg['author'];
-            if (nextAuthor is Map && nextAuthor['role'] == 'assistant') {
-              responseText = _extractText(nextMsg);
-              final respSec = nextMsg['create_time'];
-              responseTime = respSec is num
-                  ? DateTime.fromMillisecondsSinceEpoch(
-                      (respSec * 1000).toInt())
-                  : null;
-              break;
-            }
-          }
-        }
+      bool responseIsEmpty = true;
+
+      final assistantNode = _findFirstNonEmptyAssistant(fullMapping, node['id']);
+
+      if (assistantNode != null) {
+        final respMsg = assistantNode['message'] as Map;
+        responseText = _extractText(respMsg);
+        final respSec = respMsg['create_time'];
+        responseTime = respSec is num
+            ? DateTime.fromMillisecondsSinceEpoch((respSec * 1000).toInt())
+            : null;
+        responseIsEmpty = responseText.trim().isEmpty;
       }
 
       final promptIsEmpty = promptText.trim().isEmpty;
-      final responseIsEmpty = responseText == null || responseText!.trim().isEmpty;
+
       if (!promptIsEmpty || !responseIsEmpty) {
         final normalizedPrompt =
             promptIsEmpty ? '[[ Empty Prompt ]]' : promptText;
@@ -118,6 +113,36 @@ Conversation _parseConversation(Map raw) {
   }
 
   return Conversation(title: title, timestamp: ts, exchanges: exchanges);
+}
+
+Map<String, dynamic>? _findFirstNonEmptyAssistant(
+    Map fullMapping, String parentId) {
+  final visited = <String>{};
+  var currentId = parentId;
+
+  while (true) {
+    if (visited.contains(currentId)) return null;
+    visited.add(currentId);
+
+    final node = fullMapping[currentId];
+    if (node == null) return null;
+    final msg = node['message'];
+    if (msg is Map && msg['author']?['role'] == 'assistant') {
+      final content = msg['content'];
+      final parts = content is Map ? content['parts'] : null;
+      if (parts is List && parts.isNotEmpty &&
+          parts.first.toString().trim().isNotEmpty) {
+        return node as Map<String, dynamic>;
+      }
+    }
+
+    final children = node['children'];
+    if (children is List && children.isNotEmpty) {
+      currentId = children.first;
+    } else {
+      return null;
+    }
+  }
 }
 
 String _extractText(Map msg) {
