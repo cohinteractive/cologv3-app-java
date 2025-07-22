@@ -136,4 +136,4 @@ It’s built *for developers who use ChatGPT and Codex as true collaborators*, a
 
 
 ## Current State
-The conversation list panel now displays a fixed status line showing the absolute path of the open file, the number of visible and total conversations, and the current time.
+The status line is now displayed at the bottom of the app window, spanning full width, and shows the loaded file path, number of visible/total conversations, and the current system time.
