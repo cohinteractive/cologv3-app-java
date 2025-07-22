@@ -94,6 +94,7 @@ Widget build(BuildContext context) {
             padding: const EdgeInsets.only(bottom: 16),
             child: _ExchangeTile(
               key: ValueKey('ex_$index'),
+              index: index,
               exchange: ex,
               expanded: expanded,
               alignment: alignment,
@@ -189,6 +190,7 @@ Widget build(BuildContext context) {
 
 class _ExchangeTile extends StatefulWidget {
   final Exchange exchange;
+  final int index;
   final bool expanded;
   final Alignment alignment;
   final GlobalKey promptKey;
@@ -198,6 +200,7 @@ class _ExchangeTile extends StatefulWidget {
   const _ExchangeTile({
     super.key,
     required this.exchange,
+    required this.index,
     required this.expanded,
     required this.alignment,
     required this.promptKey,
@@ -265,39 +268,63 @@ class _ExchangeTileState extends State<_ExchangeTile>
                 color: _ConversationPanelState.promptBg,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    key: widget.promptKey,
-                    alignment: Alignment.centerLeft,
+                    width: 28,
+                    margin: const EdgeInsets.only(right: 8),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1976D2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                     child: Text(
-                      first,
-                      style: _ConversationPanelState.textStyle
-                          .copyWith(color: Colors.grey.shade300),
-                      maxLines: expand ? null : 1,
-                      overflow:
-                          expand ? TextOverflow.visible : TextOverflow.ellipsis,
-                      softWrap: expand,
+                      '#${widget.index + 1}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
-                  AnimatedSize(
-                    alignment: Alignment.topCenter,
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeInOut,
-                    child: expand && rest.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              rest,
-                              style: _ConversationPanelState.textStyle
-                                  .copyWith(color: Colors.grey.shade300),
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          key: widget.promptKey,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            first,
+                            style: _ConversationPanelState.textStyle
+                                .copyWith(color: Colors.grey.shade300),
+                            maxLines: expand ? null : 1,
+                            overflow: expand
+                                ? TextOverflow.visible
+                                : TextOverflow.ellipsis,
+                            softWrap: expand,
+                          ),
+                        ),
+                        AnimatedSize(
+                          alignment: Alignment.topCenter,
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          child: expand && rest.isNotEmpty
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    rest,
+                                    style: _ConversationPanelState.textStyle
+                                        .copyWith(color: Colors.grey.shade300),
+                                    softWrap: true,
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

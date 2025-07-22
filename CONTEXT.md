@@ -137,3 +137,4 @@ It’s built *for developers who use ChatGPT and Codex as true collaborators*, a
 
 ## Current State
 The status line is now displayed at the bottom of the app window, spanning full width, and shows the loaded file path, number of visible/total conversations, and the current system time.
+Prompt entries in the right panel now show per-conversation index numbers along the left side of the prompt block, matching the index box style used in the conversation list.

@@ -114,3 +114,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507232249][5001bc][REF][UI] Moved status line to bottom of window and expanded layout to show file path, filtered/total conversation count, and system time
 [2507232255][50bf9e2][FTR][DATA] Added ContextParcel model with summary, metadata, tags, and confidence tracking
 [2507232303][22e3b1][FTR][DATA] Added ContextMemory object to track latest and historical context parcels
+[2507232311][333153][FTR][UI] Added index numbers to each prompt in right panel, styled similarly to conversation list and placed inside prompt box
