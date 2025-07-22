@@ -95,3 +95,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507220621][8f3b54][BUG][UI] Fixed response lookup to capture first assistant child in JsonLoader
 [2507220631][92fb41][TST][UI] Added debugPrint on exchange expand to log conversation, index, and prompt/response preview
 [2507220656][e4536e][BUG][REF] Fixed Exchange parsing to use full mapping and added placeholder fallback for missing prompt or response
+[2507220732][72f920][BUG][REF] Walked assistant response chain to find first non-empty assistant message for each exchange
