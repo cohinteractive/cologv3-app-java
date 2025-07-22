@@ -6,13 +6,13 @@ This task file addresses immediate issues in the conversation and exchange displ
 
 ---
 
-### ✅ [IN SCOPE]
+### ✅ COMPLETED (as of 2025-07-22)
 
 1. **Fix missing responses in exchanges**  
-   Ensure responses render correctly for all exchanges, including first, last, and any in between.
+   Resolved by traversing the mapping chain to find the first non-empty assistant response.
 
 2. **Refine expand/collapse animation**  
-   Anchor animations smoothly from the tapped element and reduce layout shift. Ensure consistent experience across all exchanges.
+   Implemented directional anchoring for prompt and response expansion with corrected layout behavior.
 
 ---
 
