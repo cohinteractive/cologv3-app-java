@@ -184,7 +184,7 @@ Widget build(BuildContext context) {
       text.substring(0, math.min(40, text.length));
 }
 
-class _ExchangeTile extends StatelessWidget {
+class _ExchangeTile extends StatefulWidget {
   final Exchange exchange;
   final bool expanded;
   final Alignment alignment;
@@ -203,56 +203,134 @@ class _ExchangeTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedSize(
-      alignment: alignment,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
-      child: expanded ? _buildExpanded(context) : _buildCollapsed(context),
-    );
+  State<_ExchangeTile> createState() => _ExchangeTileState();
+}
+
+class _ExchangeTileState extends State<_ExchangeTile>
+    with TickerProviderStateMixin {
+  bool? expandedFromPrompt;
+
+  void _toggleFromPrompt() {
+    setState(() {
+      expandedFromPrompt = true;
+    });
+    widget.onToggle(Alignment.topCenter, widget.promptKey);
   }
 
-  Widget _buildExpanded(BuildContext context) {
+  void _toggleFromResponse() {
+    setState(() {
+      expandedFromPrompt = false;
+    });
+    widget.onToggle(Alignment.bottomCenter, widget.responseKey);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final expandPrompt = widget.expanded && (expandedFromPrompt ?? true);
+    final expandResponse =
+        widget.expanded && (expandedFromPrompt == false);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(
-          onTap: () => onToggle(Alignment.topCenter, promptKey),
-          child: Container(
-            key: promptKey,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: _ConversationPanelState.promptBg,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              exchange.prompt,
-              maxLines: null,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade300,
-                  ),
-            ),
+        _buildPromptBlock(context, expandPrompt),
+        if (widget.exchange.response != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: _buildResponseBlock(context, expandResponse),
           ),
+      ],
+    );
+  }
+
+  Widget _buildPromptBlock(BuildContext context, bool expand) {
+    final lines = widget.exchange.prompt.split('\n');
+    final first = lines.first;
+    final rest = lines.length > 1 ? lines.sublist(1).join('\n') : '';
+    return GestureDetector(
+      onTap: _toggleFromPrompt,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _ConversationPanelState.promptBg,
+          borderRadius: BorderRadius.circular(8),
         ),
-        if (exchange.response != null) ...[
-          const SizedBox(height: 8),
-          GestureDetector(
-            onTap: () => onToggle(Alignment.bottomCenter, responseKey),
-            child: Container(
-              key: responseKey,
-              margin: const EdgeInsets.only(left: 16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _ConversationPanelState.responseBg,
-                borderRadius: BorderRadius.circular(8),
-              ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              key: widget.promptKey,
+              alignment: Alignment.centerLeft,
               child: Text(
-                exchange.response!,
-                maxLines: null,
+                first,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade300,
+                    ),
+              ),
+            ),
+            AnimatedSize(
+              alignment: Alignment.topCenter,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: expand && rest.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        rest,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade300,
+                            ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResponseBlock(BuildContext context, bool expand) {
+    final lines = widget.exchange.response!.split('\n');
+    final first = lines.first;
+    final rest = lines.length > 1 ? lines.sublist(1).join('\n') : '';
+
+    final children = expandedFromPrompt == false
+        ? [
+            AnimatedSize(
+              alignment: Alignment.bottomCenter,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: expand && rest.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        rest,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(
+                              color: Colors.grey.shade200,
+                            ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            Container(
+              key: widget.responseKey,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                first,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context)
                     .textTheme
                     .bodySmall
@@ -261,61 +339,59 @@ class _ExchangeTile extends StatelessWidget {
                     ),
               ),
             ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildCollapsed(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () => onToggle(Alignment.topCenter, promptKey),
-          child: Container(
-            key: promptKey,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: _ConversationPanelState.promptBg,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              exchange.prompt,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade300,
-                  ),
-            ),
-          ),
-        ),
-        if (exchange.response != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: GestureDetector(
-              onTap: () => onToggle(Alignment.bottomCenter, responseKey),
-              child: Container(
-                key: responseKey,
-                margin: const EdgeInsets.only(left: 16),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: _ConversationPanelState.responseBg,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  exchange.response!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade200,
-                      ),
-                ),
+          ]
+        : [
+            Container(
+              key: widget.responseKey,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                first,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(
+                      color: Colors.grey.shade200,
+                    ),
               ),
             ),
-          ),
-      ],
+            AnimatedSize(
+              alignment: Alignment.topCenter,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: expand && rest.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        rest,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(
+                              color: Colors.grey.shade200,
+                            ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ];
+
+    return GestureDetector(
+      onTap: _toggleFromResponse,
+      child: Container(
+        margin: const EdgeInsets.only(left: 16),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _ConversationPanelState.responseBg,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: children,
+        ),
+      ),
     );
   }
 }
