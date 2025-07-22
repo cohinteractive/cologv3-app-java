@@ -2,12 +2,10 @@
 
 ## 🧭 Current Focus
 
-We are beginning **major UI modifications** to improve usability and polish. This includes fixing display issues in the conversation and exchange panels, enhancing expand/collapse animations, and introducing contextual menus.
+We are beginning work on **UI contextual menus**, which includes adding a 3-dot hover menu to conversations and exchanges, and implementing contextual actions such as “About”.
 
 ## 🧱 Key Work Areas
 
-- Fix missing response display in exchanges
-- Improve expand/collapse animations for exchanges
-- Add a 3-dot hover menu to each conversation label and exchange (prompt/response)
-- Show context menu on clicking the 3-dot menu with one option: “About”
-- Implement the “About” dialog showing app name, version, author, and copyright
+- Add a 3-dot hover menu to each conversation and each prompt/response block
+- On click, display a contextual menu
+- Implement the "About" action to show an app information dialog
