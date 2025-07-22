@@ -303,44 +303,19 @@ class _ExchangeTileState extends State<_ExchangeTile>
     final first = lines.first;
     final rest = lines.length > 1 ? lines.sublist(1).join('\n') : '';
 
-    final children = expandedFromPrompt == false
-        ? [
-            AnimatedSize(
-              alignment: Alignment.bottomCenter,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: expand && rest.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        rest,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(
-                              color: Colors.grey.shade200,
-                            ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            Container(
-              key: widget.responseKey,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                first,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(
-                      color: Colors.grey.shade200,
-                    ),
-              ),
-            ),
-          ]
-        : [
+    return GestureDetector(
+      onTap: _toggleFromResponse,
+      child: Container(
+        margin: const EdgeInsets.only(left: 16),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _ConversationPanelState.responseBg,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
             Container(
               key: widget.responseKey,
               alignment: Alignment.centerLeft,
@@ -375,21 +350,7 @@ class _ExchangeTileState extends State<_ExchangeTile>
                     )
                   : const SizedBox.shrink(),
             ),
-          ];
-
-    return GestureDetector(
-      onTap: _toggleFromResponse,
-      child: Container(
-        margin: const EdgeInsets.only(left: 16),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: _ConversationPanelState.responseBg,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: children,
+          ],
         ),
       ),
     );
