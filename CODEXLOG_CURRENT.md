@@ -97,3 +97,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507220656][e4536e][BUG][REF] Fixed Exchange parsing to use full mapping and added placeholder fallback for missing prompt or response
 [2507220732][72f920][BUG][REF] Walked assistant response chain to find first non-empty assistant message for each exchange
 [2507220754][cc9e4f9][REF][UI] Added anchored expand/collapse animation for prompt and response blocks with directional logic
+[2507220806][9524b80][BUG][UI] Fixed response block expanding upward
