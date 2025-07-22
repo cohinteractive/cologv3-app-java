@@ -50,3 +50,18 @@ ContextParcel(
   confidence: {"summary": 0.95}
 );
 */
+
+/*
+\ud83d\udce6 ContextParcel Example
+
+{
+  "summary": "Fixed null pointer in message loader",
+  "contributingExchangeIds": [12, 15, 16],
+  "tags": ["bug", "loader", "json"],
+  "assumptions": ["Data exceeds buffer size"],
+  "confidence": {
+    "summary": 0.93,
+    "tags": 0.8
+  }
+}
+*/
