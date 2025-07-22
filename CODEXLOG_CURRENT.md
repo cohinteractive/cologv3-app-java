@@ -101,3 +101,5 @@ This file records all Codex-generated changes and implementations in this projec
 [2507220817][677d05f][SNC][DOC] Marked ui_debug tasks complete and updated CURRENT_CONTEXT.md to focus on UI hover menu implementation
 [2507221039][39153c][FTR][UI] Implemented hover-triggered 3-dot contextual menu with About dialog for conversations and exchanges
 [2507221053][ce62222][REF][UI] Normalized font styling and fixed text wrapping to avoid 3-dot hover menu overlap
+
+[2507221232][6efba4f][DOC] Added tasks for context parcel and memory format
