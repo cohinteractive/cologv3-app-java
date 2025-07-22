@@ -136,4 +136,4 @@ It’s built *for developers who use ChatGPT and Codex as true collaborators*, a
 
 
 ## Current State
-A searchable conversation list is being implemented, starting with a live substring-based filter input at the top of the left panel.
+The conversation list panel now displays a fixed status line showing the absolute path of the open file, the number of visible and total conversations, and the current time.
