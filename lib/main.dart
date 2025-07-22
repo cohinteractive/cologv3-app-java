@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 import 'models/conversation.dart';
 import 'services/json_loader.dart';
@@ -73,10 +75,25 @@ class _HomePageState extends State<HomePage> {
   String? _error;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String? _currentFilePath;
+  late DateTime _currentTime;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
+      setState(() {
+        _currentTime = DateTime.now();
+      });
+    });
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _timer?.cancel();
     super.dispose();
   }
   Future<void> _openJsonFile() async {
@@ -110,12 +127,14 @@ class _HomePageState extends State<HomePage> {
           _conversations = convs;
           _selectedConversation = null;
           _loading = false;
+          _currentFilePath = file.path;
         });
       } on JsonLoadException catch (e) {
         setState(() {
           _conversations = null;
           _error = e.message;
           _loading = false;
+          _currentFilePath = null;
         });
       }
     }
@@ -155,6 +174,38 @@ class _HomePageState extends State<HomePage> {
             flex: 1,
             child: Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+                  child: SizedBox(
+                    height: 20,
+                    child: Builder(
+                      builder: (context) {
+                        final style = Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(fontSize: 12, color: Colors.grey);
+                        final countText = _searchQuery.isEmpty
+                            ? 'Conversations: ${_conversations!.length}'
+                            : 'Conversations: ${filtered.length} / ${_conversations!.length}';
+                        final timeStr = DateFormat('h:mm a').format(_currentTime);
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _currentFilePath ?? '',
+                                style: style,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Text(countText, style: style),
+                            const SizedBox(width: 8),
+                            Text(timeStr, style: style),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
