@@ -136,5 +136,4 @@ It’s built *for developers who use ChatGPT and Codex as true collaborators*, a
 
 
 ## Current State
-
-Project initialization with documentation files. Application code not yet implemented.
+A searchable conversation list is being implemented, starting with a live substring-based filter input at the top of the left panel.

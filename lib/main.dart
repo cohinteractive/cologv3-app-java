@@ -71,6 +71,14 @@ class _HomePageState extends State<HomePage> {
   Conversation? _selectedConversation;
   bool _loading = false;
   String? _error;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
   Future<void> _openJsonFile() async {
     final prefs = await SharedPreferences.getInstance();
     final initialDir = prefs.getString('last_dir');
@@ -117,6 +125,21 @@ class _HomePageState extends State<HomePage> {
     exit(0);
   }
 
+  List<Conversation> _filteredConversations() {
+    if (_conversations == null || _searchQuery.isEmpty) {
+      return _conversations ?? <Conversation>[];
+    }
+    final q = _searchQuery.toLowerCase();
+    return _conversations!.where((c) {
+      for (final ex in c.exchanges) {
+        if (ex.prompt.toLowerCase().contains(q)) return true;
+        final resp = ex.response;
+        if (resp != null && resp.toLowerCase().contains(q)) return true;
+      }
+      return false;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget body;
@@ -125,18 +148,40 @@ class _HomePageState extends State<HomePage> {
     } else if (_error != null) {
       body = ErrorPanel(message: _error!);
     } else if (_conversations != null) {
+      final filtered = _filteredConversations();
       body = Row(
         children: [
           Expanded(
             flex: 1,
-            child: ConversationList(
-              conversations: _conversations!,
-              selected: _selectedConversation,
-              onSelected: (c) {
-                setState(() {
-                  _selectedConversation = c;
-                });
-              },
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: 'Search...',
+                      isDense: true,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ConversationList(
+                    conversations: filtered,
+                    selected: _selectedConversation,
+                    onSelected: (c) {
+                      setState(() {
+                        _selectedConversation = c;
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(

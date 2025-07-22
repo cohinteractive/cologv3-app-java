@@ -16,7 +16,9 @@ class ConversationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    if (conversations.isEmpty) {
+      return const Center(child: Text('No conversations found'));
+    }
     return ListView.builder(
       itemCount: conversations.length,
       itemBuilder: (context, index) {

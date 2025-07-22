@@ -108,3 +108,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507221256][bf53e23][DOC] Added memory injection tasks
 [2507221256][d50a76][DOC] Added feature module routing tasks
 [2507221256][ed7fe8][DOC] Added context role tagging tasks
+[2507232210][5ef516][FTR][UI] Added live search bar to conversation list panel and implemented case-insensitive substring filtering across prompts and responses
