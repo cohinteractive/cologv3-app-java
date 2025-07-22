@@ -1,0 +1,4 @@
+enum MergeStrategy {
+  appendWithRefinement,
+  replaceOnConflict,
+}
