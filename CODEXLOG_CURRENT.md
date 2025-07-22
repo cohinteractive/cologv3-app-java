@@ -105,3 +105,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507221232][e1468c2][SNC][DOC] Added milestone1 instruction template tasks
 [2507221232][6efba4f][DOC] Added tasks for context parcel and memory format
 
+[2507221239][f7e2e3][DOC] Added iterative merging loop tasks
