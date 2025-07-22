@@ -57,3 +57,15 @@ final memory = ContextMemory();
 memory.update(ContextParcel(...));
 print(memory.current?.summary);
 */
+
+/*
+\ud83e\uddd0 ContextMemory Example
+
+{
+  "current": { ...ContextParcel JSON... },
+  "history": [
+    { ...previous ContextParcel... },
+    { ...older ContextParcel... }
+  ]
+}
+*/

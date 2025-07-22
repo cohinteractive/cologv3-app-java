@@ -41,3 +41,15 @@ ContextDelta(
 );
 */
 
+/*
+\ud83d\uddd0 ContextDelta Example
+
+{
+  "changeType": "modification",
+  "field": "summary",
+  "previousValue": "Old summary",
+  "newValue": "Rewritten bug fix summary",
+  "timestamp": "2025-07-23T22:13:00Z"
+}
+*/
+
