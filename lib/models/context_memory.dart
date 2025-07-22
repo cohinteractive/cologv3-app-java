@@ -1,7 +1,18 @@
 import 'context_parcel.dart';
 
+/*
+Merge History Policy:
+
+- Each call to `update()` pushes the current context into `history`.
+- This preserves all prior full versions of merged context.
+- Deltas are not currently stored separately; only full snapshots are tracked.
+- Rollback and inspection of older context states is supported via `history`.
+*/
+
 class ContextMemory {
   ContextParcel? current;
+  // Stores prior full ContextParcel snapshots before each update.
+  // Allows rollback or inspection of previous merged states.
   final List<ContextParcel> history;
 
   ContextMemory({this.current, List<ContextParcel>? history})
@@ -17,6 +28,11 @@ class ContextMemory {
   void reset() {
     current = null;
     history.clear();
+  }
+
+  ContextParcel? getPrevious(int stepsBack) {
+    if (stepsBack < 1 || stepsBack > history.length) return null;
+    return history[history.length - stepsBack];
   }
 
   factory ContextMemory.fromJson(Map<String, dynamic> json) => ContextMemory(

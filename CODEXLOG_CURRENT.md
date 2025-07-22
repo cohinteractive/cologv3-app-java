@@ -116,3 +116,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507232303][22e3b1][FTR][DATA] Added ContextMemory object to track latest and historical context parcels
 [2507232311][333153][FTR][UI] Added index numbers to each prompt in right panel, styled similarly to conversation list and placed inside prompt box
 [2507222317][cef7c7][FTR][DATA] Added ContextDelta model to represent changes between context states
+[2507232325][0aa7d50][REF][DATA] Documented and clarified merge history handling in ContextMemory
