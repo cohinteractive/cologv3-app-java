@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 import '../models/conversation.dart';
 import '../models/exchange.dart';
@@ -95,23 +96,30 @@ Widget build(BuildContext context) {
               promptKey: pKey,
               responseKey: rKey,
               onToggle: (align, anchorKey) {
-                final beforeBox = anchorKey.currentContext?.findRenderObject() as RenderBox?;
+                final beforeBox =
+                    anchorKey.currentContext?.findRenderObject() as RenderBox?;
                 final beforeOffset = beforeBox?.localToGlobal(Offset.zero);
                 setState(() {
                   if (expanded) {
                     _expanded.remove(index);
                   } else {
                     _expanded.add(index);
+                    debugPrint('[Expand] Conversation: "${conversation.title}" | '
+                        'Exchange #${index + 1}\n'
+                        'Prompt: "${_preview(ex.prompt)}"\n'
+                        'Response: "${_preview(ex.response ?? '')}"');
                   }
                   _alignmentMap[index] = align;
                 });
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final afterBox = anchorKey.currentContext?.findRenderObject() as RenderBox?;
+                  final afterBox =
+                      anchorKey.currentContext?.findRenderObject() as RenderBox?;
                   final afterOffset = afterBox?.localToGlobal(Offset.zero);
                   if (beforeOffset != null && afterOffset != null) {
                     final delta = afterOffset.dy - beforeOffset.dy;
                     if (delta != 0) {
-                      _scrollController.jumpTo(_scrollController.offset + delta);
+                      _scrollController
+                          .jumpTo(_scrollController.offset + delta);
                     }
                   }
                 });
@@ -171,6 +179,9 @@ Widget build(BuildContext context) {
 
   String _keyFor(Conversation conv) =>
       '${conv.title}_${conv.timestamp.millisecondsSinceEpoch}';
+
+  String _preview(String text) =>
+      text.substring(0, math.min(40, text.length));
 }
 
 class _ExchangeTile extends StatelessWidget {
