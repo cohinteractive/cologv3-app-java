@@ -75,18 +75,21 @@ Conversation _parseConversation(Map raw) {
       String? responseText;
       DateTime? responseTime;
       final children = node['children'];
-      if (children is List && children.isNotEmpty) {
-        final firstId = children.first;
-        final childNode = mapping[firstId];
-        if (childNode is Map && childNode['message'] is Map) {
-          final nextMsg = childNode['message'] as Map;
-          final nextAuthor = nextMsg['author'];
-          if (nextAuthor is Map && nextAuthor['role'] == 'assistant') {
-            responseText = _extractText(nextMsg);
-            final respSec = nextMsg['create_time'];
-            responseTime = respSec is num
-                ? DateTime.fromMillisecondsSinceEpoch((respSec * 1000).toInt())
-                : null;
+      if (children is List) {
+        for (final id in children) {
+          final childNode = mapping[id];
+          if (childNode is Map && childNode['message'] is Map) {
+            final nextMsg = childNode['message'] as Map;
+            final nextAuthor = nextMsg['author'];
+            if (nextAuthor is Map && nextAuthor['role'] == 'assistant') {
+              responseText = _extractText(nextMsg);
+              final respSec = nextMsg['create_time'];
+              responseTime = respSec is num
+                  ? DateTime.fromMillisecondsSinceEpoch(
+                      (respSec * 1000).toInt())
+                  : null;
+              break;
+            }
           }
         }
       }
