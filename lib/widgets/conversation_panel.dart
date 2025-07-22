@@ -209,6 +209,8 @@ class _ExchangeTile extends StatefulWidget {
 class _ExchangeTileState extends State<_ExchangeTile>
     with TickerProviderStateMixin {
   bool? expandedFromPrompt;
+  bool _hoverPrompt = false;
+  bool _hoverResponse = false;
 
   void _toggleFromPrompt() {
     setState(() {
@@ -247,50 +249,78 @@ class _ExchangeTileState extends State<_ExchangeTile>
     final lines = widget.exchange.prompt.split('\n');
     final first = lines.first;
     final rest = lines.length > 1 ? lines.sublist(1).join('\n') : '';
-    return GestureDetector(
-      onTap: _toggleFromPrompt,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: _ConversationPanelState.promptBg,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hoverPrompt = true),
+      onExit: (_) => setState(() => _hoverPrompt = false),
+      child: GestureDetector(
+        onTap: _toggleFromPrompt,
+        child: Stack(
           children: [
             Container(
-              key: widget.promptKey,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                first,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade300,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _ConversationPanelState.promptBg,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    key: widget.promptKey,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      first,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade300,
+                          ),
                     ),
+                  ),
+                  AnimatedSize(
+                    alignment: Alignment.topCenter,
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    child: expand && rest.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              rest,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade300,
+                                  ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                ],
               ),
             ),
-            AnimatedSize(
-              alignment: Alignment.topCenter,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: expand && rest.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        rest,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade300,
-                            ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                opacity: _hoverPrompt ? 1 : 0,
+                duration: const Duration(milliseconds: 150),
+                child: PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert, size: 20),
+                  color: Theme.of(context).colorScheme.surface,
+                  onSelected: (value) {
+                    if (value == 'about') {
+                      _showAboutDialog(context);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(value: 'about', child: Text('About')),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -303,56 +333,111 @@ class _ExchangeTileState extends State<_ExchangeTile>
     final first = lines.first;
     final rest = lines.length > 1 ? lines.sublist(1).join('\n') : '';
 
-    return GestureDetector(
-      onTap: _toggleFromResponse,
-      child: Container(
-        margin: const EdgeInsets.only(left: 16),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: _ConversationPanelState.responseBg,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hoverResponse = true),
+      onExit: (_) => setState(() => _hoverResponse = false),
+      child: GestureDetector(
+        onTap: _toggleFromResponse,
+        child: Stack(
           children: [
             Container(
-              key: widget.responseKey,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                first,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(
-                      color: Colors.grey.shade200,
+              margin: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _ConversationPanelState.responseBg,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    key: widget.responseKey,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      first,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(
+                            color: Colors.grey.shade200,
+                          ),
                     ),
+                  ),
+                  AnimatedSize(
+                    alignment: Alignment.topCenter,
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    child: expand && rest.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              rest,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Colors.grey.shade200,
+                                  ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                ],
               ),
             ),
-            AnimatedSize(
-              alignment: Alignment.topCenter,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: expand && rest.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        rest,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(
-                              color: Colors.grey.shade200,
-                            ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                opacity: _hoverResponse ? 1 : 0,
+                duration: const Duration(milliseconds: 150),
+                child: PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert, size: 20),
+                  color: Theme.of(context).colorScheme.surface,
+                  onSelected: (value) {
+                    if (value == 'about') {
+                      _showAboutDialog(context);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(value: 'about', child: Text('About')),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
+
+void _showAboutDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('About'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('App Name: Colog V3'),
+            Text('Version: 0.1.0'),
+            Text('Author: Charles Clark'),
+            Text('© 2025'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }
