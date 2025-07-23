@@ -4,6 +4,7 @@ import 'dart:io';
 import '../app_config.dart';
 import '../models/context_parcel.dart';
 import '../models/exchange.dart';
+import '../memory/context_delta.dart';
 
 /// Writes debug logs of [ContextParcel]s during merge operations.
 class DebugLogger {
@@ -38,6 +39,21 @@ class DebugLogger {
       final file = File(filename);
       file.createSync(recursive: true);
       file.writeAsStringSync(jsonEncode(parcel.toJson()));
+    } catch (_) {
+      // Swallow any exceptions to avoid interfering with merge flow
+    }
+  }
+
+  /// Logs the [delta] between ContextParcel states to a timestamped JSON file.
+  static void logContextDelta(ContextDelta delta, int stepIndex) {
+    try {
+      Directory('debug').createSync(recursive: true);
+      final timestamp =
+          DateTime.now().toIso8601String().replaceAll(':', '-');
+      final filename = 'debug/context_delta_${stepIndex}_$timestamp.json';
+      final file = File(filename);
+      file.createSync(recursive: true);
+      file.writeAsStringSync(jsonEncode(delta.toJson()));
     } catch (_) {
       // Swallow any exceptions to avoid interfering with merge flow
     }
