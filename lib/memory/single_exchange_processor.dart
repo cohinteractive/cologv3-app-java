@@ -6,6 +6,7 @@ import '../models/exchange.dart';
 import '../models/llm_merge_strategy.dart';
 import '../services/llm_client.dart';
 import '../llm/instruction_templates.dart';
+import '../debug/debug_logger.dart';
 
 class MergeException implements Exception {
   final String message;
@@ -47,20 +48,27 @@ $responseText''';
       print('SingleExchangeProcessor prompt:\n$prompt');
     }
 
-    final raw = await LLMClient.sendPrompt(prompt);
-    if (raw.trim().isEmpty) {
-      throw MergeException('Invalid LLM response');
+    final response = await LLMClient.sendPrompt(prompt);
+    if (response.trim().isEmpty) {
+      throw MergeException('LLM returned invalid ContextParcel format');
     }
 
     try {
-      final newParcel =
-          ContextParcel.fromJson(jsonDecode(raw) as Map<String, dynamic>);
-      if (AppConfig.debugMode) {
-        print('SingleExchangeProcessor returned: ${jsonEncode(newParcel.toJson())}');
+      final Map<String, dynamic> json = jsonDecode(response);
+      final newParcel = ContextParcel.fromJson(json);
+
+      if (newParcel.summary.isEmpty && newParcel.mergeHistory.isEmpty) {
+        throw const FormatException();
       }
+
+      if (AppConfig.debugMode) {
+        DebugLogger.logRawResponse(response);
+        DebugLogger.logParsedParcel(newParcel);
+      }
+
       return newParcel;
     } catch (_) {
-      throw MergeException('Invalid LLM response');
+      throw MergeException('LLM returned invalid ContextParcel format');
     }
   }
 }
