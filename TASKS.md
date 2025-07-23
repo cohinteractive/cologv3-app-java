@@ -9,3 +9,4 @@
 - [ ] Add fixed header to right panel showing metadata for currently expanded exchange and auto-scroll to dock it under header
 - [ ] Add summary text region to pinned header and simulate LLM summary placeholder for expanded exchange
 - [ ] Fix exchange toggle so clicking prompt or response expands/collapses both together
+- [ ] Visually de-emphasize collapsed exchanges in right panel by reducing background intensity, padding, and text color to create visual hierarchy
