@@ -128,3 +128,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507230712][1d688e][FTR][DATA] Implemented SingleExchangeProcessor to merge one Exchange into a ContextParcel using LLM
 [2507230722][7114fe3][REF][DATA] Connected SingleExchangeProcessor to IterativeMergeEngine and updated context loop handling with debug logging
 [2507230728][2c708d5][FTR][DATA] Added merge history tracking to IterativeMergeEngine for identifying contributing Exchanges
+[2507230738][12c457][FTR][DBG] Logged ContextParcel state at each step of merge loop via DebugLogger
