@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import '../app_config.dart';
+import '../config/app_config.dart';
 import '../models/context_parcel.dart';
 import '../models/exchange.dart';
 import '../memory/context_delta.dart';
@@ -11,6 +11,7 @@ class DebugLogger {
   /// Logs [parcel] to a JSON file named `context_step_{stepIndex}.json`
   /// inside [AppConfig.debugOutputDir]. Includes a timestamp and step index.
   static void logContextParcel(ContextParcel parcel, int stepIndex) {
+    if (!AppConfig.debugMode) return;
     final ts = DateTime.now().toIso8601String();
     final outputDir = Directory(AppConfig.debugOutputDir);
     if (!outputDir.existsSync()) {
@@ -31,6 +32,7 @@ class DebugLogger {
   /// the `debug/` directory. Any errors are caught to avoid disrupting
   /// the merge process.
   static void logContextCheckpoint(ContextParcel parcel, int stepIndex) {
+    if (!AppConfig.debugMode) return;
     try {
       Directory('debug').createSync(recursive: true);
       final timestamp =
@@ -46,6 +48,7 @@ class DebugLogger {
 
   /// Logs the [delta] between ContextParcel states to a timestamped JSON file.
   static void logContextDelta(ContextDelta delta, int stepIndex) {
+    if (!AppConfig.debugMode) return;
     try {
       Directory('debug').createSync(recursive: true);
       final timestamp =
@@ -65,6 +68,7 @@ class DebugLogger {
     required Exchange exchange,
     required ContextParcel context,
   }) {
+    if (!AppConfig.debugMode) return;
     final timestamp = DateTime.now().toIso8601String();
     final log = '''
     === LLM CALL [$timestamp] ===
@@ -84,11 +88,13 @@ class DebugLogger {
 
   /// Logs the raw LLM [response] for debugging purposes.
   static void logRawResponse(String response) {
+    if (!AppConfig.debugMode) return;
     // TODO: Implement logging of raw LLM responses
   }
 
   /// Logs a warning message when [AppConfig.debugMode] is enabled.
   static void logWarning(String message) {
+    if (!AppConfig.debugMode) return;
     print('[DEBUG WARNING] $message');
   }
 
@@ -107,6 +113,7 @@ class DebugLogger {
 
   /// Logs the parsed [parcel] returned from the LLM.
   static void logParsedParcel(ContextParcel parcel) {
+    if (!AppConfig.debugMode) return;
     // TODO: Implement logging of parsed ContextParcel objects
   }
 }

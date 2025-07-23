@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../app_config.dart';
+import '../config/app_config.dart';
 import '../models/context_parcel.dart';
 import '../models/exchange.dart';
 import '../models/llm_merge_strategy.dart';

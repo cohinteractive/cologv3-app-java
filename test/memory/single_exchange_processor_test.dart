@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:test/test.dart';
 
-import '../../lib/app_config.dart';
+import '../../lib/config/app_config.dart';
 import '../../lib/models/context_parcel.dart';
 import '../../lib/models/exchange.dart';
 import '../../lib/memory/single_exchange_processor.dart';
