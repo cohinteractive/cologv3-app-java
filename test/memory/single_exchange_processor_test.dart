@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:test/test.dart';
 
+import '../../lib/app_config.dart';
 import '../../lib/models/context_parcel.dart';
 import '../../lib/models/exchange.dart';
 import '../../lib/memory/single_exchange_processor.dart';
@@ -8,10 +10,19 @@ import '../../lib/models/llm_merge_strategy.dart';
 
 void main() {
   group('SingleExchangeProcessor', () {
-    final originalSender = LLMClient.sendPrompt;
-    tearDown(() => LLMClient.sendPrompt = originalSender);
+    late PromptSender originalSender;
 
-    test('returns new ContextParcel from LLM', () async {
+    setUp(() {
+      originalSender = LLMClient.sendPrompt;
+      AppConfig.debugMode = false;
+    });
+
+    tearDown(() {
+      LLMClient.sendPrompt = originalSender;
+      AppConfig.debugMode = false;
+    });
+
+    test('valid merge returns new ContextParcel', () async {
       LLMClient.sendPrompt =
           (prompt) async => '{"summary":"merged","mergeHistory":[0]}';
       final input = ContextParcel(summary: '', mergeHistory: []);
@@ -27,7 +38,7 @@ void main() {
       expect(result.mergeHistory, [0]);
     });
 
-    test('malformed exchange returns input parcel and skips LLM', () async {
+    test('empty Exchange returns input parcel without calling LLM', () async {
       var called = false;
       LLMClient.sendPrompt = (prompt) async {
         called = true;
@@ -46,8 +57,8 @@ void main() {
       expect(called, isFalse);
     });
 
-    test('throws MergeException on empty LLM response', () async {
-      LLMClient.sendPrompt = (prompt) async => '';
+    test('throws MergeException on malformed LLM response', () async {
+      LLMClient.sendPrompt = (prompt) async => 'not json';
       final input = ContextParcel(summary: '', mergeHistory: []);
       final ex = Exchange(
         prompt: 'Hi',
@@ -60,6 +71,27 @@ void main() {
             input, ex, MergeStrategy.defaultStrategy),
         throwsA(isA<MergeException>()),
       );
+    });
+
+    test('debug logging prints when enabled', () async {
+      AppConfig.debugMode = true;
+      LLMClient.sendPrompt =
+          (prompt) async => '{"summary":"d","mergeHistory":[0]}';
+      final input = ContextParcel(summary: '', mergeHistory: []);
+      final ex = Exchange(
+        prompt: 'Hi',
+        promptTimestamp: DateTime.now(),
+        response: 'There',
+        responseTimestamp: DateTime.now(),
+      );
+      final logs = <String>[];
+      await runZoned(() async {
+        await SingleExchangeProcessor.process(
+            input, ex, MergeStrategy.defaultStrategy);
+      }, zoneSpecification: ZoneSpecification(print: (self, parent, zone, line) {
+        logs.add(line);
+      }));
+      expect(logs.any((l) => l.contains('SingleExchangeProcessor prompt')), isTrue);
     });
   });
 }
