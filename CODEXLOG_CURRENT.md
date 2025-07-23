@@ -119,3 +119,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507232325][0aa7d50][REF][DATA] Documented and clarified merge history handling in ContextMemory
 [2507232338][6b805f][DOC][DATA] Added JSON schema examples to ContextParcel, ContextMemory, and ContextDelta models
 [2507222353][158a9d4][FTR][DATA] Implemented merge strategies with versioning
+[2507230004][add7d9][FTR][DOC] Added reusable LLM instruction blocks, merge logic, and prompt templates with examples
