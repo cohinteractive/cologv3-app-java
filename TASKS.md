@@ -6,3 +6,4 @@
 - [ ] Add top status line above search bar in left panel showing: absolute file path, visible/total conversations, and current time
 - [ ] Move status line to bottom of window and expand it across full width to display file path, conversation count, and current time
 - [ ] Display per-conversation prompt index numbers in right panel using styled label inside each prompt box, aligned to left
+- [ ] Add fixed header to right panel showing metadata for currently expanded exchange and auto-scroll to dock it under header

@@ -121,3 +121,5 @@ This file records all Codex-generated changes and implementations in this projec
 [2507222353][158a9d4][FTR][DATA] Implemented merge strategies with versioning
 [2507230004][add7d9][FTR][DOC] Added reusable LLM instruction blocks, merge logic, and prompt templates with examples
 [2507231203][518c97][SNC][DOC] Archived TASKS_specify_llm_instruction_templates.md after Milestone 1 completion
+
+[2507230125][4c07cf][FTR][UI] Added pinned header to right panel showing expanded exchange metadata and docked scroll behavior

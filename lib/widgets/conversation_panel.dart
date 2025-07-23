@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:intl/intl.dart';
 
 import '../models/conversation.dart';
 import '../models/exchange.dart';
@@ -14,25 +15,28 @@ class ConversationPanel extends StatefulWidget {
 
 class _ConversationPanelState extends State<ConversationPanel>
     with TickerProviderStateMixin {
-  final Map<String, Set<int>> _expandedMap = <String, Set<int>>{};
-  Set<int> _expanded = <int>{};
+  final Map<String, int?> _expandedMap = <String, int?>{};
+  int? _expandedIndex;
   final ScrollController _scrollController = ScrollController();
   final Map<int, Alignment> _alignmentMap = <int, Alignment>{};
   final Map<int, GlobalKey> _promptKeys = <int, GlobalKey>{};
   final Map<int, GlobalKey> _responseKeys = <int, GlobalKey>{};
+  final Map<int, GlobalKey> _tileKeys = <int, GlobalKey>{};
+  final GlobalKey _listKey = GlobalKey();
   static const promptBg = Color(0xFF0D47A1); // dark blue
   static const responseBg = Color(0xFF424242); // dark grey
   static const textStyle = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.normal,
   );
+  static const double _headerHeight = 28;
 
   @override
   void initState() {
     super.initState();
     final conv = widget.conversation;
     if (conv != null) {
-      _expanded = _expandedMap[_keyFor(conv)] ?? <int>{};
+      _expandedIndex = _expandedMap[_keyFor(conv)];
     }
   }
 
@@ -48,12 +52,12 @@ class _ConversationPanelState extends State<ConversationPanel>
     if (oldWidget.conversation != widget.conversation) {
       final oldConv = oldWidget.conversation;
       if (oldConv != null) {
-        _expandedMap[_keyFor(oldConv)] = _expanded;
+        _expandedMap[_keyFor(oldConv)] = _expandedIndex;
       }
       final newConv = widget.conversation;
-      _expanded = newConv != null
-          ? (_expandedMap[_keyFor(newConv)] ?? <int>{})
-          : <int>{};
+      _expandedIndex = newConv != null
+          ? _expandedMap[_keyFor(newConv)]
+          : null;
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(0);
       }
@@ -76,67 +80,108 @@ Widget build(BuildContext context) {
 
   return Container(
     color: colorScheme.background,
-    child: Scrollbar(
-      controller: _scrollController,
-      thumbVisibility: true,
-      child: ListView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.all(16),
-        addAutomaticKeepAlives: false,
-        itemCount: exchanges.length,
-        itemBuilder: (context, index) {
-          final ex = exchanges[index];
-          final expanded = _expanded.contains(index);
-          final alignment = _alignmentMap[index] ?? Alignment.topCenter;
-          final pKey = _promptKeys[index] ??= GlobalKey();
-          final rKey = _responseKeys[index] ??= GlobalKey();
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: _ExchangeTile(
-              key: ValueKey('ex_$index'),
-              index: index,
-              exchange: ex,
-              expanded: expanded,
-              alignment: alignment,
-              promptKey: pKey,
-              responseKey: rKey,
-              onToggle: (align, anchorKey) {
-                final beforeBox =
-                    anchorKey.currentContext?.findRenderObject() as RenderBox?;
-                final beforeOffset = beforeBox?.localToGlobal(Offset.zero);
-                setState(() {
-                  if (expanded) {
-                    _expanded.remove(index);
-                  } else {
-                    _expanded.add(index);
-                    debugPrint('[Expand] Conversation: "${conversation.title}" | '
-                        'Exchange #${index + 1}\n'
-                        'Prompt: "${_preview(ex.prompt)}"\n'
-                        'Response: "${_preview(ex.response ?? '')}"');
-                  }
-                  _alignmentMap[index] = align;
-                });
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final afterBox =
-                      anchorKey.currentContext?.findRenderObject() as RenderBox?;
-                  final afterOffset = afterBox?.localToGlobal(Offset.zero);
-                  if (beforeOffset != null && afterOffset != null) {
-                    final delta = afterOffset.dy - beforeOffset.dy;
-                    if (delta != 0) {
-                      _scrollController
-                          .jumpTo(_scrollController.offset + delta);
-                    }
-                  }
-                });
+    child: Column(
+      children: [
+        _buildHeader(conversation),
+        Expanded(
+          child: Scrollbar(
+            controller: _scrollController,
+            thumbVisibility: true,
+            child: ListView.builder(
+              key: _listKey,
+              controller: _scrollController,
+              padding: const EdgeInsets.all(16),
+              addAutomaticKeepAlives: false,
+              itemCount: exchanges.length,
+              itemBuilder: (context, index) {
+                final ex = exchanges[index];
+                final expanded = index == _expandedIndex;
+                final alignment = _alignmentMap[index] ?? Alignment.topCenter;
+                final pKey = _promptKeys[index] ??= GlobalKey();
+                final rKey = _responseKeys[index] ??= GlobalKey();
+                final tKey = _tileKeys[index] ??= GlobalKey();
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _ExchangeTile(
+                    key: tKey,
+                    index: index,
+                    exchange: ex,
+                    expanded: expanded,
+                    alignment: alignment,
+                    promptKey: pKey,
+                    responseKey: rKey,
+                    onToggle: (align, anchorKey) {
+                      final newlyExpanded = _expandedIndex != index;
+                      setState(() {
+                        _expandedIndex = newlyExpanded ? index : null;
+                        _alignmentMap[index] = align;
+                      });
+                      if (newlyExpanded) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          final listBox = _listKey.currentContext?.findRenderObject()
+                              as RenderBox?;
+                          final tileBox = tKey.currentContext?.findRenderObject()
+                              as RenderBox?;
+                          if (listBox != null && tileBox != null) {
+                            final listTop = listBox.localToGlobal(Offset.zero).dy;
+                            final tileTop = tileBox.localToGlobal(Offset.zero).dy;
+                            final offset = _scrollController.offset +
+                                tileTop - listTop - _headerHeight;
+                            final max = _scrollController.position.maxScrollExtent;
+                            final target = offset.clamp(0.0, max);
+                            _scrollController.animateTo(
+                              target,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        });
+                      }
+                    },
+                  ),
+                );
               },
             ),
-          );
-        },
-      ),
+          ),
+        ),
+      ],
     ),
   );
 }
 
+
+  Widget _buildHeader(Conversation conversation) {
+    final style = Theme.of(context)
+        .textTheme
+        .bodySmall
+        ?.copyWith(fontSize: 12, color: Colors.grey.shade300);
+    String text = 'Select a prompt...';
+    if (_expandedIndex != null) {
+      final ex = conversation.exchanges[_expandedIndex!];
+      final ts = ex.promptTimestamp;
+      if (ts != null) {
+        text = DateFormat('dd HH:mm').format(ts);
+      } else {
+        text = '';
+      }
+    }
+    return Container(
+      height: _headerHeight,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade800, width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: Text(text, style: style)),
+          const SizedBox(width: 40),
+        ],
+      ),
+    );
+  }
 
   Widget _buildCollapsedPreview(BuildContext context, Exchange ex) {
     return Column(
