@@ -29,7 +29,8 @@ class _ConversationPanelState extends State<ConversationPanel>
     fontSize: 14,
     fontWeight: FontWeight.normal,
   );
-  static const double _headerHeight = 28;
+  static const double _headerHeight = 56;
+  String _summaryText = '';
 
   @override
   void initState() {
@@ -55,9 +56,7 @@ class _ConversationPanelState extends State<ConversationPanel>
         _expandedMap[_keyFor(oldConv)] = _expandedIndex;
       }
       final newConv = widget.conversation;
-      _expandedIndex = newConv != null
-          ? _expandedMap[_keyFor(newConv)]
-          : null;
+      _expandedIndex = newConv != null ? _expandedMap[_keyFor(newConv)] : null;
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(0);
       }
@@ -65,119 +64,156 @@ class _ConversationPanelState extends State<ConversationPanel>
   }
 
   @override
-Widget build(BuildContext context) {
-  final conversation = widget.conversation;
-  if (conversation == null) {
-    return const Center(child: Text('No conversation selected'));
-  }
+  Widget build(BuildContext context) {
+    final conversation = widget.conversation;
+    if (conversation == null) {
+      return const Center(child: Text('No conversation selected'));
+    }
 
-  final exchanges = conversation.exchanges;
-  if (exchanges.isEmpty) {
-    return const Center(child: Text('No exchanges found.'));
-  }
+    final exchanges = conversation.exchanges;
+    if (exchanges.isEmpty) {
+      return const Center(child: Text('No exchanges found.'));
+    }
 
-  final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
-  return Container(
-    color: colorScheme.background,
-    child: Column(
-      children: [
-        _buildHeader(conversation),
-        Expanded(
-          child: Scrollbar(
-            controller: _scrollController,
-            thumbVisibility: true,
-            child: ListView.builder(
-              key: _listKey,
+    return Container(
+      color: colorScheme.background,
+      child: Column(
+        children: [
+          _buildHeader(conversation),
+          Expanded(
+            child: Scrollbar(
               controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              addAutomaticKeepAlives: false,
-              itemCount: exchanges.length,
-              itemBuilder: (context, index) {
-                final ex = exchanges[index];
-                final expanded = index == _expandedIndex;
-                final alignment = _alignmentMap[index] ?? Alignment.topCenter;
-                final pKey = _promptKeys[index] ??= GlobalKey();
-                final rKey = _responseKeys[index] ??= GlobalKey();
-                final tKey = _tileKeys[index] ??= GlobalKey();
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _ExchangeTile(
-                    key: tKey,
-                    index: index,
-                    exchange: ex,
-                    expanded: expanded,
-                    alignment: alignment,
-                    promptKey: pKey,
-                    responseKey: rKey,
-                    onToggle: (align, anchorKey) {
-                      final newlyExpanded = _expandedIndex != index;
-                      setState(() {
-                        _expandedIndex = newlyExpanded ? index : null;
-                        _alignmentMap[index] = align;
-                      });
-                      if (newlyExpanded) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          final listBox = _listKey.currentContext?.findRenderObject()
-                              as RenderBox?;
-                          final tileBox = tKey.currentContext?.findRenderObject()
-                              as RenderBox?;
-                          if (listBox != null && tileBox != null) {
-                            final listTop = listBox.localToGlobal(Offset.zero).dy;
-                            final tileTop = tileBox.localToGlobal(Offset.zero).dy;
-                            final offset = _scrollController.offset +
-                                tileTop - listTop - _headerHeight;
-                            final max = _scrollController.position.maxScrollExtent;
-                            final target = offset.clamp(0.0, max);
-                            _scrollController.animateTo(
-                              target,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
+              thumbVisibility: true,
+              child: ListView.builder(
+                key: _listKey,
+                controller: _scrollController,
+                padding: const EdgeInsets.all(16),
+                addAutomaticKeepAlives: false,
+                itemCount: exchanges.length,
+                itemBuilder: (context, index) {
+                  final ex = exchanges[index];
+                  final expanded = index == _expandedIndex;
+                  final alignment = _alignmentMap[index] ?? Alignment.topCenter;
+                  final pKey = _promptKeys[index] ??= GlobalKey();
+                  final rKey = _responseKeys[index] ??= GlobalKey();
+                  final tKey = _tileKeys[index] ??= GlobalKey();
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _ExchangeTile(
+                      key: tKey,
+                      index: index,
+                      exchange: ex,
+                      expanded: expanded,
+                      alignment: alignment,
+                      promptKey: pKey,
+                      responseKey: rKey,
+                      onToggle: (align, anchorKey) {
+                        final newlyExpanded = _expandedIndex != index;
+                        setState(() {
+                          _expandedIndex = newlyExpanded ? index : null;
+                          _alignmentMap[index] = align;
+                          if (!newlyExpanded) {
+                            _summaryText = '';
                           }
                         });
-                      }
-                    },
-                  ),
-                );
-              },
+                        if (newlyExpanded) {
+                          _loadSummary(index);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            final listBox =
+                                _listKey.currentContext?.findRenderObject()
+                                    as RenderBox?;
+                            final tileBox =
+                                tKey.currentContext?.findRenderObject()
+                                    as RenderBox?;
+                            if (listBox != null && tileBox != null) {
+                              final listTop = listBox
+                                  .localToGlobal(Offset.zero)
+                                  .dy;
+                              final tileTop = tileBox
+                                  .localToGlobal(Offset.zero)
+                                  .dy;
+                              final offset =
+                                  _scrollController.offset +
+                                  tileTop -
+                                  listTop -
+                                  _headerHeight;
+                              final max =
+                                  _scrollController.position.maxScrollExtent;
+                              final target = offset.clamp(0.0, max);
+                              _scrollController.animateTo(
+                                target,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          });
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+        ],
+      ),
+    );
+  }
 
   Widget _buildHeader(Conversation conversation) {
-    final style = Theme.of(context)
-        .textTheme
-        .bodySmall
-        ?.copyWith(fontSize: 12, color: Colors.grey.shade300);
-    String text = 'Select a prompt...';
+    final tsStyle = Theme.of(
+      context,
+    ).textTheme.bodySmall?.copyWith(fontSize: 12, color: Colors.grey.shade300);
+    final summaryStyle = tsStyle?.copyWith(fontSize: 11);
+
+    String tsText = 'Select a prompt...';
     if (_expandedIndex != null) {
       final ex = conversation.exchanges[_expandedIndex!];
       final ts = ex.promptTimestamp;
       if (ts != null) {
-        text = DateFormat('dd HH:mm').format(ts);
+        tsText = DateFormat('dd HH:mm').format(ts);
       } else {
-        text = '';
+        tsText = '';
       }
     }
+
+    final summary = _expandedIndex != null ? _summaryText : '';
+
     return Container(
       height: _headerHeight,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black54,
         border: Border(
           bottom: BorderSide(color: Colors.grey.shade800, width: 1),
         ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: Text(text, style: style)),
-          const SizedBox(width: 40),
+          SizedBox(
+            height: 16,
+            child: Row(
+              children: [
+                Expanded(child: Text(tsText, style: tsStyle)),
+                const SizedBox(width: 40),
+              ],
+            ),
+          ),
+          Divider(height: 8, color: Colors.grey.shade800),
+          Expanded(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                summary,
+                style: summaryStyle,
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -195,8 +231,9 @@ Widget build(BuildContext context) {
           ),
           child: Text(
             ex.prompt,
-            style: _ConversationPanelState.textStyle
-                .copyWith(color: Colors.grey.shade300),
+            style: _ConversationPanelState.textStyle.copyWith(
+              color: Colors.grey.shade300,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             softWrap: false,
@@ -214,8 +251,9 @@ Widget build(BuildContext context) {
               ),
               child: Text(
                 ex.response!,
-                style: _ConversationPanelState.textStyle
-                    .copyWith(color: Colors.grey.shade200),
+                style: _ConversationPanelState.textStyle.copyWith(
+                  color: Colors.grey.shade200,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
@@ -229,8 +267,19 @@ Widget build(BuildContext context) {
   String _keyFor(Conversation conv) =>
       '${conv.title}_${conv.timestamp.millisecondsSinceEpoch}';
 
-  String _preview(String text) =>
-      text.substring(0, math.min(40, text.length));
+  String _preview(String text) => text.substring(0, math.min(40, text.length));
+
+  void updateSummary(String text) {
+    setState(() => _summaryText = text);
+  }
+
+  void _loadSummary(int index) {
+    updateSummary('Summary loading…');
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (!mounted || _expandedIndex != index) return;
+      updateSummary('Prompt asks about scroll behavior and metadata pinning');
+    });
+  }
 }
 
 class _ExchangeTile extends StatefulWidget {
@@ -280,8 +329,7 @@ class _ExchangeTileState extends State<_ExchangeTile>
   @override
   Widget build(BuildContext context) {
     final expandPrompt = widget.expanded && (expandedFromPrompt ?? true);
-    final expandResponse =
-        widget.expanded && (expandedFromPrompt == false);
+    final expandResponse = widget.expanded && (expandedFromPrompt == false);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,10 +374,9 @@ class _ExchangeTileState extends State<_ExchangeTile>
                     ),
                     child: Text(
                       '#${widget.index + 1}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -342,8 +389,9 @@ class _ExchangeTileState extends State<_ExchangeTile>
                           alignment: Alignment.centerLeft,
                           child: Text(
                             first,
-                            style: _ConversationPanelState.textStyle
-                                .copyWith(color: Colors.grey.shade300),
+                            style: _ConversationPanelState.textStyle.copyWith(
+                              color: Colors.grey.shade300,
+                            ),
                             maxLines: expand ? null : 1,
                             overflow: expand
                                 ? TextOverflow.visible
@@ -428,11 +476,13 @@ class _ExchangeTileState extends State<_ExchangeTile>
                     alignment: Alignment.centerLeft,
                     child: Text(
                       first,
-                      style: _ConversationPanelState.textStyle
-                          .copyWith(color: Colors.grey.shade200),
+                      style: _ConversationPanelState.textStyle.copyWith(
+                        color: Colors.grey.shade200,
+                      ),
                       maxLines: expand ? null : 1,
-                      overflow:
-                          expand ? TextOverflow.visible : TextOverflow.ellipsis,
+                      overflow: expand
+                          ? TextOverflow.visible
+                          : TextOverflow.ellipsis,
                       softWrap: expand,
                     ),
                   ),
@@ -445,8 +495,9 @@ class _ExchangeTileState extends State<_ExchangeTile>
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               rest,
-                              style: _ConversationPanelState.textStyle
-                                  .copyWith(color: Colors.grey.shade200),
+                              style: _ConversationPanelState.textStyle.copyWith(
+                                color: Colors.grey.shade200,
+                              ),
                               softWrap: true,
                               overflow: TextOverflow.visible,
                             ),
