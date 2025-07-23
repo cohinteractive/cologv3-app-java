@@ -50,6 +50,7 @@ class IterativeMergeEngine {
           print('IterativeMergeEngine: merged exchange $index');
           print('Current merge history: $mergeHistory');
           DebugLogger.logContextParcel(context, index);
+          DebugLogger.logContextCheckpoint(context, index);
         }
       } on MergeException catch (e) {
         if (AppConfig.debugMode) {
