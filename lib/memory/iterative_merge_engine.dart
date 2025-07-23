@@ -1,6 +1,7 @@
 import '../app_config.dart';
 import '../models/context_parcel.dart';
 import '../models/exchange.dart';
+import 'single_exchange_processor.dart';
 
 /// Engine that incrementally merges a list of Exchanges into a ContextParcel
 /// using an LLM-backed processor.
@@ -39,23 +40,5 @@ class IterativeMergeEngine {
       assumptions: context.assumptions,
       confidence: context.confidence,
     );
-  }
-}
-
-/// Placeholder processor for a single Exchange. In the future this will
-/// interact with an LLM via [LLMClient].
-class SingleExchangeProcessor {
-  static Future<ContextParcel> process(
-      ContextParcel context, Exchange exchange) async {
-    return LLMClient.mergeContext(context, exchange);
-  }
-}
-
-/// Placeholder LLM client.
-class LLMClient {
-  static Future<ContextParcel> mergeContext(
-      ContextParcel context, Exchange exchange) async {
-    // TODO: Replace with real LLM call
-    return context;
   }
 }
