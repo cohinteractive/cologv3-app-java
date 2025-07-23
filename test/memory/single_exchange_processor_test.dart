@@ -4,6 +4,7 @@ import '../../lib/models/context_parcel.dart';
 import '../../lib/models/exchange.dart';
 import '../../lib/memory/single_exchange_processor.dart';
 import '../../lib/services/llm_client.dart';
+import '../../lib/models/llm_merge_strategy.dart';
 
 void main() {
   group('SingleExchangeProcessor', () {
@@ -20,7 +21,8 @@ void main() {
         response: 'Hi',
         responseTimestamp: DateTime.now(),
       );
-      final result = await SingleExchangeProcessor.process(input, ex);
+      final result = await SingleExchangeProcessor.process(
+          input, ex, MergeStrategy.defaultStrategy);
       expect(result.summary, 'merged');
       expect(result.mergeHistory, [0]);
     });
@@ -33,7 +35,8 @@ void main() {
         response: '',
         responseTimestamp: DateTime.now(),
       );
-      final result = await SingleExchangeProcessor.process(input, ex);
+      final result = await SingleExchangeProcessor.process(
+          input, ex, MergeStrategy.defaultStrategy);
       expect(identical(result, input), isTrue);
     });
 
@@ -47,7 +50,8 @@ void main() {
         responseTimestamp: DateTime.now(),
       );
       expect(
-        () => SingleExchangeProcessor.process(input, ex),
+        () => SingleExchangeProcessor.process(
+            input, ex, MergeStrategy.defaultStrategy),
         throwsA(isA<MergeException>()),
       );
     });
