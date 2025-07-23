@@ -21,7 +21,7 @@ void main() {
       expect(memory.parcels.length, 2);
       expect(memory.parcels.first.summary, 'prev');
       expect(memory.parcels.last.summary, 'final');
-      expect(memory.conversationId, 'c1');
+      expect(memory.sourceConversationId, 'c1');
       expect(memory.exchangeCount, 2);
       expect(memory.strategy, 'default');
       expect(memory.notes, 'n');
