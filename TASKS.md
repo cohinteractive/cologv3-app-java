@@ -7,3 +7,4 @@
 - [ ] Move status line to bottom of window and expand it across full width to display file path, conversation count, and current time
 - [ ] Display per-conversation prompt index numbers in right panel using styled label inside each prompt box, aligned to left
 - [ ] Add fixed header to right panel showing metadata for currently expanded exchange and auto-scroll to dock it under header
+- [ ] Add summary text region to pinned header and simulate LLM summary placeholder for expanded exchange

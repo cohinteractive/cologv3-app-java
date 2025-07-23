@@ -138,4 +138,4 @@ It’s built *for developers who use ChatGPT and Codex as true collaborators*, a
 ## Current State
 The status line is now displayed at the bottom of the app window, spanning full width, and shows the loaded file path, number of visible/total conversations, and the current system time.
 Prompt entries in the right panel now show per-conversation index numbers along the left side of the prompt block, matching the index box style used in the conversation list.
-The right-hand conversation panel now includes a pinned status header that displays the timestamp of the currently expanded exchange. When an exchange is expanded, it scrolls to align beneath the header and updates the metadata display.
+The right-hand conversation panel now includes a pinned status header that displays the timestamp of the currently expanded exchange. When an exchange is expanded, it scrolls to align beneath the header and updates the metadata display. The pinned header now includes a summary placeholder below the timestamp, ready for future LLM-generated content. This summary updates based on the currently expanded exchange.
