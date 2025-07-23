@@ -1,6 +1,7 @@
 import '../app_config.dart';
 import '../models/context_parcel.dart';
 import '../models/exchange.dart';
+import '../debug/debug_logger.dart';
 import 'single_exchange_processor.dart';
 
 /// Engine that incrementally merges a list of Exchanges into a ContextParcel
@@ -37,6 +38,7 @@ class IterativeMergeEngine {
         if (AppConfig.debugMode) {
           print('IterativeMergeEngine: merged exchange $index');
           print('Current merge history: $mergeHistory');
+          DebugLogger.logContextParcel(context, index);
         }
       } on MergeException catch (e) {
         if (AppConfig.debugMode) {
@@ -46,10 +48,7 @@ class IterativeMergeEngine {
         continue;
       }
 
-      if (AppConfig.debugMode) {
-        final ts = DateTime.now().toIso8601String();
-        print('[$ts] IterativeMergeEngine after $index: ${context.toJson()}');
-      }
+      // ContextParcel state logged via DebugLogger above when debugMode is true.
       index++;
     }
 
