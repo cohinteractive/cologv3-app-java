@@ -21,15 +21,16 @@ class SingleExchangeProcessor {
   /// Sends [exchange] and [inputParcel] to the LLM and returns the merged parcel.
   static Future<ContextParcel> process(
       ContextParcel inputParcel, Exchange exchange, MergeStrategy strategy) async {
-    final promptText = exchange.prompt.trim();
-    final responseText = exchange.response?.trim() ?? '';
-
-    if (promptText.isEmpty && responseText.isEmpty) {
+    if (!exchange.isValid()) {
       if (AppConfig.debugMode) {
-        print('SingleExchangeProcessor: Warning - malformed exchange');
+        DebugLogger.logWarning(
+            'Skipping malformed Exchange: prompt or response is empty');
       }
       return inputParcel;
     }
+
+    final promptText = exchange.prompt.trim();
+    final responseText = exchange.response!.trim();
 
     final mergeInstructions = InstructionTemplates.forStrategy(strategy);
     final prompt = '''=== MERGE INSTRUCTIONS ===

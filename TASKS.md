@@ -10,3 +10,4 @@
 - [ ] Add summary text region to pinned header and simulate LLM summary placeholder for expanded exchange
 - [ ] Fix exchange toggle so clicking prompt or response expands/collapses both together
 - [ ] Visually de-emphasize collapsed exchanges in right panel by reducing background intensity, padding, and text color to create visual hierarchy
+- [ ] Handle malformed or empty Exchange inputs in SingleExchangeProcessor.process()
