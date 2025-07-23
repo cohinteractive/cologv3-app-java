@@ -1,5 +1,8 @@
 class AppConfig {
-  static bool debugMode = true; // Toggle as needed
+  static bool debugMode = false;
+
+  static void enableDebug() => debugMode = true;
+  static void disableDebug() => debugMode = false;
 
   /// Merge strategy used by the LLM when processing exchanges.
   static String mergeStrategy = 'defaultStrategy';
