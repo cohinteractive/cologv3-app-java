@@ -140,3 +140,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507231033][baecf3][FTR][DBG] Added timestamped checkpoint logging of ContextParcel after each merge step
 [2507231104][ead3729][FTR][DBG] Added anomaly detection and logging for repeated context, LLM failures, and skipped merges
 [2507231112][8f9a3b1][FTR][DBG] Added optional ContextParcel diff logging via ContextDelta after each merge step
+[2507231126][13e17e1][SNC][DOC] Archived all Milestone 2 task files and finalized missing Milestone 1 task file moves
