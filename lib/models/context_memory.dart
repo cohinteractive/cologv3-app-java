@@ -10,13 +10,13 @@ class ContextMemory {
   /// Ordered list of merged context parcels representing the conversation.
   final List<ContextParcel> parcels;
 
-  /// Time the memory was generated, if known.
+  /// Timestamp when this memory snapshot was generated.
   final DateTime? generatedAt;
 
-  /// Identifier for the source conversation.
-  final String? conversationId;
+  /// Identifier for the original conversation this memory summarizes.
+  final String? sourceConversationId;
 
-  /// Total number of Exchanges that were processed.
+  /// Total number of exchanges that contributed to this memory.
   final int? exchangeCount;
 
   /// Merge strategy or version string used during generation.
@@ -28,7 +28,7 @@ class ContextMemory {
   ContextMemory({
     List<ContextParcel>? parcels,
     this.generatedAt,
-    this.conversationId,
+    this.sourceConversationId,
     this.exchangeCount,
     this.strategy,
     this.notes,
@@ -42,7 +42,7 @@ class ContextMemory {
         generatedAt: json['generatedAt'] != null
             ? DateTime.parse(json['generatedAt'])
             : null,
-        conversationId: json['conversationId'] as String?,
+        sourceConversationId: json['sourceConversationId'] as String?,
         exchangeCount: json['exchangeCount'] as int?,
         strategy: json['strategy'] as String?,
         notes: json['notes'] as String?,
@@ -51,7 +51,7 @@ class ContextMemory {
   Map<String, dynamic> toJson() => {
         'parcels': parcels.map((e) => e.toJson()).toList(),
         'generatedAt': generatedAt?.toIso8601String(),
-        'conversationId': conversationId,
+        'sourceConversationId': sourceConversationId,
         'exchangeCount': exchangeCount,
         'strategy': strategy,
         'notes': notes,

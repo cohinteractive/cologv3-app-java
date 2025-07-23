@@ -32,7 +32,7 @@ class ContextMemoryBuilder {
     return ContextMemory(
       parcels: parcels,
       generatedAt: genAt,
-      conversationId: sourceConversationId,
+      sourceConversationId: sourceConversationId,
       exchangeCount: exchangeCount,
       strategy: mergeStrategy,
       notes: notes,
