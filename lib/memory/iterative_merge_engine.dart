@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../app_config.dart';
 import '../models/context_parcel.dart';
 import '../models/exchange.dart';
@@ -30,19 +32,27 @@ class IterativeMergeEngine {
           (exchange.response == null || exchange.response!.trim().isEmpty)) {
         if (AppConfig.debugMode) {
           print('IterativeMergeEngine: Skipping malformed exchange at index $index');
+          DebugLogger.logAnomaly('Skipped merge for malformed exchange at index $index');
         }
         index++;
         continue;
       }
 
       try {
+        final prevJson = jsonEncode(context.toJson());
         final result = await SingleExchangeProcessor.process(context, exchange, strategy);
         if (result == null) {
           if (AppConfig.debugMode) {
             print('IterativeMergeEngine: Warning - null merge result at index $index');
           }
+          if (AppConfig.debugMode) {
+            DebugLogger.logAnomaly('LLM merge failure at exchange index $index: null result');
+          }
           index++;
           continue;
+        }
+        if (prevJson == jsonEncode(result.toJson()) && AppConfig.debugMode) {
+          DebugLogger.logAnomaly('ContextParcel unchanged after merging exchange at index $index');
         }
         context = result;
         mergeHistory.add(index);
@@ -55,6 +65,7 @@ class IterativeMergeEngine {
       } on MergeException catch (e) {
         if (AppConfig.debugMode) {
           print('IterativeMergeEngine: MergeException at index $index: $e');
+          DebugLogger.logAnomaly('LLM merge failure at exchange index $index: ${e.message}');
         }
         index++;
         continue;

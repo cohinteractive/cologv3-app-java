@@ -76,6 +76,19 @@ class DebugLogger {
     print('[DEBUG WARNING] $message');
   }
 
+  /// Logs an anomaly when [AppConfig.debugMode] is enabled.
+  /// Anomalies represent unexpected states like unchanged context or
+  /// merge failures. Entries are appended to `debug/anomalies.log` with
+  /// an ISO timestamp.
+  static void logAnomaly(String message) {
+    if (!AppConfig.debugMode) return;
+    final timestamp = DateTime.now().toIso8601String();
+    final entry = '[$timestamp] ANOMALY: $message';
+    print(entry);
+    final file = File('debug/anomalies.log');
+    file.writeAsStringSync('$entry\n', mode: FileMode.append);
+  }
+
   /// Logs the parsed [parcel] returned from the LLM.
   static void logParsedParcel(ContextParcel parcel) {
     // TODO: Implement logging of parsed ContextParcel objects

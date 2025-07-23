@@ -138,3 +138,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507231008][11c8685][TST][LLM] Added unit tests for SingleExchangeProcessor covering valid, empty, and malformed Exchange cases
 [2507231014][1d19ea3][FTR][DBG] Added debug logging of LLM calls including instructions, Exchange, and ContextParcel state
 [2507231033][baecf3][FTR][DBG] Added timestamped checkpoint logging of ContextParcel after each merge step
+[2507231104][ead3729][FTR][DBG] Added anomaly detection and logging for repeated context, LLM failures, and skipped merges
