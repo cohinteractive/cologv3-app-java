@@ -308,28 +308,21 @@ class _ExchangeTile extends StatefulWidget {
 
 class _ExchangeTileState extends State<_ExchangeTile>
     with TickerProviderStateMixin {
-  bool? expandedFromPrompt;
   bool _hoverPrompt = false;
   bool _hoverResponse = false;
 
   void _toggleFromPrompt() {
-    setState(() {
-      expandedFromPrompt = true;
-    });
     widget.onToggle(Alignment.topCenter, widget.promptKey);
   }
 
   void _toggleFromResponse() {
-    setState(() {
-      expandedFromPrompt = false;
-    });
     widget.onToggle(Alignment.bottomCenter, widget.responseKey);
   }
 
   @override
   Widget build(BuildContext context) {
-    final expandPrompt = widget.expanded && (expandedFromPrompt ?? true);
-    final expandResponse = widget.expanded && (expandedFromPrompt == false);
+    final expandPrompt = widget.expanded;
+    final expandResponse = widget.expanded;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
