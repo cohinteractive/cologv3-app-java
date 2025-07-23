@@ -23,4 +23,14 @@ class DebugLogger {
     File(path).writeAsStringSync(jsonEncode(data));
     stdout.writeln('DebugLogger: wrote $path at $ts');
   }
+
+  /// Logs the raw LLM [response] for debugging purposes.
+  static void logRawResponse(String response) {
+    // TODO: Implement logging of raw LLM responses
+  }
+
+  /// Logs the parsed [parcel] returned from the LLM.
+  static void logParsedParcel(ContextParcel parcel) {
+    // TODO: Implement logging of parsed ContextParcel objects
+  }
 }
