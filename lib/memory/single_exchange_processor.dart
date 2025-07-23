@@ -5,7 +5,7 @@ import '../models/context_parcel.dart';
 import '../models/exchange.dart';
 import '../models/llm_merge_strategy.dart';
 import '../services/llm_client.dart';
-import '../src/instructions/instruction_templates.dart';
+import '../llm/instruction_templates.dart';
 
 class MergeException implements Exception {
   final String message;
