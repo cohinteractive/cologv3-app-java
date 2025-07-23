@@ -10,4 +10,9 @@ class Exchange {
     this.response,
     this.responseTimestamp,
   });
+
+  /// Returns true if both [prompt] and [response] contain non-empty text.
+  bool isValid() {
+    return prompt.trim().isNotEmpty && (response?.trim().isNotEmpty ?? false);
+  }
 }

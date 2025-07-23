@@ -29,6 +29,11 @@ class DebugLogger {
     // TODO: Implement logging of raw LLM responses
   }
 
+  /// Logs a warning message when [AppConfig.debugMode] is enabled.
+  static void logWarning(String message) {
+    print('[DEBUG WARNING] $message');
+  }
+
   /// Logs the parsed [parcel] returned from the LLM.
   static void logParsedParcel(ContextParcel parcel) {
     // TODO: Implement logging of parsed ContextParcel objects

@@ -27,7 +27,12 @@ void main() {
       expect(result.mergeHistory, [0]);
     });
 
-    test('malformed exchange returns input parcel', () async {
+    test('malformed exchange returns input parcel and skips LLM', () async {
+      var called = false;
+      LLMClient.sendPrompt = (prompt) async {
+        called = true;
+        return '';
+      };
       final input = ContextParcel(summary: 'keep', mergeHistory: [1]);
       final ex = Exchange(
         prompt: '',
@@ -38,6 +43,7 @@ void main() {
       final result = await SingleExchangeProcessor.process(
           input, ex, MergeStrategy.defaultStrategy);
       expect(identical(result, input), isTrue);
+      expect(called, isFalse);
     });
 
     test('throws MergeException on empty LLM response', () async {
