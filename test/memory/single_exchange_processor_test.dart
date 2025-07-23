@@ -11,9 +11,9 @@ void main() {
     tearDown(() => LLMClient.sendPrompt = originalSender);
 
     test('returns new ContextParcel from LLM', () async {
-      LLMClient.sendPrompt = (prompt) async =>
-          '{"summary":"merged","contributingExchangeIds":[0]}';
-      final input = ContextParcel(summary: '', contributingExchangeIds: []);
+      LLMClient.sendPrompt =
+          (prompt) async => '{"summary":"merged","mergeHistory":[0]}';
+      final input = ContextParcel(summary: '', mergeHistory: []);
       final ex = Exchange(
         prompt: 'Hello',
         promptTimestamp: DateTime.now(),
@@ -22,11 +22,11 @@ void main() {
       );
       final result = await SingleExchangeProcessor.process(input, ex);
       expect(result.summary, 'merged');
-      expect(result.contributingExchangeIds, [0]);
+      expect(result.mergeHistory, [0]);
     });
 
     test('malformed exchange returns input parcel', () async {
-      final input = ContextParcel(summary: 'keep', contributingExchangeIds: [1]);
+      final input = ContextParcel(summary: 'keep', mergeHistory: [1]);
       final ex = Exchange(
         prompt: '',
         promptTimestamp: DateTime.now(),
@@ -39,7 +39,7 @@ void main() {
 
     test('throws MergeException on empty LLM response', () async {
       LLMClient.sendPrompt = (prompt) async => '';
-      final input = ContextParcel(summary: '', contributingExchangeIds: []);
+      final input = ContextParcel(summary: '', mergeHistory: []);
       final ex = Exchange(
         prompt: 'Hi',
         promptTimestamp: DateTime.now(),

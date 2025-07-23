@@ -9,7 +9,7 @@ class IterativeMergeEngine {
   /// Merges [exchanges] sequentially using [SingleExchangeProcessor].
   /// Returns the final merged [ContextParcel].
   Future<ContextParcel> mergeAll(List<Exchange> exchanges) async {
-    var context = ContextParcel(summary: '', contributingExchangeIds: []);
+    var context = ContextParcel(summary: '', mergeHistory: []);
     final mergeHistory = <int>[];
     var index = 0;
 
@@ -34,6 +34,10 @@ class IterativeMergeEngine {
         }
         context = result;
         mergeHistory.add(index);
+        if (AppConfig.debugMode) {
+          print('IterativeMergeEngine: merged exchange $index');
+          print('Current merge history: $mergeHistory');
+        }
       } on MergeException catch (e) {
         if (AppConfig.debugMode) {
           print('IterativeMergeEngine: MergeException at index $index: $e');
@@ -51,7 +55,7 @@ class IterativeMergeEngine {
 
     return ContextParcel(
       summary: context.summary,
-      contributingExchangeIds: mergeHistory,
+      mergeHistory: mergeHistory,
       tags: context.tags,
       assumptions: context.assumptions,
       confidence: context.confidence,
