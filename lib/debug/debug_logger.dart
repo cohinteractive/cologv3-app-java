@@ -3,6 +3,7 @@ import 'dart:io';
 
 import '../app_config.dart';
 import '../models/context_parcel.dart';
+import '../models/exchange.dart';
 
 /// Writes debug logs of [ContextParcel]s during merge operations.
 class DebugLogger {
@@ -22,6 +23,29 @@ class DebugLogger {
     };
     File(path).writeAsStringSync(jsonEncode(data));
     stdout.writeln('DebugLogger: wrote $path at $ts');
+  }
+
+  /// Logs each LLM call with instructions, exchange, and context state.
+  static void logLLMCall({
+    required String instructions,
+    required Exchange exchange,
+    required ContextParcel context,
+  }) {
+    final timestamp = DateTime.now().toIso8601String();
+    final log = '''
+    === LLM CALL [$timestamp] ===
+    Instructions:
+    $instructions
+
+    Exchange:
+    PROMPT: ${exchange.prompt}
+    RESPONSE: ${exchange.response}
+
+    ContextParcel:
+    ${jsonEncode(context.toJson())}
+    ''';
+    print(log);
+    // Optionally write to file: debug/llm_call_$timestamp.txt
   }
 
   /// Logs the raw LLM [response] for debugging purposes.

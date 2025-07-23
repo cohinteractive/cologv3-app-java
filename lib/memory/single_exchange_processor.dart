@@ -47,6 +47,11 @@ $responseText''';
 
     if (AppConfig.debugMode) {
       print('SingleExchangeProcessor prompt:\n$prompt');
+      DebugLogger.logLLMCall(
+        instructions: mergeInstructions,
+        exchange: exchange,
+        context: inputParcel,
+      );
     }
 
     final response = await LLMClient.sendPrompt(prompt);
