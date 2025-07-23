@@ -21,53 +21,46 @@ class SingleExchangeProcessor {
   static Future<ContextParcel> process(
       ContextParcel inputParcel, Exchange exchange, MergeStrategy strategy) async {
     final promptText = exchange.prompt.trim();
-    final responseText = exchange.response?.trim();
+    final responseText = exchange.response?.trim() ?? '';
 
-    if (promptText.isEmpty && (responseText == null || responseText.isEmpty)) {
-      print('SingleExchangeProcessor: Warning - malformed exchange');
+    if (promptText.isEmpty && responseText.isEmpty) {
+      if (AppConfig.debugMode) {
+        print('SingleExchangeProcessor: Warning - malformed exchange');
+      }
       return inputParcel;
     }
 
-    var instructions = InstructionTemplates.merge;
-    switch (strategy) {
-      case MergeStrategy.conservative:
-        instructions += ' Use a conservative merge strategy.';
-        break;
-      case MergeStrategy.aggressive:
-        instructions +=
-            ' Use an aggressive merge strategy that overwrites conflicting details.';
-        break;
-      case MergeStrategy.defaultStrategy:
-        break;
-    }
+    final mergeInstructions = InstructionTemplates.forStrategy(strategy);
+    final prompt = '''=== MERGE INSTRUCTIONS ===
+$mergeInstructions
 
-    final prompt = jsonEncode({
-      'context': inputParcel.toJson(),
-      'exchange': {
-        'prompt': exchange.prompt,
-        'response': exchange.response,
-      },
-      'instructions': instructions,
-    });
+=== EXISTING CONTEXT ===
+${jsonEncode(inputParcel.toJson())}
+
+=== NEW EXCHANGE ===
+PROMPT:
+$promptText
+RESPONSE:
+$responseText''';
 
     if (AppConfig.debugMode) {
-      print('SingleExchangeProcessor prompt: $prompt');
+      print('SingleExchangeProcessor prompt:\n$prompt');
     }
 
     final raw = await LLMClient.sendPrompt(prompt);
     if (raw.trim().isEmpty) {
-      throw MergeException('LLM returned empty response');
+      throw MergeException('Invalid LLM response');
     }
 
     try {
-      final parsed = jsonDecode(raw);
-      final parcel = ContextParcel.fromJson(parsed);
+      final newParcel =
+          ContextParcel.fromJson(jsonDecode(raw) as Map<String, dynamic>);
       if (AppConfig.debugMode) {
-        print('SingleExchangeProcessor returned: ${parcel.toJson()}');
+        print('SingleExchangeProcessor returned: ${jsonEncode(newParcel.toJson())}');
       }
-      return parcel;
-    } catch (e) {
-      throw MergeException('Failed to parse LLM response: $e');
+      return newParcel;
+    } catch (_) {
+      throw MergeException('Invalid LLM response');
     }
   }
 }

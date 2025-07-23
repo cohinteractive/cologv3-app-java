@@ -131,3 +131,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507230738][12c457][FTR][DBG] Logged ContextParcel state at each step of merge loop via DebugLogger
 
 [2507230751][7ea8b5c][FTR][CFG] Added configurable LLM merge strategy injection to IterativeMergeEngine and SingleExchangeProcessor
+[2507230759][342cc0b][FTR][LLM] Implemented SingleExchangeProcessor.process() to construct and send merge prompts to LLM
