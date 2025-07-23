@@ -1,3 +1,4 @@
+✅ ARCHIVED — Milestone 1 (LLM Instruction Templates) completed as of 2025-07-23.
 # TASKS_specify_llm_instruction_templates.md
 
 ## 🧠 LLM Instruction Templates (2025-07-22)
