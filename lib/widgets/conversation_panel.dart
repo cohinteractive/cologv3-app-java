@@ -99,8 +99,9 @@ class _ConversationPanelState extends State<ConversationPanel>
                   final pKey = _promptKeys[index] ??= GlobalKey();
                   final rKey = _responseKeys[index] ??= GlobalKey();
                   final tKey = _tileKeys[index] ??= GlobalKey();
+                  final bottom = expanded ? 16.0 : 8.0;
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: EdgeInsets.only(bottom: bottom),
                     child: _ExchangeTile(
                       key: tKey,
                       index: index,
@@ -349,9 +350,15 @@ class _ExchangeTileState extends State<_ExchangeTile>
         child: Stack(
           children: [
             Container(
-              padding: const EdgeInsets.fromLTRB(12, 12, 40, 12),
+              padding: EdgeInsets.fromLTRB(
+                expand ? 12 : 8,
+                expand ? 12 : 8,
+                expand ? 40 : 36,
+                expand ? 12 : 8,
+              ),
               decoration: BoxDecoration(
-                color: _ConversationPanelState.promptBg,
+                color: _ConversationPanelState.promptBg
+                    .withOpacity(expand ? 1.0 : 0.6),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -383,7 +390,9 @@ class _ExchangeTileState extends State<_ExchangeTile>
                           child: Text(
                             first,
                             style: _ConversationPanelState.textStyle.copyWith(
-                              color: Colors.grey.shade300,
+                              color: expand
+                                  ? Colors.grey.shade300
+                                  : Colors.grey.shade400,
                             ),
                             maxLines: expand ? null : 1,
                             overflow: expand
@@ -454,10 +463,16 @@ class _ExchangeTileState extends State<_ExchangeTile>
         child: Stack(
           children: [
             Container(
-              margin: const EdgeInsets.only(left: 16),
-              padding: const EdgeInsets.fromLTRB(12, 12, 40, 12),
+              margin: EdgeInsets.only(left: expand ? 16 : 12),
+              padding: EdgeInsets.fromLTRB(
+                expand ? 12 : 8,
+                expand ? 12 : 8,
+                expand ? 40 : 36,
+                expand ? 12 : 8,
+              ),
               decoration: BoxDecoration(
-                color: _ConversationPanelState.responseBg,
+                color: _ConversationPanelState.responseBg
+                    .withOpacity(expand ? 1.0 : 0.6),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -470,7 +485,9 @@ class _ExchangeTileState extends State<_ExchangeTile>
                     child: Text(
                       first,
                       style: _ConversationPanelState.textStyle.copyWith(
-                        color: Colors.grey.shade200,
+                        color: expand
+                            ? Colors.grey.shade200
+                            : Colors.grey.shade400,
                       ),
                       maxLines: expand ? null : 1,
                       overflow: expand
