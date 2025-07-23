@@ -25,6 +25,24 @@ class DebugLogger {
     stdout.writeln('DebugLogger: wrote $path at $ts');
   }
 
+  /// Writes a timestamped snapshot of [parcel] after each merge step.
+  /// The file is named `context_step_<stepIndex>_<timestamp>.json` inside
+  /// the `debug/` directory. Any errors are caught to avoid disrupting
+  /// the merge process.
+  static void logContextCheckpoint(ContextParcel parcel, int stepIndex) {
+    try {
+      Directory('debug').createSync(recursive: true);
+      final timestamp =
+          DateTime.now().toIso8601String().replaceAll(':', '-');
+      final filename = 'debug/context_step_${stepIndex}_$timestamp.json';
+      final file = File(filename);
+      file.createSync(recursive: true);
+      file.writeAsStringSync(jsonEncode(parcel.toJson()));
+    } catch (_) {
+      // Swallow any exceptions to avoid interfering with merge flow
+    }
+  }
+
   /// Logs each LLM call with instructions, exchange, and context state.
   static void logLLMCall({
     required String instructions,
