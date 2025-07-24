@@ -47,6 +47,12 @@ class ManualReviewer {
         final tagsInput = stdin.readLineSync();
         stdout.write('Edit assumptions CSV (leave blank to keep): ');
         final assumptionsInput = stdin.readLineSync();
+        stdout.write('Edit feature (leave blank to keep): ');
+        final featureInput = stdin.readLineSync();
+        stdout.write('Edit system (leave blank to keep): ');
+        final systemInput = stdin.readLineSync();
+        stdout.write('Edit module (leave blank to keep): ');
+        final moduleInput = stdin.readLineSync();
         final edited = ContextParcel(
           summary: newSummary != null && newSummary.trim().isNotEmpty
               ? newSummary.trim()
@@ -69,6 +75,15 @@ class ManualReviewer {
                   : parcel.assumptions,
           confidence: parcel.confidence,
           manualEdits: parcel.manualEdits,
+          feature: featureInput != null && featureInput.trim().isNotEmpty
+              ? featureInput.trim()
+              : parcel.feature,
+          system: systemInput != null && systemInput.trim().isNotEmpty
+              ? systemInput.trim()
+              : parcel.system,
+          module: moduleInput != null && moduleInput.trim().isNotEmpty
+              ? moduleInput.trim()
+              : parcel.module,
         );
 
         final record = ManualEdit(
@@ -84,6 +99,9 @@ class ManualReviewer {
           assumptions: edited.assumptions,
           confidence: edited.confidence,
           manualEdits: [...parcel.manualEdits, record],
+          feature: edited.feature,
+          system: edited.system,
+          module: edited.module,
         );
       default:
         stdout.writeln('Accepted.');

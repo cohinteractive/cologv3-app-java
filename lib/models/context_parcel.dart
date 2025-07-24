@@ -19,6 +19,15 @@ class ContextParcel {
   /// Records any manual edits applied during merge review.
   final List<ManualEdit> manualEdits;
 
+  /// Short feature identifier this parcel relates to (e.g. "search").
+  final String? feature;
+
+  /// Optional high-level system or component name.
+  final String? system;
+
+  /// Optional file or logical module identifier.
+  final String? module;
+
   ContextParcel({
     required this.summary,
     required this.mergeHistory,
@@ -26,6 +35,9 @@ class ContextParcel {
     this.assumptions = const [],
     this.confidence = const {},
     this.manualEdits = const [],
+    this.feature,
+    this.system,
+    this.module,
   });
 
   factory ContextParcel.fromJson(Map<String, dynamic> json) => ContextParcel(
@@ -38,6 +50,9 @@ class ContextParcel {
         manualEdits: (json['manualEdits'] as List<dynamic>? ?? [])
             .map((e) => ManualEdit.fromJson(Map<String, dynamic>.from(e)))
             .toList(),
+        feature: json['feature'] as String?,
+        system: json['system'] as String?,
+        module: json['module'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -47,6 +62,9 @@ class ContextParcel {
         'assumptions': assumptions,
         'confidence': confidence,
         'manualEdits': manualEdits.map((e) => e.toJson()).toList(),
+        if (feature != null) 'feature': feature,
+        if (system != null) 'system': system,
+        if (module != null) 'module': module,
       };
 
   /// Returns true if this parcel conveys essentially the same

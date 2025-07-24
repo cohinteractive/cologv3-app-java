@@ -14,8 +14,21 @@ void main() {
       );
       final memory = ContextMemory(
         parcels: [
-          ContextParcel(summary: 'a', mergeHistory: [1]),
-          ContextParcel(summary: 'b edited', mergeHistory: [2], manualEdits: [edit]),
+          ContextParcel(
+            summary: 'a',
+            mergeHistory: [1],
+            feature: 'search',
+            system: 'parser',
+            module: 'ContextRouter',
+          ),
+          ContextParcel(
+            summary: 'b edited',
+            mergeHistory: [2],
+            manualEdits: [edit],
+            feature: 'search',
+            system: 'parser',
+            module: 'ContextRouter',
+          ),
         ],
         generatedAt: DateTime.parse('2025-07-23T00:00:00Z'),
         sourceConversationId: 'conv1',
@@ -37,6 +50,9 @@ void main() {
       expect(roundTrip.completeness, 'partial');
       expect(roundTrip.limitations, 'some missing data');
       expect(roundTrip.generatedAt, DateTime.parse('2025-07-23T00:00:00Z'));
+      expect(roundTrip.parcels.first.feature, 'search');
+      expect(roundTrip.parcels.first.system, 'parser');
+      expect(roundTrip.parcels.first.module, 'ContextRouter');
     });
   });
 }
