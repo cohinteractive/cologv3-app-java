@@ -37,7 +37,8 @@ void main() {
       expect(result.bySystem['s1']!.length, 1);
       expect(result.byPriority['m1']!.first.summary, 'a');
       expect(result.byPriority['f1']!.length, 1);
-      expect(result.unassigned.length, 1);
+      expect(result.unassigned.length, 2);
+      expect(result.ambiguous.length, 1);
     });
 
     test('routes memories by flattening parcels', () {
@@ -51,6 +52,28 @@ void main() {
       final result = router.routeMemories([mem1, mem2]);
       expect(result.byFeature['fx']!.length, 1);
       expect(result.unassigned.length, 1);
+    });
+
+    test('manual override updates routing', () {
+      final parcel = ContextParcel(summary: 'x', mergeHistory: [0]);
+      final router = ContextRouter();
+      router.routeParcels([parcel]);
+      expect(router.getUnroutedParcels().length, 1);
+      router.overrideRouting(parcel, feature: 'feat');
+      expect(router.getUnroutedParcels().isEmpty, isTrue);
+      expect(router.getAmbiguousParcels().isEmpty, isTrue);
+    });
+
+    test('detects ambiguous parcels', () {
+      final parcel = ContextParcel(
+        summary: 'a',
+        mergeHistory: [0],
+        feature: 'f',
+        module: 'm',
+      );
+      final router = ContextRouter();
+      router.routeParcels([parcel]);
+      expect(router.getAmbiguousParcels(), contains(parcel));
     });
   });
 }

@@ -172,3 +172,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507242125][c66fab1][SNC][DOC] Marked all tasks complete and archived milestone 4 task files to archive/tasks/
 [2507242140][ac4ced][FTR][DATA] Added feature, system, and module metadata to ContextParcels
 [2507242154][0c38af7][FTR][TST] Implemented ContextRouter with metadata grouping and tests
+[2507242215][66d51e][FTR][TST] Added manual routing override and ambiguity detection
