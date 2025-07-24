@@ -17,6 +17,9 @@ void main() {
         totalExchangeCount: 2,
         mergeStrategy: 'default',
         notes: 'n',
+        confidence: '0.9',
+        completeness: 'complete',
+        limitations: 'none',
       );
       expect(memory.parcels.length, 2);
       expect(memory.parcels.first.summary, 'prev');
@@ -25,6 +28,9 @@ void main() {
       expect(memory.exchangeCount, 2);
       expect(memory.strategy, 'default');
       expect(memory.notes, 'n');
+      expect(memory.confidence, '0.9');
+      expect(memory.completeness, 'complete');
+      expect(memory.limitations, 'none');
       expect(memory.generatedAt, ts);
     });
 
