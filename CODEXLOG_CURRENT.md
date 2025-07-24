@@ -173,3 +173,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507242140][ac4ced][FTR][DATA] Added feature, system, and module metadata to ContextParcels
 [2507242154][0c38af7][FTR][TST] Implemented ContextRouter with metadata grouping and tests
 [2507242215][66d51e][FTR][TST] Added manual routing override and ambiguity detection
+[2507242231][9d48493][FTR][TST] Added RoutedContextExporter with folder export tests
