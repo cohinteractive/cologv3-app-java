@@ -175,3 +175,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507242215][66d51e][FTR][TST] Added manual routing override and ambiguity detection
 [2507242231][9d48493][FTR][TST] Added RoutedContextExporter with folder export tests
 [2507242254][460636a][DOC] Documented routed context output format
+[2507242327][202dd0][FTR][DOC] Added ContextTag enum and tagging schema documentation
