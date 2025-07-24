@@ -31,6 +31,8 @@ Optional arguments:
                               Only include conversations whose titles contain
                               any keyword
   --debug                     Enable debug logging
+  --fail-fast                 Abort batch on first error
+  --manual-review             Enable manual review of each ContextParcel
   --help                      Show this usage information
 
 Example invocations:
