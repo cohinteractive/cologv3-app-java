@@ -107,24 +107,39 @@ Future<void> main(List<String> args) async {
     exit(1);
   }
 
+  for (var i = 0; i < files.length; i++) {
+    await _processFile(files[i], results, i, files.length);
+  }
+}
+
+String _basename(String path) =>
+    path.split(Platform.pathSeparator).isNotEmpty
+        ? path.split(Platform.pathSeparator).last
+        : path;
+
+Future<void> _processFile(
+  String path,
+  ArgResults results,
+  int index,
+  int total,
+) async {
+  stdout.writeln('Processing file ${index + 1} of $total: ${_basename(path)}');
+
   final List<Conversation> conversations = [];
-  for (final path in files) {
-    stdout.writeln('Loading $path ...');
-    try {
-      final convs = await JsonLoader.loadConversations(path);
-      conversations.addAll(convs);
-    } catch (e) {
-      stderr.writeln('Failed to load $path: $e');
-    }
+  try {
+    conversations.addAll(await JsonLoader.loadConversations(path));
+  } catch (e) {
+    stderr.writeln('Failed to load $path: $e');
+    return;
   }
 
   if (conversations.isEmpty) {
-    stdout.writeln('No conversations loaded.');
-    exit(1);
+    stdout.writeln('No conversations loaded from ${_basename(path)}');
+    return;
   }
 
-  final List<Exchange> exchanges = [];
-  final List<String> titles = [];
+  final exchanges = <Exchange>[];
+  final titles = <String>[];
   for (final conv in conversations) {
     for (final ex in conv.exchanges) {
       exchanges.add(ex);
@@ -148,6 +163,7 @@ Future<void> main(List<String> args) async {
       endIndex = val;
     }
   }
+
   final filtered = exchanges.sublist(startIndex, endIndex + 1);
   final filteredTitles = titles.sublist(startIndex, endIndex + 1);
 
@@ -167,10 +183,10 @@ Future<void> main(List<String> args) async {
   final engine = IterativeMergeEngine.fromConfig();
   final parcel = await engine.mergeAll(
     filtered,
-    onProgress: (index, total, ex) {
-      final title = filteredTitles[index];
+    onProgress: (idx, total, ex) {
+      final title = filteredTitles[idx];
       final previewWords = ex.prompt.split(RegExp(r'\s+')).take(10).join(' ');
-      stdout.writeln('Processing Exchange ${index + 1} of $total...');
+      stdout.writeln('Processing Exchange ${idx + 1} of $total...');
       if (results['debug'] == true) {
         stdout.writeln('  Conversation: $title');
         stdout.writeln('  Preview: $previewWords');
@@ -217,7 +233,7 @@ Future<void> main(List<String> args) async {
       '${base}_${info?.suffix ?? format.name}_${ts}.${info?.extension ?? 'txt'}';
   final outputPath = '${AppConfig.memoryOutputDir}/$filename';
 
-  stdout.writeln('\nSummary');
+  stdout.writeln('\nSummary for ${_basename(path)}');
   stdout.writeln('  Conversations: ${conversations.length}');
   stdout.writeln('  Exchanges: ${filtered.length}');
   stdout.writeln('  Parcels: ${memory.parcels.length}');
