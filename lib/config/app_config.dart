@@ -9,4 +9,7 @@ class AppConfig {
 
   /// Directory where debug logs are written.
   static String debugOutputDir = 'debug';
+
+  /// Directory where exported ContextMemory files are written.
+  static String memoryOutputDir = 'context_memory';
 }
