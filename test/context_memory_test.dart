@@ -1,14 +1,21 @@
 import 'package:test/test.dart';
 import '../lib/models/context_memory.dart';
 import '../lib/models/context_parcel.dart';
+import '../lib/models/manual_edit.dart';
 
 void main() {
   group('ContextMemory serialization', () {
     test('toJson and fromJson preserve data', () {
+      final edit = ManualEdit(
+        exchangeId: 0,
+        original: {'summary': 'b'},
+        edited: {'summary': 'b edited'},
+        timestamp: DateTime.parse('2025-07-23T01:00:00Z'),
+      );
       final memory = ContextMemory(
         parcels: [
           ContextParcel(summary: 'a', mergeHistory: [1]),
-          ContextParcel(summary: 'b', mergeHistory: [2]),
+          ContextParcel(summary: 'b edited', mergeHistory: [2], manualEdits: [edit]),
         ],
         generatedAt: DateTime.parse('2025-07-23T00:00:00Z'),
         sourceConversationId: 'conv1',

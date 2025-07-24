@@ -74,7 +74,11 @@ class IterativeMergeEngine {
           continue;
         }
         if (AppConfig.manualReview) {
-          reviewed = await ManualReviewer.review(result, previousContext);
+          reviewed = await ManualReviewer.review(
+            result,
+            index,
+            previousContext,
+          );
           if (reviewed == null) {
             index++;
             continue;
@@ -118,6 +122,7 @@ class IterativeMergeEngine {
       tags: context.tags,
       assumptions: context.assumptions,
       confidence: context.confidence,
+      manualEdits: context.manualEdits,
     );
   }
 }

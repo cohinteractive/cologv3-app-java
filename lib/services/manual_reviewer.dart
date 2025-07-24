@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import '../models/context_parcel.dart';
+import '../models/manual_edit.dart';
 import '../config/app_config.dart';
 
 /// Provides interactive review of ContextParcel objects before merging.
@@ -10,7 +11,10 @@ class ManualReviewer {
   /// compares the parcel against [baseline] and shows a unified diff.
   /// Returns the parcel to merge or `null` if rejected.
   static Future<ContextParcel?> review(
-    ContextParcel parcel, [ContextParcel? baseline]) async {
+    ContextParcel parcel,
+    int exchangeId, [
+    ContextParcel? baseline,
+  ]) async {
     if (baseline != null && baseline.summary.isNotEmpty) {
       final oldJson = JsonEncoder.withIndent('  ').convert(baseline.toJson());
       final newJson = JsonEncoder.withIndent('  ').convert(parcel.toJson());
@@ -34,7 +38,7 @@ class ManualReviewer {
         final tagsInput = stdin.readLineSync();
         stdout.write('Edit assumptions CSV (leave blank to keep): ');
         final assumptionsInput = stdin.readLineSync();
-        return ContextParcel(
+        final edited = ContextParcel(
           summary: newSummary != null && newSummary.trim().isNotEmpty
               ? newSummary.trim()
               : parcel.summary,
@@ -55,6 +59,22 @@ class ManualReviewer {
                       .toList()
                   : parcel.assumptions,
           confidence: parcel.confidence,
+          manualEdits: parcel.manualEdits,
+        );
+
+        final record = ManualEdit(
+          exchangeId: exchangeId,
+          original: parcel.toJson(),
+          edited: edited.toJson(),
+          timestamp: DateTime.now(),
+        );
+        return ContextParcel(
+          summary: edited.summary,
+          mergeHistory: edited.mergeHistory,
+          tags: edited.tags,
+          assumptions: edited.assumptions,
+          confidence: edited.confidence,
+          manualEdits: [...parcel.manualEdits, record],
         );
       default:
         stdout.writeln('Accepted.');
