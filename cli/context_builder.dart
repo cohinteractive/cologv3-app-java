@@ -72,6 +72,11 @@ Future<void> main(List<String> args) async {
       help: 'Enable debug logging',
       defaultsTo: false,
     )
+    ..addFlag(
+      'fail-fast',
+      help: 'Abort batch on first error',
+      defaultsTo: false,
+    )
     ..addFlag('help', abbr: 'h', negatable: false, help: 'Show usage');
 
   late ArgResults results;
@@ -117,6 +122,8 @@ Future<void> main(List<String> args) async {
     AppConfig.enableDebug();
   }
 
+  final failFast = results['fail-fast'] == true;
+
   final startTime = DateTime.now();
   stdout.writeln('Context Builder: starting build process');
 
@@ -138,9 +145,18 @@ Future<void> main(List<String> args) async {
   }
 
   final summaries = <_FileStats>[];
+  final failures = <String>[];
   for (var i = 0; i < files.length; i++) {
-    final s = await _processFile(files[i], results, i, files.length, outputDir);
-    if (s != null) summaries.add(s);
+    final result = await _processFile(files[i], results, i, files.length, outputDir);
+    if (result.stats != null) {
+      summaries.add(result.stats!);
+    } else if (result.failed != null) {
+      failures.add(result.failed!);
+      if (failFast) {
+        stderr.writeln('Aborting due to --fail-fast');
+        break;
+      }
+    }
   }
 
   _printBatchSummary(
@@ -151,6 +167,7 @@ Future<void> main(List<String> args) async {
         (results['from-date'] != null && (results['from-date'] as String).isNotEmpty) ||
         (results['to-date'] != null && (results['to-date'] as String).isNotEmpty) ||
         (results['title-keywords'] != null && (results['title-keywords'] as String).isNotEmpty),
+    failures: failures,
   );
 }
 
@@ -199,7 +216,7 @@ class _FileStats {
   });
 }
 
-Future<_FileStats?> _processFile(
+Future<({ _FileStats? stats, String? failed })> _processFile(
   String path,
   ArgResults results,
   int index,
@@ -212,14 +229,17 @@ Future<_FileStats?> _processFile(
   final List<Conversation> conversations = [];
   try {
     conversations.addAll(await JsonLoader.loadConversations(path));
-  } catch (e) {
+  } catch (e, st) {
     stderr.writeln('Failed to load $path: $e');
-    return null;
+    if (results['debug'] == true) {
+      stderr.writeln(st.toString());
+    }
+    return (stats: null, failed: _basename(path));
   }
 
   if (conversations.isEmpty) {
     stdout.writeln('No conversations loaded from ${_basename(path)}');
-    return null;
+    return (stats: null, failed: _basename(path));
   }
 
   final tagsFilter = _splitCsv(results['tags'] as String?);
@@ -301,91 +321,102 @@ Future<_FileStats?> _processFile(
     'Processing ${conversations.length} conversation(s) with ${filtered.length} exchange(s)...',
   );
 
-  final engine = IterativeMergeEngine.fromConfig();
-  final parcel = await engine.mergeAll(
-    filtered,
-    onProgress: (idx, total, ex) {
-      final title = filteredTitles[idx];
-      final previewWords = ex.prompt.split(RegExp(r'\s+')).take(10).join(' ');
-      stdout.writeln('Processing Exchange ${idx + 1} of $total...');
-      if (results['debug'] == true) {
-        stdout.writeln('  Conversation: $title');
-        stdout.writeln('  Preview: $previewWords');
-        if (ex.promptTimestamp != null) {
-          stdout.writeln('  Prompt Time: ${ex.promptTimestamp}');
+  _FileStats? stats;
+  try {
+    final engine = IterativeMergeEngine.fromConfig();
+    final parcel = await engine.mergeAll(
+      filtered,
+      onProgress: (idx, total, ex) {
+        final title = filteredTitles[idx];
+        final previewWords = ex.prompt.split(RegExp(r'\s+')).take(10).join(' ');
+        stdout.writeln('Processing Exchange ${idx + 1} of $total...');
+        if (results['debug'] == true) {
+          stdout.writeln('  Conversation: $title');
+          stdout.writeln('  Preview: $previewWords');
+          if (ex.promptTimestamp != null) {
+            stdout.writeln('  Prompt Time: ${ex.promptTimestamp}');
+          }
+          if (ex.responseTimestamp != null) {
+            stdout.writeln('  Response Time: ${ex.responseTimestamp}');
+          }
         }
-        if (ex.responseTimestamp != null) {
-          stdout.writeln('  Response Time: ${ex.responseTimestamp}');
-        }
-      }
-    },
-  );
+      },
+    );
 
-  final memory = ContextMemoryBuilder.buildFinalMemory(
-    latest: parcel,
-    sourceConversationId: conversations.length == 1
-        ? conversations.first.title
-        : null,
-    totalExchangeCount: filtered.length,
-    mergeStrategy: engine.strategy.name,
-  );
+    final memory = ContextMemoryBuilder.buildFinalMemory(
+      latest: parcel,
+      sourceConversationId: conversations.length == 1
+          ? conversations.first.title
+          : null,
+      totalExchangeCount: filtered.length,
+      mergeStrategy: engine.strategy.name,
+    );
 
-  final formatName = results['output-format'] as String;
-  final format = formatName == 'markdown'
-      ? ExportFormat.markdownResume
-      : ExportFormat.structuredJson;
-  final exporter = ExporterRegistry.getExporter(format);
+    final formatName = results['output-format'] as String;
+    final format = formatName == 'markdown'
+        ? ExportFormat.markdownResume
+        : ExportFormat.structuredJson;
+    final exporter = ExporterRegistry.getExporter(format);
 
-  stdout.writeln('Context build complete. Outputting memory to terminal.');
-  final output = exporter != null
+    stdout.writeln('Context build complete. Outputting memory to terminal.');
+    final output = exporter != null
       ? exporter.export(memory)
       : jsonEncode(memory.toJson());
-  stdout.writeln(output);
+    stdout.writeln(output);
 
-  final targetDir = outputDir ?? AppConfig.memoryOutputDir;
-  final dir = Directory(targetDir);
-  if (!dir.existsSync()) {
-    dir.createSync(recursive: true);
-  }
-  final stem = _stem(path);
-  final ext = formatName == 'markdown' ? 'md' : 'json';
-  final outFilePath = '${dir.path}/$stem.context.$ext';
-  final outFile = File(outFilePath);
-  await outFile.writeAsString(output);
-  stdout.writeln('\u2714 Saved to $outFilePath');
+    final targetDir = outputDir ?? AppConfig.memoryOutputDir;
+    final dir = Directory(targetDir);
+    if (!dir.existsSync()) {
+      dir.createSync(recursive: true);
+    }
+    final stem = _stem(path);
+    final ext = formatName == 'markdown' ? 'md' : 'json';
+    final outFilePath = '${dir.path}/$stem.context.$ext';
+    final outFile = File(outFilePath);
+    await outFile.writeAsString(output);
+    stdout.writeln('\u2714 Saved to $outFilePath');
 
-  final endTime = DateTime.now();
-  final outputPath = outFilePath;
+    final endTime = DateTime.now();
+    final outputPath = outFilePath;
 
-  stdout.writeln('\nSummary for ${_basename(path)}');
-  stdout.writeln('  Conversations: ${filteredConversations.length}');
-  stdout.writeln('  Exchanges: ${filtered.length}');
-  stdout.writeln('  Parcels: ${memory.parcels.length}');
-  stdout.writeln(
+    stdout.writeln('\nSummary for ${_basename(path)}');
+    stdout.writeln('  Conversations: ${filteredConversations.length}');
+    stdout.writeln('  Exchanges: ${filtered.length}');
+    stdout.writeln('  Parcels: ${memory.parcels.length}');
+    stdout.writeln(
       '  Duration: ${startTime.toIso8601String()} -> ${endTime.toIso8601String()}');
-  stdout.writeln('  Output location: $outputPath');
+    stdout.writeln('  Output location: $outputPath');
 
-  if (results['debug'] == true) {
-    for (int i = 0; i < memory.parcels.length; i++) {
-      final conf = memory.parcels[i].confidence;
-      if (conf.isNotEmpty) {
-        stdout.writeln('  Parcel ${i + 1} confidence: $conf');
+    if (results['debug'] == true) {
+      for (int i = 0; i < memory.parcels.length; i++) {
+        final conf = memory.parcels[i].confidence;
+        if (conf.isNotEmpty) {
+          stdout.writeln('  Parcel ${i + 1} confidence: $conf');
+        }
+      }
+      if (skippedIndices.isNotEmpty) {
+        stdout.writeln('  Skipped malformed exchanges: ${skippedIndices.join(', ')}');
       }
     }
-    if (skippedIndices.isNotEmpty) {
-      stdout.writeln('  Skipped malformed exchanges: ${skippedIndices.join(', ')}');
+
+    stats = _FileStats(
+      path: path,
+      conversations: filteredConversations.length,
+      exchanges: filtered.length,
+      parcels: memory.parcels.length,
+      excluded: conversations.length - filteredConversations.length,
+      format: formatName,
+      duration: endTime.difference(startTime),
+    );
+  } catch (e, st) {
+    stderr.writeln('Error processing ${_basename(path)}: $e');
+    if (results['debug'] == true) {
+      stderr.writeln(st.toString());
     }
+    return (stats: null, failed: conversations.isNotEmpty ? conversations.first.title : _basename(path));
   }
 
-  return _FileStats(
-    path: path,
-    conversations: filteredConversations.length,
-    exchanges: filtered.length,
-    parcels: memory.parcels.length,
-    excluded: conversations.length - filteredConversations.length,
-    format: formatName,
-    duration: endTime.difference(startTime),
-  );
+  return (stats: stats, failed: null);
 }
 
 void _printBatchSummary({
@@ -393,6 +424,7 @@ void _printBatchSummary({
   required DateTime startTime,
   required bool debug,
   required bool filtersUsed,
+  required List<String> failures,
 }) {
   final endTime = DateTime.now();
   final filesProcessed = summaries.length;
@@ -417,6 +449,11 @@ void _printBatchSummary({
   }
   stdout.writeln(
       '  Duration: ${startTime.toIso8601String()} -> ${endTime.toIso8601String()}');
+
+  stdout.writeln('  Failed conversations: ${failures.length}');
+  for (final f in failures) {
+    stdout.writeln('    $f');
+  }
 
   if (debug) {
     stdout.writeln('  Per-file breakdown:');
