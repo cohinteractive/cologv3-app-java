@@ -150,3 +150,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507240201][f46066][FTR][DATA] Added ContextMemoryRouter for routing memory exports
 [2507240217][84726d][FTR][DATA] Extended ContextMemoryRouter with routing stubs
 [2507240225][69644d7][FTR][CFG] Added RoutingConfig and loader
+[2507240242][4c3e84][SNC][DOC] Archived all milestone 3 task files and removed milestone3 folder from tasks/
