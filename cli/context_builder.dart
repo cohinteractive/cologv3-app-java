@@ -67,6 +67,7 @@ Future<void> main(List<String> args) async {
     AppConfig.enableDebug();
   }
 
+  final startTime = DateTime.now();
   stdout.writeln('Context Builder: starting build process');
 
   final List<String> files = [];
@@ -130,6 +131,15 @@ Future<void> main(List<String> args) async {
   final filtered = exchanges.sublist(startIndex, endIndex + 1);
   final filteredTitles = titles.sublist(startIndex, endIndex + 1);
 
+  final skippedIndices = <int>[];
+  for (var i = 0; i < filtered.length; i++) {
+    final ex = filtered[i];
+    if (ex.prompt.trim().isEmpty &&
+        (ex.response == null || ex.response!.trim().isEmpty)) {
+      skippedIndices.add(i);
+    }
+  }
+
   stdout.writeln(
     'Processing ${conversations.length} conversation(s) with ${filtered.length} exchange(s)...',
   );
@@ -174,5 +184,36 @@ Future<void> main(List<String> args) async {
     stdout.writeln(exporter.export(memory));
   } else {
     stdout.writeln(jsonEncode(memory.toJson()));
+  }
+
+  final endTime = DateTime.now();
+  final info = exportFormatInfo[format];
+  final ts = (memory.generatedAt ?? endTime)
+      .toIso8601String()
+      .replaceAll(':', '-');
+  final base = (memory.sourceConversationId ?? 'memory')
+      .replaceAll(RegExp(r'[\\/\:]'), '_');
+  final filename =
+      '${base}_${info?.suffix ?? format.name}_${ts}.${info?.extension ?? 'txt'}';
+  final outputPath = '${AppConfig.memoryOutputDir}/$filename';
+
+  stdout.writeln('\nSummary');
+  stdout.writeln('  Conversations: ${conversations.length}');
+  stdout.writeln('  Exchanges: ${filtered.length}');
+  stdout.writeln('  Parcels: ${memory.parcels.length}');
+  stdout.writeln(
+      '  Duration: ${startTime.toIso8601String()} -> ${endTime.toIso8601String()}');
+  stdout.writeln('  Output location: $outputPath');
+
+  if (results['debug'] == true) {
+    for (int i = 0; i < memory.parcels.length; i++) {
+      final conf = memory.parcels[i].confidence;
+      if (conf.isNotEmpty) {
+        stdout.writeln('  Parcel ${i + 1} confidence: $conf');
+      }
+    }
+    if (skippedIndices.isNotEmpty) {
+      stdout.writeln('  Skipped malformed exchanges: ${skippedIndices.join(', ')}');
+    }
   }
 }
