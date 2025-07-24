@@ -16,7 +16,10 @@ class RoutedContextExporter {
   RoutedContextExporter({this.basePath = 'export/context'});
 
   /// Writes [result] groups to the filesystem.
-  Future<void> export(RoutingResult result, {bool includeUnassigned = false}) async {
+  Future<void> export(
+    RoutingResult result, {
+    bool includeUnassigned = false,
+  }) async {
     await _writeGroups(result.byFeature, 'by_feature');
     await _writeGroups(result.byModule, 'by_module');
     if (includeUnassigned) {
@@ -24,7 +27,10 @@ class RoutedContextExporter {
     }
   }
 
-  Future<void> _writeGroups(Map<String, List<ContextParcel>> groups, String subdir) async {
+  Future<void> _writeGroups(
+    Map<String, List<ContextParcel>> groups,
+    String subdir,
+  ) async {
     for (final entry in groups.entries) {
       if (entry.value.isEmpty) continue;
       final dirName = _sanitizeName(entry.key);
@@ -53,6 +59,12 @@ class RoutedContextExporter {
     if (parcel.tags.isNotEmpty) {
       buffer.writeln();
       buffer.writeln('_Tags:_ ${parcel.tags.join(', ')}');
+    }
+    if (parcel.inlineTags.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln(
+        '_Inline Tags:_ ${parcel.inlineTags.map((e) => e.label).join(', ')}',
+      );
     }
     return buffer.toString().trim();
   }

@@ -1,4 +1,5 @@
 import 'manual_edit.dart';
+import 'context_tag.dart';
 
 class ContextParcel {
   /// Human-readable context summary for quick reference
@@ -19,6 +20,9 @@ class ContextParcel {
   /// Records any manual edits applied during merge review.
   final List<ManualEdit> manualEdits;
 
+  /// Inline tags detected within the summary content.
+  final Set<ContextTag> inlineTags;
+
   /// Short feature identifier this parcel relates to (e.g. "search").
   final String? feature;
 
@@ -38,22 +42,38 @@ class ContextParcel {
     this.feature,
     this.system,
     this.module,
-  });
+    Set<ContextTag>? inlineTags,
+  }) : inlineTags = inlineTags ?? _extractInlineTags(summary);
 
-  factory ContextParcel.fromJson(Map<String, dynamic> json) => ContextParcel(
-        summary: json['summary'],
-        mergeHistory: List<int>.from(
-            json['mergeHistory'] ?? json['contributingExchangeIds'] ?? []),
-        tags: List<String>.from(json['tags'] ?? []),
-        assumptions: List<String>.from(json['assumptions'] ?? []),
-        confidence: Map<String, double>.from(json['confidence'] ?? {}),
-        manualEdits: (json['manualEdits'] as List<dynamic>? ?? [])
-            .map((e) => ManualEdit.fromJson(Map<String, dynamic>.from(e)))
-            .toList(),
-        feature: json['feature'] as String?,
-        system: json['system'] as String?,
-        module: json['module'] as String?,
-      );
+  factory ContextParcel.fromJson(Map<String, dynamic> json) {
+    final summary = json['summary'] as String? ?? '';
+    Set<ContextTag>? inline;
+    if (json['inlineTags'] is List) {
+      inline = <ContextTag>{};
+      for (final e in json['inlineTags']) {
+        if (e is String) {
+          final tag = ContextTag.fromLabel(e);
+          if (tag != null) inline.add(tag);
+        }
+      }
+    }
+    return ContextParcel(
+      summary: summary,
+      mergeHistory: List<int>.from(
+        json['mergeHistory'] ?? json['contributingExchangeIds'] ?? [],
+      ),
+      tags: List<String>.from(json['tags'] ?? []),
+      assumptions: List<String>.from(json['assumptions'] ?? []),
+      confidence: Map<String, double>.from(json['confidence'] ?? {}),
+      manualEdits: (json['manualEdits'] as List<dynamic>? ?? [])
+          .map((e) => ManualEdit.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      feature: json['feature'] as String?,
+      system: json['system'] as String?,
+      module: json['module'] as String?,
+      inlineTags: inline ?? _extractInlineTags(summary),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'summary': summary,
@@ -62,6 +82,8 @@ class ContextParcel {
         'assumptions': assumptions,
         'confidence': confidence,
         'manualEdits': manualEdits.map((e) => e.toJson()).toList(),
+        if (inlineTags.isNotEmpty)
+          'inlineTags': inlineTags.map((e) => e.label).toList(),
         if (feature != null) 'feature': feature,
         if (system != null) 'system': system,
         if (module != null) 'module': module,
@@ -77,7 +99,9 @@ class ContextParcel {
 
     final tagsA = tags.map((e) => e.toLowerCase()).toSet();
     final tagsB = other.tags.map((e) => e.toLowerCase()).toSet();
-    if (tagsA.isNotEmpty && tagsA.length == tagsB.length && tagsA.containsAll(tagsB)) {
+    if (tagsA.isNotEmpty &&
+        tagsA.length == tagsB.length &&
+        tagsA.containsAll(tagsB)) {
       return true;
     }
     return false;
@@ -108,6 +132,16 @@ class ContextParcel {
       }
     }
     return v1[t.length];
+  }
+
+  /// Scans [content] for inline tags at the start of lines.
+  static Set<ContextTag> _extractInlineTags(String content) {
+    final tags = <ContextTag>{};
+    for (final line in content.split('\n')) {
+      final tag = ContextTag.fromLine(line);
+      if (tag != null) tags.add(tag);
+    }
+    return tags;
   }
 }
 
