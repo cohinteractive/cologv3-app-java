@@ -29,6 +29,11 @@ class MarkdownResumeExporter implements ContextMemoryExporter {
       if (parcel.tags.isNotEmpty) {
         buffer.writeln('_Tags:_ ${parcel.tags.join(', ')}');
       }
+      if (parcel.inlineTags.isNotEmpty) {
+        buffer.writeln(
+          '_Inline Tags:_ ${parcel.inlineTags.map((e) => e.label).join(', ')}',
+        );
+      }
       buffer.writeln();
     }
     return buffer.toString().trim();

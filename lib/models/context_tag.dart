@@ -50,6 +50,14 @@ enum ContextTag {
     return null;
   }
 
+  /// Returns the tag matching [label], or `null` if unrecognized.
+  static ContextTag? fromLabel(String label) {
+    for (final tag in ContextTag.values) {
+      if (tag.label == label) return tag;
+    }
+    return null;
+  }
+
   /// Returns `true` if [line] begins with a recognized context tag.
   static bool isValidTaggedLine(String line) => fromLine(line) != null;
 
