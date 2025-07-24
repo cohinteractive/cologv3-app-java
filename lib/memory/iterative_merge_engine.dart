@@ -74,7 +74,7 @@ class IterativeMergeEngine {
           continue;
         }
         if (AppConfig.manualReview) {
-          reviewed = await ManualReviewer.review(result);
+          reviewed = await ManualReviewer.review(result, previousContext);
           if (reviewed == null) {
             index++;
             continue;
