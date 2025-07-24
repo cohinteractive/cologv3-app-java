@@ -77,6 +77,12 @@ Future<void> main(List<String> args) async {
       help: 'Abort batch on first error',
       defaultsTo: false,
     )
+    ..addFlag(
+      'manual-review',
+      abbr: 'm',
+      help: 'Enable manual review of each ContextParcel before merging',
+      defaultsTo: false,
+    )
     ..addFlag('help', abbr: 'h', negatable: false, help: 'Show usage');
 
   late ArgResults results;
@@ -120,6 +126,9 @@ Future<void> main(List<String> args) async {
 
   if (results['debug'] == true) {
     AppConfig.enableDebug();
+  }
+  if (results['manual-review'] == true) {
+    AppConfig.enableManualReview();
   }
 
   final failFast = results['fail-fast'] == true;

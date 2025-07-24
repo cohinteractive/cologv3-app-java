@@ -165,3 +165,4 @@ This file records all Codex-generated changes and implementations in this projec
 
 [2507240755][c8d9381][FTR][BATCH] Logged end-of-batch summary with conversation, exchange, and file statistics
 [2507240826][19772de][ERR][BATCH] Added graceful error handling and reporting for failed conversations during batch processing
+[2507240842][ecb1ae][FTR][REVIEW] Added --manual-review flag to enable review before merging ContextParcels
