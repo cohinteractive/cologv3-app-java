@@ -5,6 +5,7 @@ import '../models/context_memory.dart';
 import '../export/context_memory_exporter.dart';
 import '../export/export_formats.dart';
 import '../export/exporter_registry.dart';
+import '../config/routing_config.dart';
 
 /// Possible destinations for exported [ContextMemory].
 enum OutputDestination {
@@ -25,10 +26,10 @@ enum OutputDestination {
 class ContextMemoryRouter {
   const ContextMemoryRouter();
 
-  /// Exports [memory] using each of the requested [formats] and dispatches the
-  /// results to all requested [destinations].
-  Future<void> route(ContextMemory memory, List<ExportFormat> formats,
-      Set<OutputDestination> destinations) async {
+  /// Exports [memory] using the formats and destinations defined in [config].
+  Future<void> route(ContextMemory memory, RoutingConfig config) async {
+    final formats = config.formats;
+    final destinations = config.destinations;
     for (final format in formats) {
       final ContextMemoryExporter? exporter =
           ExporterRegistry.getExporter(format);
