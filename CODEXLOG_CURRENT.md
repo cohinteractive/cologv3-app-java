@@ -153,3 +153,5 @@ This file records all Codex-generated changes and implementations in this projec
 [2507240242][4c3e84][SNC][DOC] Archived all milestone 3 task files and removed milestone3 folder from tasks/
 
 [2507240251][1e8f06][FTR][CLI] Added CLI entry point to trigger context memory build from exported ChatGPT data
+
+[2507240343][b5f5ae][FTR][CLI] Added argument parsing to CLI with support for input path, format, range, and debug toggle
