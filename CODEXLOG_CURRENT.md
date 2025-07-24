@@ -149,3 +149,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507240032][cfddc8f][FTR][DATA] Added metadata blocks to all ContextMemory export views
 [2507240201][f46066][FTR][DATA] Added ContextMemoryRouter for routing memory exports
 [2507240217][84726d][FTR][DATA] Extended ContextMemoryRouter with routing stubs
+[2507240225][69644d7][FTR][CFG] Added RoutingConfig and loader
