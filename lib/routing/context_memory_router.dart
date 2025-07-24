@@ -15,24 +15,20 @@ enum OutputDestination {
   logViewer,
 
   /// Placeholder for documentation generation pipeline.
-  documentationGenerator,
+  docGenerator,
 
   /// Placeholder for error or fix pattern archive routing.
-  errorArchive,
+  fixArchive,
 }
 
 /// Routes [ContextMemory] exports to configured destinations.
 class ContextMemoryRouter {
-  final List<OutputDestination> destinations;
-
-  /// Creates a router that writes to [destinations]. If none are provided,
-  /// [OutputDestination.fileSystem] is used by default.
-  ContextMemoryRouter({List<OutputDestination>? destinations})
-      : destinations = destinations ?? [OutputDestination.fileSystem];
+  const ContextMemoryRouter();
 
   /// Exports [memory] using each of the requested [formats] and dispatches the
-  /// results to all configured destinations.
-  Future<void> route(ContextMemory memory, List<ExportFormat> formats) async {
+  /// results to all requested [destinations].
+  Future<void> route(ContextMemory memory, List<ExportFormat> formats,
+      Set<OutputDestination> destinations) async {
     for (final format in formats) {
       final ContextMemoryExporter? exporter =
           ExporterRegistry.getExporter(format);
@@ -44,13 +40,15 @@ class ContextMemoryRouter {
             await _writeToFileSystem(output, memory, format);
             break;
           case OutputDestination.logViewer:
-            // TODO: integrate with log summary viewer
+            _logViewerStub();
             break;
-          case OutputDestination.documentationGenerator:
+          case OutputDestination.docGenerator:
             // TODO: integrate with documentation generator
             break;
-          case OutputDestination.errorArchive:
-            // TODO: integrate with error/fix archive
+          case OutputDestination.fixArchive:
+            if (_hasFixTags(memory)) {
+              _fixArchiveStub();
+            }
             break;
         }
       }
@@ -73,6 +71,26 @@ class ContextMemoryRouter {
         '${base}_${info?.suffix ?? format.name}_${ts}.${info?.extension ?? 'txt'}';
     final file = File('${dir.path}/$filename');
     await file.writeAsString(content);
+  }
+
+  void _logViewerStub() {
+    print('LogViewer: output routing not yet implemented');
+  }
+
+  void _fixArchiveStub() {
+    print('FixArchive: output routing not yet implemented');
+  }
+
+  bool _hasFixTags(ContextMemory memory) {
+    for (final parcel in memory.parcels) {
+      for (final tag in parcel.tags) {
+        final lower = tag.toLowerCase();
+        if (lower.contains('fix') || lower.contains('error') || lower.contains('bug')) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
 
