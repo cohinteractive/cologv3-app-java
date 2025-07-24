@@ -62,7 +62,7 @@ class IterativeMergeEngine {
           exchange,
           strategy,
         );
-        var reviewed = result;
+        ContextParcel? reviewed = result;
         if (result == null) {
           if (AppConfig.debugMode) {
             print(
