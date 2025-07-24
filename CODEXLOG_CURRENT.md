@@ -169,3 +169,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507242033][e8da75e][FTR][REVIEW] Added inline diff preview of ContextParcel changes during manual review
 [2507242105][9b5d95c][FTR][CFG] Added --manual-review CLI flag to toggle user review of ContextParcels
 [2507242118][b26c8d0][REF][REVIEW] Enforced --manual-review toggle across all user interaction and edit tracking logic
+[2507242125][c66fab1][SNC][DOC] Marked all tasks complete and archived milestone 4 task files to archive/tasks/
