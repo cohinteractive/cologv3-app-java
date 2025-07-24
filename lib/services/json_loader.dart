@@ -46,6 +46,13 @@ Conversation _parseConversation(Map raw) {
   final ts = tsSeconds is num
       ? DateTime.fromMillisecondsSinceEpoch((tsSeconds * 1000).toInt())
       : DateTime.now();
+  final tagsRaw = raw['tags'];
+  final tags = <String>[];
+  if (tagsRaw is List) {
+    for (final t in tagsRaw) {
+      if (t is String) tags.add(t);
+    }
+  }
   final fullMapping = raw['mapping'] as Map? ?? {};
   final mapping = <String, Map<String, dynamic>>{};
   final nodes = <Map<String, dynamic>>[];
@@ -112,7 +119,12 @@ Conversation _parseConversation(Map raw) {
     }
   }
 
-  return Conversation(title: title, timestamp: ts, exchanges: exchanges);
+  return Conversation(
+    title: title,
+    timestamp: ts,
+    exchanges: exchanges,
+    tags: tags,
+  );
 }
 
 Map<String, dynamic>? _findFirstNonEmptyAssistant(

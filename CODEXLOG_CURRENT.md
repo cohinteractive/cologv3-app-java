@@ -160,3 +160,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507240435][c5fae9d][FTR][CLI] Added CLI help instructions and example usage output
 
 [2507240641][cff1b83][FTR][BATCH] Added batch mode to process all .json files in a directory via CLI
+[2507240649][1fee53][FTR][BATCH] Added conversation filtering by tags, date range, and title keywords in batch mode
