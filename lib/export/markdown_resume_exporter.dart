@@ -11,6 +11,17 @@ class MarkdownResumeExporter implements ContextMemoryExporter {
   @override
   String export(ContextMemory memory) {
     final buffer = StringBuffer();
+    final info = exportFormatInfo[format];
+
+    buffer.writeln('#### Export Metadata');
+    buffer.writeln('- Format: Markdown Resume');
+    final ts = (memory.generatedAt ?? DateTime.now()).toIso8601String();
+    buffer.writeln('- Generated: $ts');
+    if (memory.sourceConversationId != null) {
+      buffer.writeln('- Source Conversation: ${memory.sourceConversationId}');
+    }
+    buffer.writeln('- Purpose: ${info?.description}');
+    buffer.writeln();
     for (int i = 0; i < memory.parcels.length; i++) {
       final ContextParcel parcel = memory.parcels[i];
       buffer.writeln('### Step ${i + 1}');
