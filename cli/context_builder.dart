@@ -137,9 +137,21 @@ Future<void> main(List<String> args) async {
     exit(1);
   }
 
+  final summaries = <_FileStats>[];
   for (var i = 0; i < files.length; i++) {
-    await _processFile(files[i], results, i, files.length, outputDir);
+    final s = await _processFile(files[i], results, i, files.length, outputDir);
+    if (s != null) summaries.add(s);
   }
+
+  _printBatchSummary(
+    summaries: summaries,
+    startTime: startTime,
+    debug: results['debug'] == true,
+    filtersUsed: (results['tags'] != null && (results['tags'] as String).isNotEmpty) ||
+        (results['from-date'] != null && (results['from-date'] as String).isNotEmpty) ||
+        (results['to-date'] != null && (results['to-date'] as String).isNotEmpty) ||
+        (results['title-keywords'] != null && (results['title-keywords'] as String).isNotEmpty),
+  );
 }
 
 String _basename(String path) =>
@@ -167,7 +179,27 @@ DateTime? _parseDate(String? value) {
   }
 }
 
-Future<void> _processFile(
+class _FileStats {
+  final String path;
+  final int conversations;
+  final int exchanges;
+  final int parcels;
+  final int excluded;
+  final String format;
+  final Duration duration;
+
+  const _FileStats({
+    required this.path,
+    required this.conversations,
+    required this.exchanges,
+    required this.parcels,
+    required this.excluded,
+    required this.format,
+    required this.duration,
+  });
+}
+
+Future<_FileStats?> _processFile(
   String path,
   ArgResults results,
   int index,
@@ -182,12 +214,12 @@ Future<void> _processFile(
     conversations.addAll(await JsonLoader.loadConversations(path));
   } catch (e) {
     stderr.writeln('Failed to load $path: $e');
-    return;
+    return null;
   }
 
   if (conversations.isEmpty) {
     stdout.writeln('No conversations loaded from ${_basename(path)}');
-    return;
+    return null;
   }
 
   final tagsFilter = _splitCsv(results['tags'] as String?);
@@ -342,6 +374,55 @@ Future<void> _processFile(
     }
     if (skippedIndices.isNotEmpty) {
       stdout.writeln('  Skipped malformed exchanges: ${skippedIndices.join(', ')}');
+    }
+  }
+
+  return _FileStats(
+    path: path,
+    conversations: filteredConversations.length,
+    exchanges: filtered.length,
+    parcels: memory.parcels.length,
+    excluded: conversations.length - filteredConversations.length,
+    format: formatName,
+    duration: endTime.difference(startTime),
+  );
+}
+
+void _printBatchSummary({
+  required List<_FileStats> summaries,
+  required DateTime startTime,
+  required bool debug,
+  required bool filtersUsed,
+}) {
+  final endTime = DateTime.now();
+  final filesProcessed = summaries.length;
+  final totalConversations =
+      summaries.fold(0, (sum, s) => sum + s.conversations);
+  final totalExchanges = summaries.fold(0, (sum, s) => sum + s.exchanges);
+  final totalExcluded = summaries.fold(0, (sum, s) => sum + s.excluded);
+  final jsonCount =
+      summaries.where((s) => s.format == 'json').length;
+  final mdCount =
+      summaries.where((s) => s.format == 'markdown').length;
+
+  stdout.writeln('\nBatch Summary');
+  stdout.writeln('  Files processed: $filesProcessed');
+  stdout.writeln('  Conversations included: $totalConversations');
+  stdout.writeln('  Exchanges included: $totalExchanges');
+  stdout.writeln('  ContextMemory files generated:');
+  stdout.writeln('    json: $jsonCount');
+  stdout.writeln('    markdown: $mdCount');
+  if (filtersUsed) {
+    stdout.writeln('  Conversations excluded by filters: $totalExcluded');
+  }
+  stdout.writeln(
+      '  Duration: ${startTime.toIso8601String()} -> ${endTime.toIso8601String()}');
+
+  if (debug) {
+    stdout.writeln('  Per-file breakdown:');
+    for (final s in summaries) {
+      stdout.writeln(
+          '    ${_basename(s.path)}: ${s.conversations} conv, ${s.exchanges} exch, ${s.parcels} parcels, ${s.duration.inMilliseconds}ms');
     }
   }
 }
