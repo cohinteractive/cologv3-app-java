@@ -10,6 +10,7 @@ import 'package:colog_v3/memory/iterative_merge_engine.dart';
 import 'package:colog_v3/services/context_memory_builder.dart';
 import 'package:colog_v3/models/conversation.dart';
 import 'package:colog_v3/models/exchange.dart';
+import 'package:colog_v3/models/context_parcel.dart';
 
 const String _usageGuide = '''
 Builds a ContextMemory from exported ChatGPT conversation JSON.
