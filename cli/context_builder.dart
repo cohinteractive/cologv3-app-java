@@ -21,6 +21,7 @@ Required arguments:
 
 Optional arguments:
   --output-format <json|markdown>  (default: json)
+  --output-dir <path>        Directory for generated files
   --start-id <exchangeId>     Start Exchange ID
   --end-id <exchangeId>       End Exchange ID
   --tags <tag1,tag2,...>      Only include conversations with these tags
@@ -34,7 +35,8 @@ Optional arguments:
 
 Example invocations:
   dart cli/context_builder.dart --input ./exports/chat.json
-  dart cli/context_builder.dart --input ./exports/ --output-format markdown --debug
+  dart cli/context_builder.dart --input ./exports/ \
+      --output-dir ./out --output-format markdown --debug
 ''';
 
 Future<void> main(List<String> args) async {
@@ -51,6 +53,11 @@ Future<void> main(List<String> args) async {
       help: 'Output format',
       allowed: ['markdown', 'json'],
       defaultsTo: 'json',
+    )
+    ..addOption(
+      'output-dir',
+      help: 'Directory to write output files',
+      valueHelp: 'path',
     )
     ..addOption('start-id', help: 'Start Exchange ID (inclusive)')
     ..addOption('end-id', help: 'End Exchange ID (inclusive)')
@@ -94,6 +101,18 @@ Future<void> main(List<String> args) async {
     exit(1);
   }
 
+  final outputDir = results['output-dir'] as String?;
+  if (entityType == FileSystemEntityType.directory && outputDir == null) {
+    stderr.writeln('Error: --output-dir is required when processing a directory');
+    exit(1);
+  }
+  if (outputDir != null) {
+    final dir = Directory(outputDir);
+    if (!dir.existsSync()) {
+      dir.createSync(recursive: true);
+    }
+  }
+
   if (results['debug'] == true) {
     AppConfig.enableDebug();
   }
@@ -119,7 +138,7 @@ Future<void> main(List<String> args) async {
   }
 
   for (var i = 0; i < files.length; i++) {
-    await _processFile(files[i], results, i, files.length);
+    await _processFile(files[i], results, i, files.length, outputDir);
   }
 }
 
@@ -127,6 +146,12 @@ String _basename(String path) =>
     path.split(Platform.pathSeparator).isNotEmpty
         ? path.split(Platform.pathSeparator).last
         : path;
+
+String _stem(String path) {
+  final base = _basename(path);
+  final dotIndex = base.lastIndexOf('.');
+  return dotIndex == -1 ? base : base.substring(0, dotIndex);
+}
 
 List<String> _splitCsv(String? csv) {
   if (csv == null || csv.trim().isEmpty) return [];
@@ -147,6 +172,7 @@ Future<void> _processFile(
   ArgResults results,
   int index,
   int total,
+  String? outputDir,
 ) async {
   stdout.writeln('Processing file ${index + 1} of $total: ${_basename(path)}');
   final startTime = DateTime.now();
@@ -279,22 +305,25 @@ Future<void> _processFile(
   final exporter = ExporterRegistry.getExporter(format);
 
   stdout.writeln('Context build complete. Outputting memory to terminal.');
-  if (exporter != null) {
-    stdout.writeln(exporter.export(memory));
-  } else {
-    stdout.writeln(jsonEncode(memory.toJson()));
+  final output = exporter != null
+      ? exporter.export(memory)
+      : jsonEncode(memory.toJson());
+  stdout.writeln(output);
+
+  final targetDir = outputDir ?? AppConfig.memoryOutputDir;
+  final dir = Directory(targetDir);
+  if (!dir.existsSync()) {
+    dir.createSync(recursive: true);
   }
+  final stem = _stem(path);
+  final ext = formatName == 'markdown' ? 'md' : 'json';
+  final outFilePath = '${dir.path}/$stem.context.$ext';
+  final outFile = File(outFilePath);
+  await outFile.writeAsString(output);
+  stdout.writeln('\u2714 Saved to $outFilePath');
 
   final endTime = DateTime.now();
-  final info = exportFormatInfo[format];
-  final ts = (memory.generatedAt ?? endTime)
-      .toIso8601String()
-      .replaceAll(':', '-');
-  final base = (memory.sourceConversationId ?? 'memory')
-      .replaceAll(RegExp(r'[\\/\:]'), '_');
-  final filename =
-      '${base}_${info?.suffix ?? format.name}_${ts}.${info?.extension ?? 'txt'}';
-  final outputPath = '${AppConfig.memoryOutputDir}/$filename';
+  final outputPath = outFilePath;
 
   stdout.writeln('\nSummary for ${_basename(path)}');
   stdout.writeln('  Conversations: ${filteredConversations.length}');
