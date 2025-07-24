@@ -7,6 +7,7 @@ import '../debug/debug_logger.dart';
 import '../models/llm_merge_strategy.dart';
 import 'single_exchange_processor.dart';
 import 'context_delta.dart';
+import '../services/manual_reviewer.dart';
 
 /// Engine that incrementally merges a list of Exchanges into a ContextParcel
 /// using an LLM-backed processor.
@@ -57,6 +58,7 @@ class IterativeMergeEngine {
           exchange,
           strategy,
         );
+        var reviewed = result;
         if (result == null) {
           if (AppConfig.debugMode) {
             print(
@@ -71,16 +73,23 @@ class IterativeMergeEngine {
           index++;
           continue;
         }
-        if (prevJson == jsonEncode(result.toJson()) && AppConfig.debugMode) {
+        if (AppConfig.manualReview) {
+          reviewed = await ManualReviewer.review(result);
+          if (reviewed == null) {
+            index++;
+            continue;
+          }
+        }
+        if (prevJson == jsonEncode(reviewed.toJson()) && AppConfig.debugMode) {
           DebugLogger.logAnomaly(
             'ContextParcel unchanged after merging exchange at index $index',
           );
         }
         if (AppConfig.debugMode) {
-          final delta = ContextDelta.compute(previousContext, result);
+          final delta = ContextDelta.compute(previousContext, reviewed);
           DebugLogger.logContextDelta(delta, index);
         }
-        context = result;
+        context = reviewed;
         mergeHistory.add(index);
         if (AppConfig.debugMode) {
           print('IterativeMergeEngine: merged exchange $index');
