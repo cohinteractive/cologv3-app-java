@@ -11,6 +11,14 @@ class StructuredJsonExporter implements ContextMemoryExporter {
 
   @override
   String export(ContextMemory memory) {
-    return jsonEncode(memory.toJson());
+    final info = exportFormatInfo[format];
+    final data = Map<String, dynamic>.from(memory.toJson());
+    data['_meta'] = {
+      'format': 'structuredJson',
+      'generatedAt': (memory.generatedAt ?? DateTime.now()).toIso8601String(),
+      'sourceConversationId': memory.sourceConversationId,
+      'description': info?.description,
+    };
+    return jsonEncode(data);
   }
 }
