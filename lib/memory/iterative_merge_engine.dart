@@ -32,6 +32,10 @@ class IterativeMergeEngine {
 
     if (AppConfig.debugMode) {
       print('IterativeMergeEngine: Using strategy $strategy');
+      print(
+        'IterativeMergeEngine: manual review mode is '
+        '${AppConfig.manualReview ? 'enabled' : 'disabled'}',
+      );
     }
     final total = exchanges.length;
     for (final exchange in exchanges) {
@@ -74,6 +78,9 @@ class IterativeMergeEngine {
           continue;
         }
         if (AppConfig.manualReview) {
+          if (AppConfig.debugMode) {
+            print('IterativeMergeEngine: launching manual review for exchange $index');
+          }
           reviewed = await ManualReviewer.review(
             result,
             index,

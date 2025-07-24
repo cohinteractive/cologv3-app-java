@@ -15,6 +15,15 @@ class ManualReviewer {
     int exchangeId, [
     ContextParcel? baseline,
   ]) async {
+    if (!AppConfig.manualReview) {
+      if (AppConfig.debugMode) {
+        stdout.writeln('ManualReviewer: manual review disabled');
+      }
+      return parcel;
+    }
+    if (AppConfig.debugMode) {
+      stdout.writeln('ManualReviewer: reviewing exchange $exchangeId');
+    }
     if (baseline != null && baseline.summary.isNotEmpty) {
       final oldJson = JsonEncoder.withIndent('  ').convert(baseline.toJson());
       final newJson = JsonEncoder.withIndent('  ').convert(parcel.toJson());
