@@ -145,3 +145,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507232324][d76868c][FTR][DATA] Added optional metadata fields in ContextMemory
 [2507232352][36624e9][FTR][DATA] Added confidence, completeness, limitations fields
 [2507240010][87e711][FTR][DATA] Defined export formats enumeration and metadata
+[2507240022][191d26c][FTR][DATA] Added pluggable ContextMemory exporters
