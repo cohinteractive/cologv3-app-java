@@ -1,6 +1,7 @@
 import 'package:test/test.dart';
 
 import '../../lib/models/context_parcel.dart';
+import '../../lib/models/manual_edit.dart';
 import '../../lib/services/context_memory_builder.dart';
 
 void main() {
@@ -32,6 +33,23 @@ void main() {
       expect(memory.completeness, 'complete');
       expect(memory.limitations, 'none');
       expect(memory.generatedAt, ts);
+    });
+
+    test('preserves manual edits in final memory', () {
+      final edit = ManualEdit(
+        exchangeId: 1,
+        original: {'summary': 'initial'},
+        edited: {'summary': 'edited'},
+        timestamp: DateTime.parse('2025-07-24T01:00:00Z'),
+      );
+      final latest = ContextParcel(
+        summary: 'edited',
+        mergeHistory: [1],
+        manualEdits: [edit],
+      );
+      final memory = ContextMemoryBuilder.buildFinalMemory(latest: latest);
+      expect(memory.parcels.first.manualEdits.length, 1);
+      expect(memory.parcels.first.manualEdits.first.exchangeId, 1);
     });
 
     test('infers generatedAt and exchangeCount', () {

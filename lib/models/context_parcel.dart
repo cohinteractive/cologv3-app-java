@@ -1,3 +1,5 @@
+import 'manual_edit.dart';
+
 class ContextParcel {
   /// Human-readable context summary for quick reference
   final String summary;
@@ -14,12 +16,16 @@ class ContextParcel {
   /// Optional confidence values for parts of the summary or tags
   final Map<String, double> confidence;
 
+  /// Records any manual edits applied during merge review.
+  final List<ManualEdit> manualEdits;
+
   ContextParcel({
     required this.summary,
-      required this.mergeHistory,
+    required this.mergeHistory,
     this.tags = const [],
     this.assumptions = const [],
     this.confidence = const {},
+    this.manualEdits = const [],
   });
 
   factory ContextParcel.fromJson(Map<String, dynamic> json) => ContextParcel(
@@ -29,6 +35,9 @@ class ContextParcel {
         tags: List<String>.from(json['tags'] ?? []),
         assumptions: List<String>.from(json['assumptions'] ?? []),
         confidence: Map<String, double>.from(json['confidence'] ?? {}),
+        manualEdits: (json['manualEdits'] as List<dynamic>? ?? [])
+            .map((e) => ManualEdit.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +46,7 @@ class ContextParcel {
         'tags': tags,
         'assumptions': assumptions,
         'confidence': confidence,
+        'manualEdits': manualEdits.map((e) => e.toJson()).toList(),
       };
 
   /// Returns true if this parcel conveys essentially the same
