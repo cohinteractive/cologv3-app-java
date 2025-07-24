@@ -13,15 +13,27 @@ import 'package:colog_v3/models/exchange.dart';
 
 Future<void> main(List<String> args) async {
   final parser = ArgParser()
-    ..addOption('input', abbr: 'i', help: 'Input file or directory', valueHelp: 'path')
-    ..addOption('output-format',
-        abbr: 'o',
-        help: 'Output format',
-        allowed: ['markdown', 'json'],
-        defaultsTo: 'json')
+    ..addOption(
+      'input',
+      abbr: 'i',
+      help: 'Input file or directory',
+      valueHelp: 'path',
+    )
+    ..addOption(
+      'output-format',
+      abbr: 'o',
+      help: 'Output format',
+      allowed: ['markdown', 'json'],
+      defaultsTo: 'json',
+    )
     ..addOption('start-id', help: 'Start Exchange ID (inclusive)')
     ..addOption('end-id', help: 'End Exchange ID (inclusive)')
-    ..addFlag('debug', abbr: 'd', help: 'Enable debug logging', defaultsTo: false)
+    ..addFlag(
+      'debug',
+      abbr: 'd',
+      help: 'Enable debug logging',
+      defaultsTo: false,
+    )
     ..addFlag('help', abbr: 'h', negatable: false, help: 'Show usage');
 
   late ArgResults results;
@@ -91,8 +103,12 @@ Future<void> main(List<String> args) async {
   }
 
   final List<Exchange> exchanges = [];
+  final List<String> titles = [];
   for (final conv in conversations) {
-    exchanges.addAll(conv.exchanges);
+    for (final ex in conv.exchanges) {
+      exchanges.add(ex);
+      titles.add(conv.title);
+    }
   }
 
   var startIndex = 0;
@@ -112,17 +128,37 @@ Future<void> main(List<String> args) async {
     }
   }
   final filtered = exchanges.sublist(startIndex, endIndex + 1);
+  final filteredTitles = titles.sublist(startIndex, endIndex + 1);
 
   stdout.writeln(
-      'Processing ${conversations.length} conversation(s) with ${filtered.length} exchange(s)...');
+    'Processing ${conversations.length} conversation(s) with ${filtered.length} exchange(s)...',
+  );
 
   final engine = IterativeMergeEngine.fromConfig();
-  final parcel = await engine.mergeAll(filtered);
+  final parcel = await engine.mergeAll(
+    filtered,
+    onProgress: (index, total, ex) {
+      final title = filteredTitles[index];
+      final previewWords = ex.prompt.split(RegExp(r'\s+')).take(10).join(' ');
+      stdout.writeln('Processing Exchange ${index + 1} of $total...');
+      if (results['debug'] == true) {
+        stdout.writeln('  Conversation: $title');
+        stdout.writeln('  Preview: $previewWords');
+        if (ex.promptTimestamp != null) {
+          stdout.writeln('  Prompt Time: ${ex.promptTimestamp}');
+        }
+        if (ex.responseTimestamp != null) {
+          stdout.writeln('  Response Time: ${ex.responseTimestamp}');
+        }
+      }
+    },
+  );
 
   final memory = ContextMemoryBuilder.buildFinalMemory(
     latest: parcel,
-    sourceConversationId:
-        conversations.length == 1 ? conversations.first.title : null,
+    sourceConversationId: conversations.length == 1
+        ? conversations.first.title
+        : null,
     totalExchangeCount: filtered.length,
     mergeStrategy: engine.strategy.name,
   );
