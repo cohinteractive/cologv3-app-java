@@ -30,6 +30,9 @@ Optional arguments:
   --title-keywords <kw1,kw2,...>
                               Only include conversations whose titles contain
                               any keyword
+  --feature <name>            Feature tag for generated memory
+  --system <name>             System/component name
+  --module <name>             Module identifier
   --debug                     Enable debug logging
   --fail-fast                 Abort batch on first error
   --manual-review             Enable manual review of each ContextParcel
@@ -68,6 +71,9 @@ Future<void> main(List<String> args) async {
     ..addOption('to-date', help: 'End date yyyy-mm-dd')
     ..addOption('title-keywords',
         help: 'Comma-separated conversation title keywords')
+    ..addOption('feature', help: 'Feature tag for generated memory')
+    ..addOption('system', help: 'System/component name')
+    ..addOption('module', help: 'Module identifier')
     ..addFlag(
       'debug',
       abbr: 'd',
@@ -362,6 +368,26 @@ Future<({ _FileStats? stats, String? failed })> _processFile(
       totalExchangeCount: filtered.length,
       mergeStrategy: engine.strategy.name,
     );
+
+    final feature = results['feature'] as String?;
+    final system = results['system'] as String?;
+    final module = results['module'] as String?;
+    if (feature != null || system != null || module != null) {
+      for (var i = 0; i < memory.parcels.length; i++) {
+        final p = memory.parcels[i];
+        memory.parcels[i] = ContextParcel(
+          summary: p.summary,
+          mergeHistory: p.mergeHistory,
+          tags: p.tags,
+          assumptions: p.assumptions,
+          confidence: p.confidence,
+          manualEdits: p.manualEdits,
+          feature: feature ?? p.feature,
+          system: system ?? p.system,
+          module: module ?? p.module,
+        );
+      }
+    }
 
     final formatName = results['output-format'] as String;
     final format = formatName == 'markdown'

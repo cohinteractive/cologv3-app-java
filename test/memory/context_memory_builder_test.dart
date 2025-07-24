@@ -7,8 +7,20 @@ import '../../lib/services/context_memory_builder.dart';
 void main() {
   group('ContextMemoryBuilder', () {
     test('builds memory with history and metadata', () {
-      final latest = ContextParcel(summary: 'final', mergeHistory: [0, 1]);
-      final prev = ContextParcel(summary: 'prev', mergeHistory: [0]);
+      final latest = ContextParcel(
+        summary: 'final',
+        mergeHistory: [0, 1],
+        feature: 'search',
+        system: 'parser',
+        module: 'ContextRouter',
+      );
+      final prev = ContextParcel(
+        summary: 'prev',
+        mergeHistory: [0],
+        feature: 'search',
+        system: 'parser',
+        module: 'ContextRouter',
+      );
       final ts = DateTime.parse('2025-07-24T00:00:00Z');
       final memory = ContextMemoryBuilder.buildFinalMemory(
         latest: latest,
@@ -25,6 +37,9 @@ void main() {
       expect(memory.parcels.length, 2);
       expect(memory.parcels.first.summary, 'prev');
       expect(memory.parcels.last.summary, 'final');
+      expect(memory.parcels.first.feature, 'search');
+      expect(memory.parcels.first.system, 'parser');
+      expect(memory.parcels.first.module, 'ContextRouter');
       expect(memory.sourceConversationId, 'c1');
       expect(memory.exchangeCount, 2);
       expect(memory.strategy, 'default');
