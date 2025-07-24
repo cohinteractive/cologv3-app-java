@@ -11,6 +11,26 @@ import 'package:colog_v3/services/context_memory_builder.dart';
 import 'package:colog_v3/models/conversation.dart';
 import 'package:colog_v3/models/exchange.dart';
 
+const String _usageGuide = '''
+Builds a ContextMemory from exported ChatGPT conversation JSON.
+
+Usage: dart cli/context_builder.dart --input <file|directory> [options]
+
+Required arguments:
+  --input <file|directory>    Input file or directory
+
+Optional arguments:
+  --output-format <json|markdown>  (default: json)
+  --start-id <exchangeId>     Start Exchange ID
+  --end-id <exchangeId>       End Exchange ID
+  --debug                     Enable debug logging
+  --help                      Show this usage information
+
+Example invocations:
+  dart cli/context_builder.dart --input ./exports/chat.json
+  dart cli/context_builder.dart --input ./exports/ --output-format markdown --debug
+''';
+
 Future<void> main(List<String> args) async {
   final parser = ArgParser()
     ..addOption(
@@ -41,19 +61,19 @@ Future<void> main(List<String> args) async {
     results = parser.parse(args);
   } on ArgParserException catch (e) {
     stderr.writeln(e.message);
-    stderr.writeln(parser.usage);
+    stdout.writeln(_usageGuide);
     exit(1);
   }
 
-  if (results['help'] == true) {
-    stdout.writeln(parser.usage);
+  if (results['help'] == true || args.isEmpty) {
+    stdout.writeln(_usageGuide);
     return;
   }
 
   final inputPath = results['input'] as String?;
   if (inputPath == null) {
     stderr.writeln('Error: --input is required');
-    stderr.writeln(parser.usage);
+    stdout.writeln(_usageGuide);
     exit(1);
   }
 
