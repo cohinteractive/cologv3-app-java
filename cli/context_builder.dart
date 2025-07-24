@@ -23,6 +23,12 @@ Optional arguments:
   --output-format <json|markdown>  (default: json)
   --start-id <exchangeId>     Start Exchange ID
   --end-id <exchangeId>       End Exchange ID
+  --tags <tag1,tag2,...>      Only include conversations with these tags
+  --from-date <yyyy-mm-dd>    Start date inclusive
+  --to-date <yyyy-mm-dd>      End date inclusive
+  --title-keywords <kw1,kw2,...>
+                              Only include conversations whose titles contain
+                              any keyword
   --debug                     Enable debug logging
   --help                      Show this usage information
 
@@ -48,6 +54,11 @@ Future<void> main(List<String> args) async {
     )
     ..addOption('start-id', help: 'Start Exchange ID (inclusive)')
     ..addOption('end-id', help: 'End Exchange ID (inclusive)')
+    ..addOption('tags', help: 'Comma-separated tag filter')
+    ..addOption('from-date', help: 'Start date yyyy-mm-dd')
+    ..addOption('to-date', help: 'End date yyyy-mm-dd')
+    ..addOption('title-keywords',
+        help: 'Comma-separated conversation title keywords')
     ..addFlag(
       'debug',
       abbr: 'd',
@@ -117,6 +128,20 @@ String _basename(String path) =>
         ? path.split(Platform.pathSeparator).last
         : path;
 
+List<String> _splitCsv(String? csv) {
+  if (csv == null || csv.trim().isEmpty) return [];
+  return csv.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+}
+
+DateTime? _parseDate(String? value) {
+  if (value == null || value.trim().isEmpty) return null;
+  try {
+    return DateTime.parse(value);
+  } catch (_) {
+    return null;
+  }
+}
+
 Future<void> _processFile(
   String path,
   ArgResults results,
@@ -124,6 +149,7 @@ Future<void> _processFile(
   int total,
 ) async {
   stdout.writeln('Processing file ${index + 1} of $total: ${_basename(path)}');
+  final startTime = DateTime.now();
 
   final List<Conversation> conversations = [];
   try {
@@ -138,9 +164,46 @@ Future<void> _processFile(
     return;
   }
 
+  final tagsFilter = _splitCsv(results['tags'] as String?);
+  final titleKeywords =
+      _splitCsv(results['title-keywords'] as String?).map((e) => e.toLowerCase()).toList();
+  final fromDate = _parseDate(results['from-date'] as String?);
+  final toDate = _parseDate(results['to-date'] as String?);
+
+  var tagExcluded = 0;
+  var dateExcluded = 0;
+  var titleExcluded = 0;
+
+  final filteredConversations = <Conversation>[];
+  for (final conv in conversations) {
+    final convTags = conv.tags.map((e) => e.toLowerCase()).toList();
+    final byTag = tagsFilter.isNotEmpty &&
+        !tagsFilter.any((t) => convTags.contains(t.toLowerCase()));
+    final byDate = (fromDate != null && conv.timestamp.isBefore(fromDate)) ||
+        (toDate != null && conv.timestamp.isAfter(toDate));
+    final titleLower = conv.title.toLowerCase();
+    final byTitle =
+        titleKeywords.isNotEmpty && !titleKeywords.any(titleLower.contains);
+
+    if (byTag) tagExcluded++;
+    if (byDate) dateExcluded++;
+    if (byTitle) titleExcluded++;
+
+    if (!(byTag || byDate || byTitle)) {
+      filteredConversations.add(conv);
+    }
+  }
+
+  if (results['debug'] == true) {
+    stdout.writeln('  Filter results for ${_basename(path)}:');
+    stdout.writeln('    Excluded by tags: $tagExcluded');
+    stdout.writeln('    Excluded by date: $dateExcluded');
+    stdout.writeln('    Excluded by title keywords: $titleExcluded');
+  }
+
   final exchanges = <Exchange>[];
   final titles = <String>[];
-  for (final conv in conversations) {
+  for (final conv in filteredConversations) {
     for (final ex in conv.exchanges) {
       exchanges.add(ex);
       titles.add(conv.title);
@@ -234,7 +297,7 @@ Future<void> _processFile(
   final outputPath = '${AppConfig.memoryOutputDir}/$filename';
 
   stdout.writeln('\nSummary for ${_basename(path)}');
-  stdout.writeln('  Conversations: ${conversations.length}');
+  stdout.writeln('  Conversations: ${filteredConversations.length}');
   stdout.writeln('  Exchanges: ${filtered.length}');
   stdout.writeln('  Parcels: ${memory.parcels.length}');
   stdout.writeln(
