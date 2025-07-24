@@ -22,8 +22,26 @@ class ContextMemory {
   /// Merge strategy or version string used during generation.
   final String? strategy;
 
-  /// Optional notes such as LLM confidence or limitations.
+  /// Optional free-form notes about this memory snapshot.
+  ///
+  /// This may include explanations from the LLM, caveats, or other
+  /// context that doesn't fit in the dedicated fields below.
   final String? notes;
+
+  /// Overall confidence score or description provided by the LLM.
+  ///
+  /// Use this to gauge how reliable the summarized context may be.
+  final String? confidence;
+
+  /// Indicates how complete the LLM believes this memory to be.
+  ///
+  /// Useful when only a partial conversation was available during
+  /// summarization.
+  final String? completeness;
+
+  /// Any known limitations or blind spots noted by the LLM when
+  /// generating this memory.
+  final String? limitations;
 
   ContextMemory({
     List<ContextParcel>? parcels,
@@ -32,6 +50,9 @@ class ContextMemory {
     this.exchangeCount,
     this.strategy,
     this.notes,
+    this.confidence,
+    this.completeness,
+    this.limitations,
   }) : parcels = parcels ?? [];
 
   factory ContextMemory.fromJson(Map<String, dynamic> json) => ContextMemory(
@@ -46,6 +67,9 @@ class ContextMemory {
         exchangeCount: json['exchangeCount'] as int?,
         strategy: json['strategy'] as String?,
         notes: json['notes'] as String?,
+        confidence: json['confidence'] as String?,
+        completeness: json['completeness'] as String?,
+        limitations: json['limitations'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -55,5 +79,8 @@ class ContextMemory {
         'exchangeCount': exchangeCount,
         'strategy': strategy,
         'notes': notes,
+        'confidence': confidence,
+        'completeness': completeness,
+        'limitations': limitations,
       };
 }

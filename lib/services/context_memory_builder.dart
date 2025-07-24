@@ -16,6 +16,12 @@ class ContextMemoryBuilder {
     int? totalExchangeCount,
     String? mergeStrategy,
     String? notes,
+    /// Overall confidence annotation from the LLM, if provided.
+    String? confidence,
+    /// How complete the LLM believes this memory is.
+    String? completeness,
+    /// Any limitations or caveats noted when generating the memory.
+    String? limitations,
   }) {
     final parcels = <ContextParcel>[...history, latest];
 
@@ -36,6 +42,9 @@ class ContextMemoryBuilder {
       exchangeCount: exchangeCount,
       strategy: mergeStrategy,
       notes: notes,
+      confidence: confidence,
+      completeness: completeness,
+      limitations: limitations,
     );
   }
 }

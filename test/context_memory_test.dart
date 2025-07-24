@@ -15,6 +15,9 @@ void main() {
         exchangeCount: 2,
         strategy: 'test',
         notes: 'n',
+        confidence: '0.8',
+        completeness: 'partial',
+        limitations: 'some missing data',
       );
       final json = memory.toJson();
       final roundTrip = ContextMemory.fromJson(json);
@@ -23,6 +26,9 @@ void main() {
       expect(roundTrip.exchangeCount, 2);
       expect(roundTrip.strategy, 'test');
       expect(roundTrip.notes, 'n');
+      expect(roundTrip.confidence, '0.8');
+      expect(roundTrip.completeness, 'partial');
+      expect(roundTrip.limitations, 'some missing data');
       expect(roundTrip.generatedAt, DateTime.parse('2025-07-23T00:00:00Z'));
     });
   });
