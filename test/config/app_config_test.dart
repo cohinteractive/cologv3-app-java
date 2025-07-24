@@ -9,5 +9,12 @@ void main() {
       AppConfig.enableDebug();
       expect(AppConfig.debugMode, isTrue);
     });
+
+    test('toggle manual review mode', () {
+      AppConfig.disableManualReview();
+      expect(AppConfig.manualReview, isFalse);
+      AppConfig.enableManualReview();
+      expect(AppConfig.manualReview, isTrue);
+    });
   });
 }
