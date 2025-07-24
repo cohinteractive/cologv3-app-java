@@ -155,3 +155,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507240251][1e8f06][FTR][CLI] Added CLI entry point to trigger context memory build from exported ChatGPT data
 
 [2507240343][b5f5ae][FTR][CLI] Added argument parsing to CLI with support for input path, format, range, and debug toggle
+[2507240407][2c2ec2][FTR][CLI] Added progress output for CLI context builder with debug mode enhancements

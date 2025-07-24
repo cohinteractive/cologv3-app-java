@@ -16,11 +16,15 @@ class IterativeMergeEngine {
   IterativeMergeEngine({this.strategy = MergeStrategy.defaultStrategy});
 
   factory IterativeMergeEngine.fromConfig() => IterativeMergeEngine(
-      strategy: MergeStrategyParser.fromString(AppConfig.mergeStrategy));
+    strategy: MergeStrategyParser.fromString(AppConfig.mergeStrategy),
+  );
 
   /// Merges [exchanges] sequentially using [SingleExchangeProcessor].
   /// Returns the final merged [ContextParcel].
-  Future<ContextParcel> mergeAll(List<Exchange> exchanges) async {
+  Future<ContextParcel> mergeAll(
+    List<Exchange> exchanges, {
+    void Function(int index, int total, Exchange exchange)? onProgress,
+  }) async {
     var context = ContextParcel(summary: '', mergeHistory: []);
     final mergeHistory = <int>[];
     var index = 0;
@@ -28,12 +32,18 @@ class IterativeMergeEngine {
     if (AppConfig.debugMode) {
       print('IterativeMergeEngine: Using strategy $strategy');
     }
+    final total = exchanges.length;
     for (final exchange in exchanges) {
+      onProgress?.call(index, total, exchange);
       if (exchange.prompt.trim().isEmpty &&
           (exchange.response == null || exchange.response!.trim().isEmpty)) {
         if (AppConfig.debugMode) {
-          print('IterativeMergeEngine: Skipping malformed exchange at index $index');
-          DebugLogger.logAnomaly('Skipped merge for malformed exchange at index $index');
+          print(
+            'IterativeMergeEngine: Skipping malformed exchange at index $index',
+          );
+          DebugLogger.logAnomaly(
+            'Skipped merge for malformed exchange at index $index',
+          );
         }
         index++;
         continue;
@@ -42,19 +52,29 @@ class IterativeMergeEngine {
       try {
         final previousContext = context;
         final prevJson = jsonEncode(previousContext.toJson());
-        final result = await SingleExchangeProcessor.process(context, exchange, strategy);
+        final result = await SingleExchangeProcessor.process(
+          context,
+          exchange,
+          strategy,
+        );
         if (result == null) {
           if (AppConfig.debugMode) {
-            print('IterativeMergeEngine: Warning - null merge result at index $index');
+            print(
+              'IterativeMergeEngine: Warning - null merge result at index $index',
+            );
           }
           if (AppConfig.debugMode) {
-            DebugLogger.logAnomaly('LLM merge failure at exchange index $index: null result');
+            DebugLogger.logAnomaly(
+              'LLM merge failure at exchange index $index: null result',
+            );
           }
           index++;
           continue;
         }
         if (prevJson == jsonEncode(result.toJson()) && AppConfig.debugMode) {
-          DebugLogger.logAnomaly('ContextParcel unchanged after merging exchange at index $index');
+          DebugLogger.logAnomaly(
+            'ContextParcel unchanged after merging exchange at index $index',
+          );
         }
         if (AppConfig.debugMode) {
           final delta = ContextDelta.compute(previousContext, result);
@@ -71,7 +91,9 @@ class IterativeMergeEngine {
       } on MergeException catch (e) {
         if (AppConfig.debugMode) {
           print('IterativeMergeEngine: MergeException at index $index: $e');
-          DebugLogger.logAnomaly('LLM merge failure at exchange index $index: ${e.message}');
+          DebugLogger.logAnomaly(
+            'LLM merge failure at exchange index $index: ${e.message}',
+          );
         }
         index++;
         continue;
