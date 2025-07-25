@@ -1,5 +1,6 @@
 import '../models/context_memory.dart';
 import '../models/context_parcel.dart';
+import 'tag_indexer.dart';
 
 /// Utility for constructing a finalized [ContextMemory] from the
 /// latest [ContextParcel] produced by the merge pipeline.
@@ -35,8 +36,11 @@ class ContextMemoryBuilder {
       }
     }
 
+    final indexer = TagIndexer.indexAllTags(parcels);
+
     return ContextMemory(
       parcels: parcels,
+      tagIndex: indexer.tagIndex,
       generatedAt: genAt,
       sourceConversationId: sourceConversationId,
       exchangeCount: exchangeCount,

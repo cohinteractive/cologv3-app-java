@@ -178,3 +178,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507242327][202dd0][FTR][DOC] Added ContextTag enum and tagging schema documentation
 [2507242348][b645f5c][FTR][TST] Added inline tag extraction in ContextParcel and tests
 [2507242353][a16cc19][FTR][DOC] Updated LLM instruction template with tagging guidance
+[2507250006][3ceed87][FTR][TST] Added TagIndexer and tag index generation
