@@ -180,3 +180,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507242353][a16cc19][FTR][DOC] Updated LLM instruction template with tagging guidance
 [2507250006][3ceed87][FTR][TST] Added TagIndexer and tag index generation
 [2507250012][a8fcdac][TST] Added tag parser and export rendering tests
+[2507250021][e749e0b][FTR][TST] Added InjectableContext for prompt injection
