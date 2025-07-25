@@ -182,3 +182,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507250012][a8fcdac][TST] Added tag parser and export rendering tests
 [2507250021][e749e0b][FTR][TST] Added InjectableContext for prompt injection
 [2507250029][17ce72][FTR][TST] Implemented MemorySlicer with filtering and tests
+[2507250107][989d762][FTR][TST] Added InjectionFormatter with multi-format output
