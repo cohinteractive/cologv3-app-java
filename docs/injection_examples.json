@@ -1,0 +1,12 @@
+[
+  {
+    "tag": "DECISION",
+    "summary": "Chose to route context by feature",
+    "timestamp": "2025-07-25T09:30:00Z"
+  },
+  {
+    "tag": "BUG_FIX",
+    "summary": "Resolved conflict in module export paths",
+    "timestamp": "2025-07-25T09:50:00Z"
+  }
+]
