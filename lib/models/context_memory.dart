@@ -10,6 +10,9 @@ class ContextMemory {
   /// Ordered list of merged context parcels representing the conversation.
   final List<ContextParcel> parcels;
 
+  /// Map of inline tag labels to parcel indices.
+  final Map<String, List<int>> tagIndex;
+
   /// Timestamp when this memory snapshot was generated.
   final DateTime? generatedAt;
 
@@ -45,6 +48,7 @@ class ContextMemory {
 
   ContextMemory({
     List<ContextParcel>? parcels,
+    Map<String, List<int>>? tagIndex,
     this.generatedAt,
     this.sourceConversationId,
     this.exchangeCount,
@@ -53,13 +57,18 @@ class ContextMemory {
     this.confidence,
     this.completeness,
     this.limitations,
-  }) : parcels = parcels ?? [];
+  })  : parcels = parcels ?? [],
+        tagIndex = tagIndex ?? {};
 
   factory ContextMemory.fromJson(Map<String, dynamic> json) => ContextMemory(
         parcels: (json['parcels'] as List<dynamic>?)
                 ?.map((e) => ContextParcel.fromJson(e as Map<String, dynamic>))
                 .toList() ??
             [],
+        tagIndex: (json['tagIndex'] as Map<String, dynamic>?)?.map(
+              (k, v) => MapEntry(k, List<int>.from(v as List<dynamic>)),
+            ) ??
+            {},
         generatedAt: json['generatedAt'] != null
             ? DateTime.parse(json['generatedAt'])
             : null,
@@ -74,6 +83,7 @@ class ContextMemory {
 
   Map<String, dynamic> toJson() => {
         'parcels': parcels.map((e) => e.toJson()).toList(),
+        if (tagIndex.isNotEmpty) 'tagIndex': tagIndex,
         'generatedAt': generatedAt?.toIso8601String(),
         'sourceConversationId': sourceConversationId,
         'exchangeCount': exchangeCount,

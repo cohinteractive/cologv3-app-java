@@ -48,6 +48,7 @@ void main() {
       expect(memory.completeness, 'complete');
       expect(memory.limitations, 'none');
       expect(memory.generatedAt, ts);
+      expect(memory.tagIndex.isEmpty, isTrue);
     });
 
     test('preserves manual edits in final memory', () {
@@ -65,6 +66,7 @@ void main() {
       final memory = ContextMemoryBuilder.buildFinalMemory(latest: latest);
       expect(memory.parcels.first.manualEdits.length, 1);
       expect(memory.parcels.first.manualEdits.first.exchangeId, 1);
+      expect(memory.tagIndex.isEmpty, isTrue);
     });
 
     test('infers generatedAt and exchangeCount', () {
@@ -73,6 +75,7 @@ void main() {
       expect(memory.parcels.length, 1);
       expect(memory.generatedAt, isNotNull);
       expect(memory.exchangeCount, 3);
+      expect(memory.tagIndex.isEmpty, isTrue);
     });
   });
 }

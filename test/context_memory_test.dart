@@ -53,6 +53,7 @@ void main() {
       expect(roundTrip.parcels.first.feature, 'search');
       expect(roundTrip.parcels.first.system, 'parser');
       expect(roundTrip.parcels.first.module, 'ContextRouter');
+      expect(roundTrip.tagIndex.isEmpty, isTrue);
     });
   });
 }
