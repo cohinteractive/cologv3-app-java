@@ -185,3 +185,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507250107][989d762][FTR][TST] Added InjectionFormatter with multi-format output
 [2507250339][4555598][FTR][TST] Added MemorySelector with filtering and interactive selection tests
 [2507250348][ec08ac][DOC] Added injection output documentation examples
+[2507252307][1a981c0][FTR][CFG] Implemented OpenAI client and added http dependency
