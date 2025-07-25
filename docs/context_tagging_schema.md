@@ -30,3 +30,16 @@ A line without a recognized tag is treated as regular summary text.
 [ARCH_NOTE] Parser layer separated from UI for testing.
 [PLAN] Implement caching next sprint.
 ```
+
+### Instruction Snippet
+
+The LLM summarization template encourages tagging inline:
+
+```text
+Analyze the prompt and response carefully and capture only high-value context.
+- Ignore filler text or social niceties.
+- Prioritize concrete facts, decisions, bug fixes, and architectural insights.
+- Preserve code snippets or key configuration details exactly as written.
+- Omit prompts or responses that add no new insight.
+- Use tags [DECISION], [BUG_FIX], [PLAN], [BLOCKER], [ARCH_NOTE] at the start of relevant lines when helpful.
+```
