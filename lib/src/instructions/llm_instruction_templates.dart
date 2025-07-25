@@ -10,6 +10,7 @@ Analyze the prompt and response carefully and capture only high-value context.
 - Prioritize concrete facts, decisions, bug fixes, and architectural insights.
 - Preserve code snippets or key configuration details exactly as written.
 - Omit prompts or responses that add no new insight.
+- Use tags [DECISION], [BUG_FIX], [PLAN], [BLOCKER], [ARCH_NOTE] at the start of relevant lines when helpful.
 ''';
 
 const String mergeInstruction = '''
@@ -19,6 +20,7 @@ When merging new context with existing summaries:
 - If contradictions arise, prefer the most recent statement unless earlier
   information is clearly more reliable.
 - Mark unresolved areas as unclear rather than discarding them.
+- Maintain role tags like [DECISION], [BUG_FIX], [PLAN], [BLOCKER], [ARCH_NOTE].
 ''';
 
 const String initialExchangePromptTemplate = '''
