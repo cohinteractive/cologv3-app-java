@@ -111,6 +111,18 @@ class DebugLogger {
     file.writeAsStringSync('$entry\n', mode: FileMode.append);
   }
 
+  /// Logs an error message with optional [error] and [stack] details.
+  static void logError(String message, {Object? error, StackTrace? stack}) {
+    if (!AppConfig.debugMode) return;
+    final timestamp = DateTime.now().toIso8601String();
+    final entry = '[$timestamp] ERROR: $message';
+    print(entry);
+    if (error != null) print(error);
+    if (stack != null) print(stack);
+    final file = File('debug/errors.log');
+    file.writeAsStringSync('$entry\n', mode: FileMode.append);
+  }
+
   /// Logs the parsed [parcel] returned from the LLM.
   static void logParsedParcel(ContextParcel parcel) {
     if (!AppConfig.debugMode) return;

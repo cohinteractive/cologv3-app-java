@@ -3,13 +3,13 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-typedef PromptSender = Future<String> Function(String);
+typedef PromptSender = Future<Map<String, dynamic>> Function(String);
 
 class LLMClient {
   /// Function used to send prompts. Can be overridden in tests.
   static PromptSender sendPrompt = _defaultSendPrompt;
 
-  static Future<String> _defaultSendPrompt(String prompt) async {
+  static Future<Map<String, dynamic>> _defaultSendPrompt(String prompt) async {
     final apiKey = Platform.environment['OPENAI_API_KEY_COLOG'];
     if (apiKey == null || apiKey.isEmpty) {
       throw Exception('OPENAI_API_KEY_COLOG not found in environment.');
@@ -36,14 +36,6 @@ class LLMClient {
     }
 
     final Map<String, dynamic> json = jsonDecode(response.body);
-    final choices = json['choices'];
-    if (choices is List && choices.isNotEmpty) {
-      final message = choices[0]['message'];
-      if (message is Map<String, dynamic> && message['content'] != null) {
-        return message['content'] as String;
-      }
-    }
-
-    throw Exception('OpenAI response missing message content');
+    return json;
   }
 }

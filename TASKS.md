@@ -11,3 +11,4 @@
 - [ ] Fix exchange toggle so clicking prompt or response expands/collapses both together
 - [ ] Visually de-emphasize collapsed exchanges in right panel by reducing background intensity, padding, and text color to create visual hierarchy
 - [ ] Handle malformed or empty Exchange inputs in SingleExchangeProcessor.process()
+- [ ] Use real LLMClient.sendPrompt() to send prompts and parse JSON responses in SingleExchangeProcessor
