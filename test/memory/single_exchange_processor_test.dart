@@ -23,8 +23,15 @@ void main() {
     });
 
     test('valid merge returns new ContextParcel', () async {
-      LLMClient.sendPrompt =
-          (prompt) async => '{"summary":"merged","mergeHistory":[0]}';
+      LLMClient.sendPrompt = (prompt) async => {
+            'choices': [
+              {
+                'message': {
+                  'content': '{"summary":"merged","mergeHistory":[0]}'
+                }
+              }
+            ]
+          };
       final input = ContextParcel(summary: '', mergeHistory: []);
       final ex = Exchange(
         prompt: 'Hello',
@@ -42,7 +49,7 @@ void main() {
       var called = false;
       LLMClient.sendPrompt = (prompt) async {
         called = true;
-        return '';
+        return {'choices': []};
       };
       final input = ContextParcel(summary: 'keep', mergeHistory: [1]);
       final ex = Exchange(
@@ -58,7 +65,13 @@ void main() {
     });
 
     test('throws MergeException on malformed LLM response', () async {
-      LLMClient.sendPrompt = (prompt) async => 'not json';
+      LLMClient.sendPrompt = (prompt) async => {
+            'choices': [
+              {
+                'message': {'content': 'not json'}
+              }
+            ]
+          };
       final input = ContextParcel(summary: '', mergeHistory: []);
       final ex = Exchange(
         prompt: 'Hi',
@@ -75,8 +88,15 @@ void main() {
 
     test('debug logging prints when enabled', () async {
       AppConfig.debugMode = true;
-      LLMClient.sendPrompt =
-          (prompt) async => '{"summary":"d","mergeHistory":[0]}';
+      LLMClient.sendPrompt = (prompt) async => {
+            'choices': [
+              {
+                'message': {
+                  'content': '{"summary":"d","mergeHistory":[0]}'
+                }
+              }
+            ]
+          };
       final input = ContextParcel(summary: '', mergeHistory: []);
       final ex = Exchange(
         prompt: 'Hi',

@@ -54,13 +54,19 @@ $responseText''';
       );
     }
 
-    final response = await LLMClient.sendPrompt(prompt);
-    if (response.trim().isEmpty) {
-      throw MergeException('LLM returned invalid ContextParcel format');
+    final Map<String, dynamic> response = await LLMClient.sendPrompt(prompt);
+    final choices = response['choices'];
+    if (choices == null || choices.isEmpty) {
+      throw MergeException('No choices returned from LLM');
+    }
+
+    final content = choices.first['message']?['content'] as String?;
+    if (content == null || content.trim().isEmpty) {
+      throw MergeException('LLM response content is empty');
     }
 
     try {
-      final Map<String, dynamic> json = jsonDecode(response);
+      final Map<String, dynamic> json = jsonDecode(content);
       final newParcel = ContextParcel.fromJson(json);
 
       if (newParcel.summary.isEmpty && newParcel.mergeHistory.isEmpty) {
@@ -68,12 +74,13 @@ $responseText''';
       }
 
       if (AppConfig.debugMode) {
-        DebugLogger.logRawResponse(response);
+        DebugLogger.logRawResponse(jsonEncode(response));
         DebugLogger.logParsedParcel(newParcel);
       }
 
       return newParcel;
-    } catch (_) {
+    } catch (e, stack) {
+      DebugLogger.logError('LLM merge failed', error: e, stack: stack);
       throw MergeException('LLM returned invalid ContextParcel format');
     }
   }
