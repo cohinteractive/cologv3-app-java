@@ -65,6 +65,8 @@ $responseText''';
       throw MergeException('LLM response content is empty');
     }
 
+    print('[DEBUG] Raw LLM response content:\n$content');
+
     Map<String, dynamic> parsed;
     try {
       parsed = jsonDecode(content);
