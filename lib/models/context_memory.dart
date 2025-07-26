@@ -5,6 +5,7 @@
 /// the memory was generated so it can be routed or audited by other tools.
 
 import 'context_parcel.dart';
+import '../injection/injectable_context.dart';
 
 class ContextMemory {
   /// Ordered list of merged context parcels representing the conversation.
@@ -93,4 +94,15 @@ class ContextMemory {
         'completeness': completeness,
         'limitations': limitations,
       };
+
+  /// Adds [parcel] to the in-memory list while preserving existing entries.
+  void mergeWith(ContextParcel parcel) {
+    parcels.add(parcel);
+  }
+
+  /// Converts all parcels into a single concatenated [InjectableContext].
+  InjectableContext toInjectable({String? role}) {
+    final summaries = parcels.map((p) => p.summary).join('\n\n');
+    return InjectableContext(summary: summaries, role: role);
+  }
 }
