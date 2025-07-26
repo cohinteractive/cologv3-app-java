@@ -8,6 +8,12 @@ import '../memory/context_delta.dart';
 
 /// Writes debug logs of [ContextParcel]s during merge operations.
 class DebugLogger {
+  /// Logs an arbitrary [message] when [AppConfig.debugMode] is enabled.
+  static void log(String message) {
+    if (!AppConfig.debugMode) return;
+    print('[DEBUG] $message');
+  }
+
   /// Logs [parcel] to a JSON file named `context_step_{stepIndex}.json`
   /// inside [AppConfig.debugOutputDir]. Includes a timestamp and step index.
   static void logContextParcel(ContextParcel parcel, int stepIndex) {
@@ -146,6 +152,6 @@ $rawResponse
   /// Logs the parsed [parcel] returned from the LLM.
   static void logParsedParcel(ContextParcel parcel) {
     if (!AppConfig.debugMode) return;
-    // TODO: Implement logging of parsed ContextParcel objects
+    print('[DEBUG] Parsed ContextParcel: ${jsonEncode(parcel.toJson())}');
   }
 }

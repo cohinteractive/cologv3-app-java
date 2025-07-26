@@ -389,7 +389,8 @@ class _ExchangeTileState extends State<_ExchangeTile>
             padding: const EdgeInsets.only(top: 4),
             child: Text(_error!, style: const TextStyle(color: Colors.red)),
           )
-        else if (widget.exchange.llmSummary != null)
+        else if (widget.exchange.llmSummary != null &&
+            widget.exchange.llmSummary!.trim().isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Card(
