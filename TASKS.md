@@ -13,3 +13,5 @@
 - [ ] Handle malformed or empty Exchange inputs in SingleExchangeProcessor.process()
 - [ ] Use real LLMClient.sendPrompt() to send prompts and parse JSON responses in SingleExchangeProcessor
 - [ ] Add 'Summarize with LLM' option to 3-dot menu that processes the exchange and shows summary
+
+- [ ] Implement merge iteration review dialog showing context summary and metrics during supervised merge
