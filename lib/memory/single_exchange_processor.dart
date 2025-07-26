@@ -29,11 +29,12 @@ class SingleExchangeProcessor {
       return inputParcel;
     }
 
-    final promptText = exchange.prompt.trim();
-    final responseText = exchange.response!.trim();
+    try {
+      final promptText = exchange.prompt.trim();
+      final responseText = exchange.response!.trim();
 
-    final mergeInstructions = InstructionTemplates.forStrategy(strategy);
-    final prompt = '''=== MERGE INSTRUCTIONS ===
+      final mergeInstructions = InstructionTemplates.forStrategy(strategy);
+      final prompt = '''=== MERGE INSTRUCTIONS ===
 $mergeInstructions
 
 === EXISTING CONTEXT ===
@@ -45,58 +46,81 @@ $promptText
 RESPONSE:
 $responseText''';
 
-    if (AppConfig.debugMode) {
-      print('SingleExchangeProcessor prompt:\n$prompt');
-      DebugLogger.logLLMCall(
-        instructions: mergeInstructions,
-        exchange: exchange,
-        context: inputParcel,
-      );
-    }
-
-    final Map<String, dynamic> response = await LLMClient.sendPrompt(prompt);
-    if (AppConfig.debugMode) {
-      DebugLogger.logLLMCallRaw(
-          prompt: prompt, rawResponse: jsonEncode(response));
-      print('[DEBUG] Full OpenAI JSON response:\n$response');
-    }
-    final choices = response['choices'];
-    if (choices == null || choices.isEmpty) {
-      throw MergeException('No choices returned from LLM');
-    }
-
-    final content = choices.first['message']?['content'] as String?;
-    if (content == null || content.trim().isEmpty) {
-      throw MergeException('LLM response content is empty');
-    }
-
-    print('[DEBUG] Raw LLM response content:\n$content');
-
-    Map<String, dynamic> parsed;
-    try {
-      parsed = jsonDecode(content);
-    } catch (e) {
-      DebugLogger.logError('LLM returned non-JSON content', error: e, stack: StackTrace.current, raw: content);
-      throw MergeException('Invalid JSON format in LLM response');
-    }
-
-    try {
-      final contextParcel = ContextParcel.fromJson(parsed);
-      DebugLogger.log('LLM Summary Returned: ${contextParcel.summary}');
-
-      if (contextParcel.summary.isEmpty && contextParcel.mergeHistory.isEmpty) {
-        throw const FormatException();
-      }
-
       if (AppConfig.debugMode) {
-        DebugLogger.logRawResponse(jsonEncode(response));
-        DebugLogger.logParsedParcel(contextParcel);
+        print('SingleExchangeProcessor prompt:\n$prompt');
+        DebugLogger.logLLMCall(
+          instructions: mergeInstructions,
+          exchange: exchange,
+          context: inputParcel,
+        );
       }
 
-      return contextParcel;
+      final Map<String, dynamic> response = await LLMClient.sendPrompt(prompt);
+      if (AppConfig.debugMode) {
+        DebugLogger.logLLMCallRaw(
+            prompt: prompt, rawResponse: jsonEncode(response));
+        print('[DEBUG] LLM JSON received: $response');
+      }
+      final choices = response['choices'];
+      if (choices == null || choices.isEmpty) {
+        if (AppConfig.debugMode) {
+          print('[DEBUG] No choices returned in response');
+        }
+        throw MergeException('No choices returned from LLM');
+      }
+
+      final content = choices.first['message']?['content'] as String?;
+      if (AppConfig.debugMode) {
+        print('[DEBUG] Raw content string: $content');
+      }
+      if (content == null || content.trim().isEmpty) {
+        if (AppConfig.debugMode) {
+          print('[DEBUG] content was null or empty');
+        }
+        throw MergeException('LLM response content is empty');
+      }
+
+      Map<String, dynamic> parsed;
+      try {
+        parsed = jsonDecode(content);
+        if (AppConfig.debugMode) {
+          print('[DEBUG] Parsed JSON: $parsed');
+        }
+      } catch (e) {
+        if (AppConfig.debugMode) {
+          print('[DEBUG] Failed to decode JSON');
+        }
+        DebugLogger.logError('LLM returned non-JSON content', error: e, stack: StackTrace.current, raw: content);
+        throw MergeException('Invalid JSON format in LLM response');
+      }
+
+      try {
+        final contextParcel = ContextParcel.fromJson(parsed);
+        if (AppConfig.debugMode) {
+          print('[DEBUG] ContextParcel.summary: ${contextParcel.summary}');
+        }
+        DebugLogger.log('LLM Summary Returned: ${contextParcel.summary}');
+
+        if (contextParcel.summary.isEmpty && contextParcel.mergeHistory.isEmpty) {
+          throw const FormatException();
+        }
+
+        if (AppConfig.debugMode) {
+          DebugLogger.logRawResponse(jsonEncode(response));
+          DebugLogger.logParsedParcel(contextParcel);
+        }
+
+        return contextParcel;
+      } catch (e, stack) {
+        DebugLogger.logError('LLM merge failed', error: e, stack: stack, raw: content);
+        throw MergeException('LLM returned invalid ContextParcel format');
+      }
     } catch (e, stack) {
-      DebugLogger.logError('LLM merge failed', error: e, stack: stack, raw: content);
-      throw MergeException('LLM returned invalid ContextParcel format');
+      if (AppConfig.debugMode) {
+        print('[DEBUG] General failure in process(): $e');
+      }
+      DebugLogger.logError('LLM merge failed', error: e, stack: stack);
+      throw MergeException('Failed to process LLM response: $e');
     }
   }
 }
