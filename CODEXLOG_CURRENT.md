@@ -194,3 +194,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507260054][a3492c][BUG][FTR] Added debug logs for LLM summary flow
 [2507260241][3dfb95][BUG][LLM] Printed raw LLM content before JSON parse
 [2507260327][c4b1a3a][BUG][LLM] Logged full OpenAI JSON response
+[2507260511][31df89f][DBG][LLM] Added step-by-step debug prints in SingleExchangeProcessor
