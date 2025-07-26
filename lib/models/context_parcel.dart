@@ -14,8 +14,11 @@ class ContextParcel {
   /// Optional assumptions inferred or explicitly stated
   final List<String> assumptions;
 
-  /// Optional confidence values for parts of the summary or tags
-  final Map<String, double> confidence;
+  /// Optional notes or caveats provided by the LLM.
+  final String? notes;
+
+  /// Overall confidence score for this parcel.
+  final double? confidence;
 
   /// Records any manual edits applied during merge review.
   final List<ManualEdit> manualEdits;
@@ -37,7 +40,8 @@ class ContextParcel {
     required this.mergeHistory,
     this.tags = const [],
     this.assumptions = const [],
-    this.confidence = const {},
+    this.notes,
+    this.confidence,
     this.manualEdits = const [],
     this.feature,
     this.system,
@@ -63,9 +67,16 @@ class ContextParcel {
       mergeHistory: List<int>.from(
         json['mergeHistory'] ?? json['contributingExchangeIds'] ?? [],
       ),
-      tags: List<String>.from(json['tags'] ?? []),
-      assumptions: List<String>.from(json['assumptions'] ?? []),
-      confidence: Map<String, double>.from(json['confidence'] ?? {}),
+      tags: json['tags'] is List
+          ? List<String>.from(json['tags'])
+          : <String>[],
+      assumptions: json['assumptions'] is List
+          ? List<String>.from(json['assumptions'])
+          : <String>[],
+      notes: json['notes'] as String?,
+      confidence: (json['confidence'] is num)
+          ? (json['confidence'] as num).toDouble()
+          : null,
       manualEdits: (json['manualEdits'] as List<dynamic>? ?? [])
           .map((e) => ManualEdit.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
@@ -81,7 +92,8 @@ class ContextParcel {
         'mergeHistory': mergeHistory,
         'tags': tags,
         'assumptions': assumptions,
-        'confidence': confidence,
+        if (notes != null) 'notes': notes,
+        if (confidence != null) 'confidence': confidence,
         'manualEdits': manualEdits.map((e) => e.toJson()).toList(),
         if (inlineTags.isNotEmpty)
           'inlineTags': inlineTags.map((e) => e.label).toList(),
@@ -154,7 +166,8 @@ ContextParcel(
   mergeHistory: [101, 102, 105],
   tags: ["bug", "loader", "streaming"],
   assumptions: ["File was too large for previous parser"],
-  confidence: {"summary": 0.95}
+  notes: "No major gaps",
+  confidence: 0.95
 );
 */
 
@@ -166,9 +179,7 @@ ContextParcel(
   "mergeHistory": [12, 15, 16],
   "tags": ["bug", "loader", "json"],
   "assumptions": ["Data exceeds buffer size"],
-  "confidence": {
-    "summary": 0.93,
-    "tags": 0.8
-  }
+  "notes": "Edge case when file is empty",
+  "confidence": 0.93
 }
 */

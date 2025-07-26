@@ -428,7 +428,7 @@ Future<({ _FileStats? stats, String? failed })> _processFile(
     if (results['debug'] == true) {
       for (int i = 0; i < memory.parcels.length; i++) {
         final conf = memory.parcels[i].confidence;
-        if (conf.isNotEmpty) {
+        if (conf != null) {
           stdout.writeln('  Parcel ${i + 1} confidence: $conf');
         }
       }

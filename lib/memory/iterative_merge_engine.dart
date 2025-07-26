@@ -128,6 +128,7 @@ class IterativeMergeEngine {
       mergeHistory: mergeHistory,
       tags: context.tags,
       assumptions: context.assumptions,
+      notes: context.notes,
       confidence: context.confidence,
       manualEdits: context.manualEdits,
     );
