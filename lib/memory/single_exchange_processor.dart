@@ -55,6 +55,11 @@ $responseText''';
     }
 
     final Map<String, dynamic> response = await LLMClient.sendPrompt(prompt);
+    if (AppConfig.debugMode) {
+      DebugLogger.logLLMCallRaw(
+          prompt: prompt, rawResponse: jsonEncode(response));
+      print('[DEBUG] Full OpenAI JSON response:\n$response');
+    }
     final choices = response['choices'];
     if (choices == null || choices.isEmpty) {
       throw MergeException('No choices returned from LLM');
