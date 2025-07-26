@@ -206,3 +206,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507261109][be58f2a][BUG] Corrected import path and response handler call
 [2507261121][3f735c][REF] Switched instruction templates to use MergeStrategy enum
 [2507261128][0b62b9][BUG][LLM] Fixed JSON parsing call in processExchange
+[2507261136][ee0e85a][FTR][UI] Added merge completion dialog with summary copy option

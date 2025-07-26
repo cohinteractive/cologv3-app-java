@@ -5,6 +5,7 @@ import '../models/context_parcel.dart';
 import '../models/exchange.dart';
 import 'single_exchange_processor.dart';
 import '../widgets/context_merge_review_dialog.dart';
+import '../widgets/context_merge_complete_dialog.dart';
 
 /// Controls a step-by-step supervised merge process.
 class SupervisedMergeController {
@@ -59,6 +60,11 @@ class SupervisedMergeController {
         break;
       }
     }
+
+    await showDialog(
+      context: context,
+      builder: (_) => ContextMergeCompleteDialog(memory: memory),
+    );
 
     debugPrint('[SupervisedMerge] Completed merge process.');
   }
