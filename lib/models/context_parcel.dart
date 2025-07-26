@@ -5,6 +5,9 @@ class ContextParcel {
   /// Human-readable context summary for quick reference
   final String summary;
 
+  /// Detailed bullet-point insights extracted from the exchange.
+  final List<String>? points;
+
   /// Indices of exchanges that contributed to this summary
   final List<int> mergeHistory;
 
@@ -37,6 +40,7 @@ class ContextParcel {
 
   ContextParcel({
     required this.summary,
+    this.points,
     required this.mergeHistory,
     this.tags = const [],
     this.assumptions = const [],
@@ -64,12 +68,13 @@ class ContextParcel {
     }
     return ContextParcel(
       summary: summary,
+      points: (json['points'] is List)
+          ? List<String>.from(json['points'])
+          : null,
       mergeHistory: List<int>.from(
         json['mergeHistory'] ?? json['contributingExchangeIds'] ?? [],
       ),
-      tags: json['tags'] is List
-          ? List<String>.from(json['tags'])
-          : <String>[],
+      tags: json['tags'] is List ? List<String>.from(json['tags']) : <String>[],
       assumptions: json['assumptions'] is List
           ? List<String>.from(json['assumptions'])
           : <String>[],
@@ -88,19 +93,20 @@ class ContextParcel {
   }
 
   Map<String, dynamic> toJson() => {
-        'summary': summary,
-        'mergeHistory': mergeHistory,
-        'tags': tags,
-        'assumptions': assumptions,
-        if (notes != null) 'notes': notes,
-        if (confidence != null) 'confidence': confidence,
-        'manualEdits': manualEdits.map((e) => e.toJson()).toList(),
-        if (inlineTags.isNotEmpty)
-          'inlineTags': inlineTags.map((e) => e.label).toList(),
-        if (feature != null) 'feature': feature,
-        if (system != null) 'system': system,
-        if (module != null) 'module': module,
-      };
+    'summary': summary,
+    if (points != null) 'points': points,
+    'mergeHistory': mergeHistory,
+    'tags': tags,
+    'assumptions': assumptions,
+    if (notes != null) 'notes': notes,
+    if (confidence != null) 'confidence': confidence,
+    'manualEdits': manualEdits.map((e) => e.toJson()).toList(),
+    if (inlineTags.isNotEmpty)
+      'inlineTags': inlineTags.map((e) => e.label).toList(),
+    if (feature != null) 'feature': feature,
+    if (system != null) 'system': system,
+    if (module != null) 'module': module,
+  };
 
   /// Returns true if this parcel conveys essentially the same
   /// information as [other] using simple text and tag comparisons.

@@ -100,20 +100,26 @@ Respond ONLY with a JSON object. Example:
   /// summary and associated metadata.
   static String contextExtractionPrompt(Exchange exchange) {
     return '''
-Extract all developer-relevant context from the following exchange. Focus on meaningful tasks, decisions, questions, and implementation details. Exclude greetings, conversational fluff, or generic language.
+Extract all developer-relevant insights from the following prompt/response. Focus on task logic, class or method names, migration phases, standards, instructions, and reasoning.
 
-Return only a valid JSON object in this format:
+Return a detailed bullet-point list. Avoid vague summaries. Exclude conversational fluff.
+
+Return ONLY a valid JSON object in the following format:
 {
-  "summary": "...",
+  "points": [
+    "First actionable insight...",
+    "Next decision, standard, or method detail...",
+    ...
+  ],
   "tags": ["..."],
   "notes": "...",
   "confidence": float
 }
 
-Prompt:
+PROMPT:
 ${exchange.prompt}
 
-Response:
+RESPONSE:
 ${exchange.response}
 ''';
   }
