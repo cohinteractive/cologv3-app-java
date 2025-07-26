@@ -8,34 +8,6 @@ import '../services/llm_client.dart';
 import '../src/instructions/instruction_templates.dart';
 import '../debug/debug_logger.dart';
 
-/// Parses an LLM [response] into a [ContextParcel]. Returns null if parsing
-/// fails or the response is empty.
-ContextParcel? process(Map<String, dynamic> response) {
-  final choices = response['choices'];
-  if (choices == null || choices.isEmpty) {
-    return null;
-  }
-  final content = choices.first['message']?['content'] as String?;
-  if (content == null || content.trim().isEmpty) {
-    return null;
-  }
-
-  try {
-    final Map<String, dynamic> json = jsonDecode(content);
-    final parcel = ContextParcel.fromJson(json);
-    if (AppConfig.debugMode) {
-      DebugLogger.logParsedParcel(parcel);
-    }
-    return parcel;
-  } catch (e) {
-    DebugLogger.logError(
-      'Failed to parse context extraction',
-      error: e,
-      raw: content,
-    );
-    return null;
-  }
-}
 
 class MergeException implements Exception {
   final String message;
@@ -47,6 +19,34 @@ class MergeException implements Exception {
 /// Processes a single Exchange using an LLM to merge it with an existing
 /// ContextParcel.
 class SingleExchangeProcessor {
+  /// Parses the raw LLM [response] Map into a [ContextParcel].
+  /// Returns null if parsing fails.
+  static ContextParcel? parseLLMResponse(Map<String, dynamic> response) {
+    final choices = response['choices'];
+    if (choices == null || choices.isEmpty) {
+      return null;
+    }
+    final content = choices.first['message']?['content'] as String?;
+    if (content == null || content.trim().isEmpty) {
+      return null;
+    }
+
+    try {
+      final Map<String, dynamic> json = jsonDecode(content);
+      final parcel = ContextParcel.fromJson(json);
+      if (AppConfig.debugMode) {
+        DebugLogger.logParsedParcel(parcel);
+      }
+      return parcel;
+    } catch (e) {
+      DebugLogger.logError(
+        'Failed to parse context extraction',
+        error: e,
+        raw: content,
+      );
+      return null;
+    }
+  }
   /// Sends [exchange] and [inputParcel] to the LLM and returns the merged parcel.
   static Future<ContextParcel> process(
       ContextParcel inputParcel, Exchange exchange, MergeStrategy strategy) async {
@@ -168,6 +168,7 @@ $responseText''';
     }
 
     final response = await LLMClient.sendPrompt(prompt);
-    return SingleExchangeProcessor.process(response);
+    final map = response as Map<String, dynamic>;
+    return SingleExchangeProcessor.parseLLMResponse(map);
   }
 }
