@@ -353,6 +353,7 @@ class _ExchangeTileState extends State<_ExchangeTile>
       }
       final Map<String, dynamic> json = jsonDecode(content);
       final parcel = ContextParcel.fromJson(json);
+      print('[DEBUG] Assigning llmSummary: "${parcel.summary}"');
       setState(() {
         widget.exchange.llmSummary = parcel.summary;
         _loading = false;
@@ -391,33 +392,39 @@ class _ExchangeTileState extends State<_ExchangeTile>
           )
         else if (widget.exchange.llmSummary != null &&
             widget.exchange.llmSummary!.trim().isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Card(
-              color: Colors.black54,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        widget.exchange.llmSummary!,
-                        style: _ConversationPanelState.textStyle,
-                      ),
+          Builder(
+            builder: (context) {
+              print('[DEBUG] Rendering summary block for Exchange index: '
+                  '${widget.index}');
+              return Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Card(
+                  color: Colors.black54,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.exchange.llmSummary!,
+                            style: _ConversationPanelState.textStyle,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 16),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          onPressed: () {
+                            setState(() => widget.exchange.llmSummary = null);
+                          },
+                        )
+                      ],
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 16),
-                      padding: EdgeInsets.zero,
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () {
-                        setState(() => widget.exchange.llmSummary = null);
-                      },
-                    )
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
       ],
     );

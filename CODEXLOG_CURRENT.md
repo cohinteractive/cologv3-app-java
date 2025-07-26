@@ -191,3 +191,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507260010][c5e3a8][FTR][UI] Added LLM summarization menu and inline summary rendering
 [2507260035][e2210f4][BUG][LLM] Hardened LLM JSON parsing and enforced JSON-only responses
 [2507260042][550560][BUG][UI] Fixed summary parsing log and render
+[2507260054][a3492c][BUG][FTR] Added debug logs for LLM summary flow
