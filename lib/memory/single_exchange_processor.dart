@@ -75,6 +75,7 @@ $responseText''';
 
     try {
       final newParcel = ContextParcel.fromJson(parsed);
+      DebugLogger.log('Parsed ContextParcel summary: ${newParcel.summary}');
 
       if (newParcel.summary.isEmpty && newParcel.mergeHistory.isEmpty) {
         throw const FormatException();
