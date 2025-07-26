@@ -124,4 +124,44 @@ $responseText''';
       throw MergeException('Failed to process LLM response: $e');
     }
   }
+
+  /// Processes a single [exchange] and returns a [ContextParcel] generated
+  /// by the LLM without merging it into existing context.
+  static Future<ContextParcel?> processExchange(Exchange exchange) async {
+    final prompt = InstructionTemplates.contextExtractionPrompt(exchange);
+    if (AppConfig.debugMode) {
+      DebugLogger.logLLMCall(instructions: prompt, exchange: exchange);
+    }
+    final Map<String, dynamic> response = await LLMClient.sendPrompt(prompt);
+    if (AppConfig.debugMode) {
+      DebugLogger.logLLMCallRaw(
+        prompt: prompt,
+        rawResponse: jsonEncode(response),
+      );
+    }
+    final choices = response['choices'];
+    if (choices == null || choices.isEmpty) {
+      return null;
+    }
+    final content = choices.first['message']?['content'] as String?;
+    if (content == null || content.trim().isEmpty) {
+      return null;
+    }
+
+    try {
+      final Map<String, dynamic> json = jsonDecode(content);
+      final parcel = ContextParcel.fromJson(json);
+      if (AppConfig.debugMode) {
+        DebugLogger.logParsedParcel(parcel);
+      }
+      return parcel;
+    } catch (e) {
+      DebugLogger.logError(
+        'Failed to parse context extraction',
+        error: e,
+        raw: content,
+      );
+      return null;
+    }
+  }
 }

@@ -16,14 +16,13 @@ class SupervisedMergeController {
     required int startIndex,
   }) async {
     final memory = ContextMemory(parcels: []);
-    final processor = SingleExchangeProcessor();
 
     for (int i = startIndex; i < exchanges.length; i++) {
       final exchange = exchanges[i];
       ContextParcel? parcel;
 
       try {
-        parcel = await processor.process(exchange);
+        parcel = await SingleExchangeProcessor.processExchange(exchange);
       } catch (e) {
         debugPrint('[SupervisedMerge] Error processing exchange $i: $e');
         continue;

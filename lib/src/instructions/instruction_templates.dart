@@ -1,3 +1,5 @@
+import '../../models/exchange.dart';
+
 class InstructionTemplates {
   static String forStrategy(String strategy) {
     switch (strategy) {
@@ -88,4 +90,20 @@ Respond ONLY with a JSON object. Example:
   "raw": "<original text here>"
 }
 ''';
+
+  /// Builds a prompt to extract context from a single [exchange].
+  /// Returns instructions that ask the LLM for a concise, developer-focused
+  /// summary and associated metadata.
+  static String contextExtractionPrompt(Exchange exchange) {
+    return '''
+Extract a developer-focused context summary from the following conversation exchange.
+Return only JSON in the format: { "summary": "...", "tags": ["..."], "notes": "...", "confidence": float }
+
+Prompt:
+${exchange.prompt}
+
+Response:
+${exchange.response}
+''';
+  }
 }
