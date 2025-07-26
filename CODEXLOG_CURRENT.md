@@ -199,3 +199,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507260854][9c9a7c][FTR][UI] Added supervised merge menu trigger
 [2507260904][73b9055][FTR][UI] Added SupervisedMergeController for stepwise merge
 [2507260918][586acc2][FTR][UI] Implemented context merge review dialog
+[2507261031][cf29e29][BUG][UI] Fixed merged context summary display
