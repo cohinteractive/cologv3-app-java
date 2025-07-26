@@ -197,3 +197,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507260511][31df89f][DBG][LLM] Added step-by-step debug prints in SingleExchangeProcessor
 [2507260832][8e6e34][BUG][LLM] Enforced JSON-only summary with improved logs
 [2507260854][9c9a7c][FTR][UI] Added supervised merge menu trigger
+[2507260904][73b9055][FTR][UI] Added SupervisedMergeController for stepwise merge
