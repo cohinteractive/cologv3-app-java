@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 import '../config/app_config.dart';
 import '../models/context_parcel.dart';
@@ -22,28 +23,42 @@ class SingleExchangeProcessor {
   /// Parses the raw LLM [response] Map into a [ContextParcel].
   /// Returns null if parsing fails.
   static ContextParcel? parseLLMResponse(Map<String, dynamic> response) {
-    final choices = response['choices'];
-    if (choices == null || choices.isEmpty) {
-      return null;
-    }
-    final content = choices.first['message']?['content'] as String?;
-    if (content == null || content.trim().isEmpty) {
-      return null;
-    }
-
     try {
-      final Map<String, dynamic> json = jsonDecode(content);
-      final parcel = ContextParcel.fromJson(json);
-      if (AppConfig.debugMode) {
-        DebugLogger.logParsedParcel(parcel);
+      if (!response.containsKey('choices')) {
+        debugPrint('[DEBUG] No choices returned in response');
+        return null;
       }
+
+      final choices = response['choices'];
+      if (choices == null || choices.isEmpty) {
+        debugPrint('[DEBUG] choices is empty');
+        return null;
+      }
+
+      final content = choices[0]['message']['content'];
+      if (content == null || content.trim().isEmpty) {
+        debugPrint('[DEBUG] Raw content was null or empty');
+        return null;
+      }
+
+      debugPrint('[DEBUG] Raw content string: $content');
+
+      Map<String, dynamic> parsed;
+      try {
+        parsed = jsonDecode(content);
+      } catch (e) {
+        debugPrint('[DEBUG] Failed to decode content as JSON: $e');
+        return null;
+      }
+
+      debugPrint('[DEBUG] Parsed JSON: $parsed');
+
+      final parcel = ContextParcel.fromJson(parsed);
+
+      debugPrint('[DEBUG] ContextParcel.fromJson: summary = "${parcel.summary}"');
       return parcel;
     } catch (e) {
-      DebugLogger.logError(
-        'Failed to parse context extraction',
-        error: e,
-        raw: content,
-      );
+      debugPrint('[DEBUG] General failure in process(): $e');
       return null;
     }
   }
