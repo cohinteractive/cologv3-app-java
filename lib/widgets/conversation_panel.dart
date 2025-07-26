@@ -354,8 +354,12 @@ class _ExchangeTileState extends State<_ExchangeTile>
       final Map<String, dynamic> json = jsonDecode(content);
       final parcel = ContextParcel.fromJson(json);
       print('[DEBUG] Assigning llmSummary: "${parcel.summary}"');
+      var summary = parcel.summary.trim();
+      if (summary.isEmpty) {
+        summary = '⚠️ No summary was generated.';
+      }
       setState(() {
-        widget.exchange.llmSummary = parcel.summary;
+        widget.exchange.llmSummary = summary;
         _loading = false;
       });
     } catch (e) {

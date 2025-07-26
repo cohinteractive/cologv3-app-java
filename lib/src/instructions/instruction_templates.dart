@@ -25,7 +25,9 @@ Summarize the intent, any problems discussed, solutions proposed, decisions made
 
 Omit conversational fluff, pleasantries, or reiteration of the full exchange.
 
-Respond ONLY with a valid JSON object. Example:
+Return only a valid JSON object in the form: { "summary": "..." }
+Do not include any explanation or commentary outside the JSON object.
+Example:
 {
   "summary": "User proposed adding a hover menu option to trigger LLM summarization. Assistant agreed and outlined required changes.",
   "tags": ["feature", "LLM integration", "UI"]
@@ -41,8 +43,8 @@ Your task is to merge the new exchange into the context memory.
 Update or append to the summary as needed.
 Preserve any prior important information unless it is clearly superseded or contradicted.
 
-Respond ONLY with a valid JSON object representing the updated memory.
-
+Return only a valid JSON object in the form: { "summary": "..." }
+Do not include any explanation or commentary outside the JSON object.
 Example:
 {
   "summary": "Initial CLI added. Later refined to support filters. Now extended with LLM summarization trigger.",
@@ -55,8 +57,8 @@ Example:
 You will be given a single user <-> assistant exchange.
 Build the initial context memory by summarizing what occurred and tagging it.
 
-Respond ONLY with a JSON object.
-
+Return only a valid JSON object in the form: { "summary": "..." }
+Do not include any explanation or commentary outside the JSON object.
 Example:
 {
   "summary": "User wants to structure their AI coding logs using ContextParcels. Assistant outlined file and model structure.",
@@ -68,7 +70,9 @@ Example:
 You will be given a complete context memory JSON object representing merged conversation history.
 Provide a concise snapshot capturing key features, decisions, and unresolved issues.
 
-Respond ONLY with a JSON object. Example:
+Return only a valid JSON object in the form: { "summary": "..." }
+Do not include any explanation or commentary outside the JSON object.
+Example:
 {
   "summary": "Memory includes CLI batch mode, manual review, and debug logging. UI integration remains in progress.",
   "tags": ["CLI", "manual review", "debug", "UI"]

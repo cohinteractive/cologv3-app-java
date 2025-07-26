@@ -47,7 +47,7 @@ RESPONSE:
 $responseText''';
 
       if (AppConfig.debugMode) {
-        print('SingleExchangeProcessor prompt:\n$prompt');
+        print('[DEBUG] Prompt sent to LLM:\n$prompt');
         DebugLogger.logLLMCall(
           instructions: mergeInstructions,
           exchange: exchange,
@@ -59,7 +59,7 @@ $responseText''';
       if (AppConfig.debugMode) {
         DebugLogger.logLLMCallRaw(
             prompt: prompt, rawResponse: jsonEncode(response));
-        print('[DEBUG] LLM JSON received: $response');
+        print('[DEBUG] Full raw LLM response:\n${jsonEncode(response)}');
       }
       final choices = response['choices'];
       if (choices == null || choices.isEmpty) {
@@ -74,9 +74,7 @@ $responseText''';
         print('[DEBUG] Raw content string: $content');
       }
       if (content == null || content.trim().isEmpty) {
-        if (AppConfig.debugMode) {
-          print('[DEBUG] content was null or empty');
-        }
+        print('[DEBUG] content was null or empty');
         throw MergeException('LLM response content is empty');
       }
 
@@ -85,6 +83,9 @@ $responseText''';
         parsed = jsonDecode(content);
         if (AppConfig.debugMode) {
           print('[DEBUG] Parsed JSON: $parsed');
+        }
+        if (!parsed.containsKey('summary')) {
+          print('[DEBUG] Parsed JSON missing "summary" key');
         }
       } catch (e) {
         if (AppConfig.debugMode) {
