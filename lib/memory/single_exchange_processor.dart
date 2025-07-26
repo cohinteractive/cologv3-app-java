@@ -5,7 +5,7 @@ import '../models/context_parcel.dart';
 import '../models/exchange.dart';
 import '../models/llm_merge_strategy.dart';
 import '../services/llm_client.dart';
-import '../llm/instruction_templates.dart';
+import '../src/instructions/instruction_templates.dart';
 import '../debug/debug_logger.dart';
 
 /// Parses an LLM [response] into a [ContextParcel]. Returns null if parsing
@@ -168,6 +168,6 @@ $responseText''';
     }
 
     final response = await LLMClient.sendPrompt(prompt);
-    return process(response);
+    return SingleExchangeProcessor.process(response);
   }
 }
