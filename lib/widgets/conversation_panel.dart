@@ -9,7 +9,7 @@ import '../models/context_parcel.dart';
 import '../services/llm_client.dart';
 import '../debug/debug_logger.dart';
 import '../src/instructions/llm_instruction_templates.dart';
-import '../services/supervised_merge_controller.dart';
+import '../memory/supervised_merge_controller.dart';
 import 'exchange_hover_menu.dart';
 
 class ConversationPanel extends StatefulWidget {
@@ -294,7 +294,11 @@ class _ConversationPanelState extends State<ConversationPanel>
     final conv = widget.conversation;
     if (conv == null) return;
     if (startIndex < 0 || startIndex >= conv.exchanges.length) return;
-    SupervisedMergeController.start(conv, startIndex);
+    SupervisedMergeController.start(
+      context: context,
+      exchanges: conv.exchanges,
+      startIndex: startIndex,
+    );
   }
 }
 
