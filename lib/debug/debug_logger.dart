@@ -72,10 +72,13 @@ class DebugLogger {
   static void logLLMCall({
     required String instructions,
     required Exchange exchange,
-    required ContextParcel context,
+    Object? context,
   }) {
     if (!AppConfig.debugMode) return;
     final timestamp = DateTime.now().toIso8601String();
+    final contextString = context is ContextParcel
+        ? jsonEncode(context.toJson())
+        : context?.toString() ?? 'null';
     final log = '''
     === LLM CALL [$timestamp] ===
     Instructions:
@@ -85,8 +88,8 @@ class DebugLogger {
     PROMPT: ${exchange.prompt}
     RESPONSE: ${exchange.response}
 
-    ContextParcel:
-    ${jsonEncode(context.toJson())}
+    Context:
+    $contextString
     ''';
     print(log);
     // Optionally write to file: debug/llm_call_$timestamp.txt
