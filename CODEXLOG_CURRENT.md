@@ -189,3 +189,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507252316][5671e43][FTR][LLM] Switched SingleExchangeProcessor to parse OpenAI response via LLMClient
 [2507252356][e77383][SNC][DOC] Added LLM summarization UI entrypoint task
 [2507260010][c5e3a8][FTR][UI] Added LLM summarization menu and inline summary rendering
+[2507260035][e2210f4][BUG][LLM] Hardened LLM JSON parsing and enforced JSON-only responses

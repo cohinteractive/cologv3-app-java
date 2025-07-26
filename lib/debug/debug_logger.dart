@@ -127,15 +127,20 @@ $rawResponse
   }
 
   /// Logs an error message with optional [error] and [stack] details.
-  static void logError(String message, {Object? error, StackTrace? stack}) {
+  static void logError(String message,
+      {Object? error, StackTrace? stack, String? raw}) {
     if (!AppConfig.debugMode) return;
     final timestamp = DateTime.now().toIso8601String();
     final entry = '[$timestamp] ERROR: $message';
     print(entry);
     if (error != null) print(error);
+    if (raw != null) print('RAW CONTENT: $raw');
     if (stack != null) print(stack);
     final file = File('debug/errors.log');
-    file.writeAsStringSync('$entry\n', mode: FileMode.append);
+    final buffer = StringBuffer(entry);
+    if (error != null) buffer.write(' | $error');
+    if (raw != null) buffer.write(' | RAW: $raw');
+    file.writeAsStringSync('${buffer.toString()}\n', mode: FileMode.append);
   }
 
   /// Logs the parsed [parcel] returned from the LLM.

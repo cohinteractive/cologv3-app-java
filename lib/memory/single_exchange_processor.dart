@@ -65,9 +65,16 @@ $responseText''';
       throw MergeException('LLM response content is empty');
     }
 
+    Map<String, dynamic> parsed;
     try {
-      final Map<String, dynamic> json = jsonDecode(content);
-      final newParcel = ContextParcel.fromJson(json);
+      parsed = jsonDecode(content);
+    } catch (e) {
+      DebugLogger.logError('LLM returned non-JSON content', error: e, stack: StackTrace.current, raw: content);
+      throw MergeException('Invalid JSON format in LLM response');
+    }
+
+    try {
+      final newParcel = ContextParcel.fromJson(parsed);
 
       if (newParcel.summary.isEmpty && newParcel.mergeHistory.isEmpty) {
         throw const FormatException();
@@ -80,7 +87,7 @@ $responseText''';
 
       return newParcel;
     } catch (e, stack) {
-      DebugLogger.logError('LLM merge failed', error: e, stack: stack);
+      DebugLogger.logError('LLM merge failed', error: e, stack: stack, raw: content);
       throw MergeException('LLM returned invalid ContextParcel format');
     }
   }
