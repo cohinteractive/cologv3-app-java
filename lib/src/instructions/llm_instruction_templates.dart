@@ -11,6 +11,7 @@ Analyze the prompt and response carefully and capture only high-value context.
 - Preserve code snippets or key configuration details exactly as written.
 - Omit prompts or responses that add no new insight.
 - Use tags [DECISION], [BUG_FIX], [PLAN], [BLOCKER], [ARCH_NOTE] at the start of relevant lines when helpful.
+Respond only with a strict JSON object and nothing else. Do not include explanations or Markdown formatting.
 ''';
 
 const String mergeInstruction = '''
@@ -21,6 +22,7 @@ When merging new context with existing summaries:
   information is clearly more reliable.
 - Mark unresolved areas as unclear rather than discarding them.
 - Maintain role tags like [DECISION], [BUG_FIX], [PLAN], [BLOCKER], [ARCH_NOTE].
+Respond only with a strict JSON object and nothing else. Do not include explanations or Markdown formatting.
 ''';
 
 const String initialExchangePromptTemplate = '''
@@ -30,6 +32,7 @@ RESPONSE: {{response}}
 
 Extract high-value context suitable for persistent project memory. Use the instruction set:
 $singleExchangeInstruction
+Respond only with a strict JSON object and nothing else. Do not include explanations or Markdown formatting.
 ''';
 
 const String subsequentExchangePromptTemplate = '''
@@ -42,6 +45,7 @@ RESPONSE: {{response}}
 
 Apply the following merge instructions to update the context:
 $mergeInstruction
+Respond only with a strict JSON object and nothing else. Do not include explanations or Markdown formatting.
 ''';
 
 String examplePrompt(bool isFirst) {
