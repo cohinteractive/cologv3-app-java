@@ -92,6 +92,21 @@ class DebugLogger {
     // TODO: Implement logging of raw LLM responses
   }
 
+  /// Logs the full [prompt] sent to the LLM and the [rawResponse] string.
+  static void logLLMCallRaw({required String prompt, required String rawResponse}) {
+    if (!AppConfig.debugMode) return;
+    final timestamp = DateTime.now().toIso8601String();
+    final entry = '''
+=== LLM CALL [$timestamp] ===
+PROMPT:
+$prompt
+
+RAW RESPONSE:
+$rawResponse
+''';
+    print(entry);
+  }
+
   /// Logs a warning message when [AppConfig.debugMode] is enabled.
   static void logWarning(String message) {
     if (!AppConfig.debugMode) return;

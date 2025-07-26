@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'dart:convert';
 import 'package:intl/intl.dart';
 
 import '../models/conversation.dart';
 import '../models/exchange.dart';
+import '../models/context_parcel.dart';
+import '../services/llm_client.dart';
+import '../debug/debug_logger.dart';
+import '../src/instructions/llm_instruction_templates.dart';
+import 'exchange_hover_menu.dart';
 
 class ConversationPanel extends StatefulWidget {
   final Conversation? conversation;
@@ -311,6 +317,8 @@ class _ExchangeTileState extends State<_ExchangeTile>
     with TickerProviderStateMixin {
   bool _hoverPrompt = false;
   bool _hoverResponse = false;
+  bool _loading = false;
+  String? _error;
 
   void _toggleFromPrompt() {
     widget.onToggle(Alignment.topCenter, widget.promptKey);
@@ -318,6 +326,43 @@ class _ExchangeTileState extends State<_ExchangeTile>
 
   void _toggleFromResponse() {
     widget.onToggle(Alignment.bottomCenter, widget.responseKey);
+  }
+
+  Future<void> _summarize() async {
+    if (_loading) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    final prompt = initialExchangePromptTemplate
+        .replaceAll('{{prompt}}', widget.exchange.prompt.trim())
+        .replaceAll('{{response}}', widget.exchange.response?.trim() ?? '');
+    try {
+      final resp = await LLMClient.sendPrompt(prompt);
+      DebugLogger.logLLMCallRaw(
+        prompt: prompt,
+        rawResponse: jsonEncode(resp),
+      );
+      final choices = resp['choices'];
+      if (choices == null || choices.isEmpty) {
+        throw Exception('No choices returned');
+      }
+      final content = choices.first['message']?['content'] as String?;
+      if (content == null || content.trim().isEmpty) {
+        throw Exception('LLM response content is empty');
+      }
+      final Map<String, dynamic> json = jsonDecode(content);
+      final parcel = ContextParcel.fromJson(json);
+      setState(() {
+        widget.exchange.llmSummary = parcel.summary;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+        _error = e.toString();
+      });
+    }
   }
 
   @override
@@ -333,6 +378,45 @@ class _ExchangeTileState extends State<_ExchangeTile>
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: _buildResponseBlock(context, expandResponse),
+          ),
+        if (_loading)
+          const Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: Text('Summarizing...', style: TextStyle(color: Colors.amber)),
+          )
+        else if (_error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(_error!, style: const TextStyle(color: Colors.red)),
+          )
+        else if (widget.exchange.llmSummary != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Card(
+              color: Colors.black54,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.exchange.llmSummary!,
+                        style: _ConversationPanelState.textStyle,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 16),
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () {
+                        setState(() => widget.exchange.llmSummary = null);
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ),
           ),
       ],
     );
@@ -430,17 +514,9 @@ class _ExchangeTileState extends State<_ExchangeTile>
               child: AnimatedOpacity(
                 opacity: _hoverPrompt ? 1 : 0,
                 duration: const Duration(milliseconds: 150),
-                child: PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, size: 20),
-                  color: Theme.of(context).colorScheme.surface,
-                  onSelected: (value) {
-                    if (value == 'about') {
-                      _showAboutDialog(context);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(value: 'about', child: Text('About')),
-                  ],
+                child: ExchangeHoverMenu(
+                  exchange: widget.exchange,
+                  onSummarizeRequested: (_) => _summarize(),
                 ),
               ),
             ),
@@ -523,17 +599,9 @@ class _ExchangeTileState extends State<_ExchangeTile>
               child: AnimatedOpacity(
                 opacity: _hoverResponse ? 1 : 0,
                 duration: const Duration(milliseconds: 150),
-                child: PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, size: 20),
-                  color: Theme.of(context).colorScheme.surface,
-                  onSelected: (value) {
-                    if (value == 'about') {
-                      _showAboutDialog(context);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(value: 'about', child: Text('About')),
-                  ],
+                child: ExchangeHoverMenu(
+                  exchange: widget.exchange,
+                  onSummarizeRequested: (_) => _summarize(),
                 ),
               ),
             ),
@@ -542,31 +610,4 @@ class _ExchangeTileState extends State<_ExchangeTile>
       ),
     );
   }
-}
-
-void _showAboutDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('About'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('App Name: Colog V3'),
-            Text('Version: 0.1.0'),
-            Text('Author: Charles Clark'),
-            Text('© 2025'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      );
-    },
-  );
 }
