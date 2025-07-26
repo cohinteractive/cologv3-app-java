@@ -73,6 +73,7 @@ class ManualReviewer {
                       .where((e) => e.isNotEmpty)
                       .toList()
                   : parcel.assumptions,
+          notes: parcel.notes,
           confidence: parcel.confidence,
           manualEdits: parcel.manualEdits,
           feature: featureInput != null && featureInput.trim().isNotEmpty
@@ -97,6 +98,7 @@ class ManualReviewer {
           mergeHistory: edited.mergeHistory,
           tags: edited.tags,
           assumptions: edited.assumptions,
+          notes: edited.notes,
           confidence: edited.confidence,
           manualEdits: [...parcel.manualEdits, record],
           feature: edited.feature,

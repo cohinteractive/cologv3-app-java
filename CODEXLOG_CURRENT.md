@@ -208,3 +208,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507261128][0b62b9][BUG][LLM] Fixed JSON parsing call in processExchange
 [2507261136][ee0e85a][FTR][UI] Added merge completion dialog with summary copy option
 [2507261146][8121a6e][BUG][LLM] Hardened LLM response parsing with debug logs
+[2507261201][65b75de][ERR][DATA] Fixed confidence parsing in ContextParcel.fromJson

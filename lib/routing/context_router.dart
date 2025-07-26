@@ -117,6 +117,7 @@ class ContextRouter {
       mergeHistory: parcel.mergeHistory,
       tags: parcel.tags,
       assumptions: parcel.assumptions,
+      notes: parcel.notes,
       confidence: parcel.confidence,
       manualEdits: parcel.manualEdits,
       feature: feature ?? parcel.feature,
