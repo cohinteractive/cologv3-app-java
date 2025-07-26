@@ -5,10 +5,12 @@ import '../models/exchange.dart';
 class ExchangeHoverMenu extends StatelessWidget {
   final Exchange exchange;
   final void Function(Exchange) onSummarizeRequested;
+  final void Function(Exchange)? onSummarizeFromHereRequested;
   const ExchangeHoverMenu({
     super.key,
     required this.exchange,
     required this.onSummarizeRequested,
+    this.onSummarizeFromHereRequested,
   });
 
   @override
@@ -17,14 +19,25 @@ class ExchangeHoverMenu extends StatelessWidget {
       icon: const Icon(Icons.more_vert, size: 20),
       color: Theme.of(context).colorScheme.surface,
       onSelected: (value) {
-        if (value == 'summarize') {
-          onSummarizeRequested(exchange);
+        switch (value) {
+          case 'summarize':
+            onSummarizeRequested(exchange);
+            break;
+          case 'summarize_from_here':
+            if (onSummarizeFromHereRequested != null) {
+              onSummarizeFromHereRequested!(exchange);
+            }
+            break;
         }
       },
       itemBuilder: (context) => const [
         PopupMenuItem(
           value: 'summarize',
           child: Text('Summarize with LLM'),
+        ),
+        PopupMenuItem(
+          value: 'summarize_from_here',
+          child: Text('Summarize From This Point Forward'),
         ),
       ],
     );

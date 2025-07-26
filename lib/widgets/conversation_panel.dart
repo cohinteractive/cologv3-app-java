@@ -9,6 +9,7 @@ import '../models/context_parcel.dart';
 import '../services/llm_client.dart';
 import '../debug/debug_logger.dart';
 import '../src/instructions/llm_instruction_templates.dart';
+import '../services/supervised_merge_controller.dart';
 import 'exchange_hover_menu.dart';
 
 class ConversationPanel extends StatefulWidget {
@@ -116,6 +117,7 @@ class _ConversationPanelState extends State<ConversationPanel>
                       alignment: alignment,
                       promptKey: pKey,
                       responseKey: rKey,
+                      onSummarizeFromHere: () => _startSupervisedMergeFrom(index),
                       onToggle: (align, anchorKey) {
                         final newlyExpanded = _expandedIndex != index;
                         setState(() {
@@ -287,6 +289,13 @@ class _ConversationPanelState extends State<ConversationPanel>
       updateSummary('Prompt asks about scroll behavior and metadata pinning');
     });
   }
+
+  void _startSupervisedMergeFrom(int startIndex) {
+    final conv = widget.conversation;
+    if (conv == null) return;
+    if (startIndex < 0 || startIndex >= conv.exchanges.length) return;
+    SupervisedMergeController.start(conv, startIndex);
+  }
 }
 
 class _ExchangeTile extends StatefulWidget {
@@ -297,6 +306,7 @@ class _ExchangeTile extends StatefulWidget {
   final GlobalKey promptKey;
   final GlobalKey responseKey;
   final void Function(Alignment, GlobalKey) onToggle;
+  final VoidCallback onSummarizeFromHere;
 
   const _ExchangeTile({
     super.key,
@@ -307,6 +317,7 @@ class _ExchangeTile extends StatefulWidget {
     required this.promptKey,
     required this.responseKey,
     required this.onToggle,
+    required this.onSummarizeFromHere,
   });
 
   @override
@@ -529,6 +540,7 @@ class _ExchangeTileState extends State<_ExchangeTile>
                 child: ExchangeHoverMenu(
                   exchange: widget.exchange,
                   onSummarizeRequested: (_) => _summarize(),
+                  onSummarizeFromHereRequested: (_) => widget.onSummarizeFromHere(),
                 ),
               ),
             ),
@@ -614,6 +626,7 @@ class _ExchangeTileState extends State<_ExchangeTile>
                 child: ExchangeHoverMenu(
                   exchange: widget.exchange,
                   onSummarizeRequested: (_) => _summarize(),
+                  onSummarizeFromHereRequested: (_) => widget.onSummarizeFromHere(),
                 ),
               ),
             ),
