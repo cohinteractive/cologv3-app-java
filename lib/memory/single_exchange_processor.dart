@@ -8,6 +8,35 @@ import '../services/llm_client.dart';
 import '../llm/instruction_templates.dart';
 import '../debug/debug_logger.dart';
 
+/// Parses an LLM [response] into a [ContextParcel]. Returns null if parsing
+/// fails or the response is empty.
+ContextParcel? process(Map<String, dynamic> response) {
+  final choices = response['choices'];
+  if (choices == null || choices.isEmpty) {
+    return null;
+  }
+  final content = choices.first['message']?['content'] as String?;
+  if (content == null || content.trim().isEmpty) {
+    return null;
+  }
+
+  try {
+    final Map<String, dynamic> json = jsonDecode(content);
+    final parcel = ContextParcel.fromJson(json);
+    if (AppConfig.debugMode) {
+      DebugLogger.logParsedParcel(parcel);
+    }
+    return parcel;
+  } catch (e) {
+    DebugLogger.logError(
+      'Failed to parse context extraction',
+      error: e,
+      raw: content,
+    );
+    return null;
+  }
+}
+
 class MergeException implements Exception {
   final String message;
   MergeException(this.message);
@@ -129,39 +158,16 @@ $responseText''';
   /// by the LLM without merging it into existing context.
   static Future<ContextParcel?> processExchange(Exchange exchange) async {
     final prompt = InstructionTemplates.contextExtractionPrompt(exchange);
+
     if (AppConfig.debugMode) {
-      DebugLogger.logLLMCall(instructions: prompt, exchange: exchange);
-    }
-    final Map<String, dynamic> response = await LLMClient.sendPrompt(prompt);
-    if (AppConfig.debugMode) {
-      DebugLogger.logLLMCallRaw(
-        prompt: prompt,
-        rawResponse: jsonEncode(response),
+      DebugLogger.logLLMCall(
+        context: 'supervised_merge_iteration',
+        instructions: prompt,
+        exchange: exchange,
       );
-    }
-    final choices = response['choices'];
-    if (choices == null || choices.isEmpty) {
-      return null;
-    }
-    final content = choices.first['message']?['content'] as String?;
-    if (content == null || content.trim().isEmpty) {
-      return null;
     }
 
-    try {
-      final Map<String, dynamic> json = jsonDecode(content);
-      final parcel = ContextParcel.fromJson(json);
-      if (AppConfig.debugMode) {
-        DebugLogger.logParsedParcel(parcel);
-      }
-      return parcel;
-    } catch (e) {
-      DebugLogger.logError(
-        'Failed to parse context extraction',
-        error: e,
-        raw: content,
-      );
-      return null;
-    }
+    final response = await LLMClient.sendPrompt(prompt);
+    return process(response);
   }
 }
