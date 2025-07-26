@@ -39,12 +39,19 @@ class ContextMergeReviewDialog extends StatelessWidget {
             const SizedBox(height: 12),
             Text('Merged Context Summary:'),
             const SizedBox(height: 8),
-            Text(
-              memory.parcels
-                  .map((p) => p.summary)
-                  .whereType<String>()
-                  .join('\n\n'),
-              style: TextStyle(fontFamily: 'monospace'),
+            Builder(
+              builder: (context) {
+                final content = (memory.parcels
+                    .expand(
+                      (p) =>
+                          p.points ?? (p.summary != null ? [p.summary!] : []),
+                    )
+                    .join('\n\n'));
+                return Text(
+                  content.isEmpty ? '(no content)' : content,
+                  style: const TextStyle(fontFamily: 'monospace'),
+                );
+              },
             ),
           ],
         ),

@@ -16,6 +16,7 @@ void main() {
         parcels: [
           ContextParcel(
             summary: 'a',
+            points: ['p1'],
             mergeHistory: [1],
             feature: 'search',
             system: 'parser',
@@ -23,6 +24,7 @@ void main() {
           ),
           ContextParcel(
             summary: 'b edited',
+            points: ['p2', 'p3'],
             mergeHistory: [2],
             manualEdits: [edit],
             feature: 'search',
@@ -53,6 +55,8 @@ void main() {
       expect(roundTrip.parcels.first.feature, 'search');
       expect(roundTrip.parcels.first.system, 'parser');
       expect(roundTrip.parcels.first.module, 'ContextRouter');
+      expect(roundTrip.parcels.first.points, ['p1']);
+      expect(roundTrip.parcels.last.points, ['p2', 'p3']);
       expect(roundTrip.tagIndex.isEmpty, isTrue);
     });
   });
