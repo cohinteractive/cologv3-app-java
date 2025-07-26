@@ -74,19 +74,19 @@ $responseText''';
     }
 
     try {
-      final newParcel = ContextParcel.fromJson(parsed);
-      DebugLogger.log('Parsed ContextParcel summary: ${newParcel.summary}');
+      final contextParcel = ContextParcel.fromJson(parsed);
+      DebugLogger.log('LLM Summary Returned: ${contextParcel.summary}');
 
-      if (newParcel.summary.isEmpty && newParcel.mergeHistory.isEmpty) {
+      if (contextParcel.summary.isEmpty && contextParcel.mergeHistory.isEmpty) {
         throw const FormatException();
       }
 
       if (AppConfig.debugMode) {
         DebugLogger.logRawResponse(jsonEncode(response));
-        DebugLogger.logParsedParcel(newParcel);
+        DebugLogger.logParsedParcel(contextParcel);
       }
 
-      return newParcel;
+      return contextParcel;
     } catch (e, stack) {
       DebugLogger.logError('LLM merge failed', error: e, stack: stack, raw: content);
       throw MergeException('LLM returned invalid ContextParcel format');

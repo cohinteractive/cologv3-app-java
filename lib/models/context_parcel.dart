@@ -47,6 +47,7 @@ class ContextParcel {
 
   factory ContextParcel.fromJson(Map<String, dynamic> json) {
     final summary = json['summary'] as String? ?? '';
+    print('[DEBUG] ContextParcel.fromJson: summary = "$summary"');
     Set<ContextTag>? inline;
     if (json['inlineTags'] is List) {
       inline = <ContextTag>{};
