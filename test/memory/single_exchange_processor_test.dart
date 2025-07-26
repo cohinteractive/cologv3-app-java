@@ -6,7 +6,7 @@ import '../../lib/models/context_parcel.dart';
 import '../../lib/models/exchange.dart';
 import '../../lib/memory/single_exchange_processor.dart';
 import '../../lib/services/llm_client.dart';
-import '../../lib/models/llm_merge_strategy.dart';
+import '../../lib/models/merge_strategy.dart';
 
 void main() {
   group('SingleExchangeProcessor', () {
@@ -40,7 +40,7 @@ void main() {
         responseTimestamp: DateTime.now(),
       );
       final result = await SingleExchangeProcessor.process(
-          input, ex, MergeStrategy.defaultStrategy);
+          input, ex, MergeStrategy.smart);
       expect(result.summary, 'merged');
       expect(result.mergeHistory, [0]);
     });
@@ -59,7 +59,7 @@ void main() {
         responseTimestamp: DateTime.now(),
       );
       final result = await SingleExchangeProcessor.process(
-          input, ex, MergeStrategy.defaultStrategy);
+          input, ex, MergeStrategy.smart);
       expect(identical(result, input), isTrue);
       expect(called, isFalse);
     });
@@ -81,7 +81,7 @@ void main() {
       );
       expect(
         () => SingleExchangeProcessor.process(
-            input, ex, MergeStrategy.defaultStrategy),
+            input, ex, MergeStrategy.smart),
         throwsA(isA<MergeException>()),
       );
     });
@@ -107,7 +107,7 @@ void main() {
       final logs = <String>[];
       await runZoned(() async {
         await SingleExchangeProcessor.process(
-            input, ex, MergeStrategy.defaultStrategy);
+            input, ex, MergeStrategy.smart);
       }, zoneSpecification: ZoneSpecification(print: (self, parent, zone, line) {
         logs.add(line);
       }));

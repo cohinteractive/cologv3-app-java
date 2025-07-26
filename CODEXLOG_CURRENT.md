@@ -204,3 +204,4 @@ This file records all Codex-generated changes and implementations in this projec
 [2507261047][5473a0b][FTR][LLM] Added processExchange helper and updated supervised merge
 [2507261057][107b62e][BUG][LLM] Updated context extraction prompt and exchange processor
 [2507261109][be58f2a][BUG] Corrected import path and response handler call
+[2507261121][3f735c][REF] Switched instruction templates to use MergeStrategy enum
