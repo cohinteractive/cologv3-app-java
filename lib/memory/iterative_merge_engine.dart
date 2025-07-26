@@ -4,7 +4,7 @@ import '../config/app_config.dart';
 import '../models/context_parcel.dart';
 import '../models/exchange.dart';
 import '../debug/debug_logger.dart';
-import '../models/llm_merge_strategy.dart';
+import '../models/merge_strategy.dart';
 import 'single_exchange_processor.dart';
 import 'context_delta.dart';
 import '../services/manual_reviewer.dart';
@@ -14,11 +14,11 @@ import '../services/manual_reviewer.dart';
 class IterativeMergeEngine {
   final MergeStrategy strategy;
 
-  IterativeMergeEngine({this.strategy = MergeStrategy.defaultStrategy});
+  IterativeMergeEngine({this.strategy = MergeStrategy.smart});
 
   factory IterativeMergeEngine.fromConfig() => IterativeMergeEngine(
-    strategy: MergeStrategyParser.fromString(AppConfig.mergeStrategy),
-  );
+        strategy: MergeStrategyParser.fromString(AppConfig.mergeStrategy),
+      );
 
   /// Merges [exchanges] sequentially using [SingleExchangeProcessor].
   /// Returns the final merged [ContextParcel].

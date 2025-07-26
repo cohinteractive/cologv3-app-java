@@ -1,20 +1,15 @@
 import '../../models/exchange.dart';
+import '../../models/merge_strategy.dart';
 
 class InstructionTemplates {
-  static String forStrategy(String strategy) {
+  static String forStrategy(MergeStrategy strategy) {
     switch (strategy) {
-      case 'singleExchange':
-        return _singleExchangeSummary;
-      case 'mergeWithContext':
-        return _mergeWithContext;
-      case 'firstExchangeOnly':
-        return _firstExchangeBootstrap;
-      case 'contextSummarySnapshot':
-        return _contextSummarySnapshot;
-      case 'debugRawExcerpt':
-        return _debugRawExcerpt;
-      default:
-        throw ArgumentError('Unknown strategy: $strategy');
+      case MergeStrategy.replace:
+        return _replace;
+      case MergeStrategy.append:
+        return _append;
+      case MergeStrategy.smart:
+        return _smartMerge;
     }
   }
 
@@ -90,6 +85,15 @@ Respond ONLY with a JSON object. Example:
   "raw": "<original text here>"
 }
 ''';
+
+  static const String _replace =
+      'Replace the previous context entirely with the new information.';
+
+  static const String _append =
+      'Append the new exchange information to the end of the existing context.';
+
+  static const String _smartMerge =
+      'Merge the new exchange intelligently into the existing context, preserving important previous details while incorporating new ones.';
 
   /// Builds a prompt to extract context from a single [exchange].
   /// Returns instructions that ask the LLM for a concise, developer-focused
