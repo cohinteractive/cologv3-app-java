@@ -9,6 +9,7 @@ import '../models/exchange.dart';
 import '../models/llm_merge_strategy.dart';
 import '../services/context_memory_builder.dart';
 import 'single_exchange_processor.dart';
+import '../widgets/context_merge_review_dialog.dart';
 
 /// Controls a step-by-step supervised merge process.
 class SupervisedMergeController {
@@ -55,12 +56,27 @@ class SupervisedMergeController {
         return;
       }
 
-      final continueMerge = await _showStepDialog(
-        context,
-        iteration: i - startIndex + 1,
-        memory: memory,
+      final charCount = jsonEncode(memory.toJson()).length;
+      const promptTokens = 0;
+      const completionTokens = 0;
+      const model = 'mock-model';
+
+      final result = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => ContextMergeReviewDialog(
+          iteration: i - startIndex + 1,
+          memory: memory,
+          memoryCharCount: charCount,
+          promptTokens: promptTokens,
+          completionTokens: completionTokens,
+          model: model,
+          onContinue: () => Navigator.of(context).pop('continue'),
+          onCancel: () => Navigator.of(context).pop('cancel'),
+        ),
       );
-      if (!continueMerge) break;
+
+      if (result != 'continue') break;
     }
 
     await showDialog(
@@ -87,48 +103,5 @@ class SupervisedMergeController {
     print('[MERGE] Memory size: ${jsonEncode(memory.toJson()).length} chars');
   }
 
-  /// Shows a placeholder dialog with metrics for the current [memory].
-  static Future<bool> _showStepDialog(
-    BuildContext context, {
-    required int iteration,
-    required ContextMemory memory,
-  }) async {
-    final charCount = jsonEncode(memory.toJson()).length;
-    // Placeholder token usage and model values.
-    const promptTokens = 0;
-    const completionTokens = 0;
-    const model = 'mock-model';
-
-    return await showDialog<bool>(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => AlertDialog(
-            title: Text('Merge Step $iteration'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Memory chars: $charCount'),
-                Text('Model: $model'),
-                Text('Prompt tokens: $promptTokens'),
-                Text('Completion tokens: $completionTokens'),
-                const SizedBox(height: 8),
-                Text('Summary:\n${memory.parcels.last.summary}'),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Continue'),
-              ),
-            ],
-          ),
-        ) ??
-        false;
-  }
 }
 
